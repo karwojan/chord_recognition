@@ -16,7 +16,7 @@ filepath;song;artist;subset;album;videoId
 ./data/chordlab/rs200/bizarre_love_triangle.lab;Bizarre Love Triangle;New Order;rs200;;ZnrSNEah_20
 ./data/chordlab/rs200/blitzkrieg_bop.lab;Blitzkrieg Bop;The Ramones;rs200;;skdE0KAFCEA
 ./data/chordlab/rs200/blowin_in_the_wind.lab;Blowin' in the Wind;Bob Dylan;rs200;;KJBbX0jzM2c
-./data/chordlab/rs200/blue_suede_shoes_perkins.lab;Blue Suede Shoes;Carl Perkins;rs200;;mvsYRAc-BWA
+./data/chordlab/rs200/blue_suede_shoes.lab;Blue Suede Shoes;Carl Perkins;rs200;;mvsYRAc-BWA
 ./data/chordlab/rs200/blueberry_hill.lab;Blueberry Hill;Fats Domino;rs200;;VZ94XocLeSg
 ./data/chordlab/rs200/bo_diddley.lab;Bo Diddley;Bo Diddley;rs200;;WJLy-Fnedy8
 ./data/chordlab/rs200/bohemian_rhapsody.lab;Bohemian Rhapsody;Queen;rs200;;bSnlKl_PoQU
@@ -24,8 +24,6 @@ filepath;song;artist;subset;album;videoId
 ./data/chordlab/rs200/born_to_run.lab;Born to Run;Bruce Springsteen;rs200;;Wu4_zVxmufY
 ./data/chordlab/rs200/both_sides_now.lab;Both Sides Now;Joni Mitchell;rs200;;7cBf0olE9Yc
 ./data/chordlab/rs200/bridge_over_troubled_water.lab;Bridge over Troubled Water;Simon and Garfunkel;rs200;;KXm1xG1C080
-./data/chordlab/rs200/bring_the_noise.lab;Bring the Noise;Public Enemy;rs200;;mZF4G79OLkk
-./data/chordlab/rs200/brown_eyed_girl.lab;Brown Eyed Girl;Van Morrison;rs200;;yZ-VUnIehi8
 ./data/chordlab/rs200/california_dreamin.lab;California Dreamin';The Mamas & the Papas;rs200;;oU6uUEwZ8FM
 ./data/chordlab/rs200/california_girls.lab;California Girls;The Beach Boys;rs200;;DR2lvcdKSdU
 ./data/chordlab/rs200/california_love.lab;California Love;Dr. Dre and 2Pac;rs200;;LRt6TdSvHag
@@ -53,7 +51,7 @@ filepath;song;artist;subset;album;videoId
 ./data/chordlab/rs200/fortunate_son.lab;Fortunate Son;Creedence Clearwater Revival;rs200;;3RmQTYLD398
 ./data/chordlab/rs200/foxey_lady.lab;Foxey Lady;The Jimi Hendrix Experience;rs200;;-QWTHY2_gDA
 ./data/chordlab/rs200/free_fallin.lab;Free Fallin';Tom Petty;rs200;;PIuAFrLeXfY
-./data/chordlab/rs200/georgia_on_my_miind.lab;Georgia on My Miind;Ray Charles;rs200;;0Y4yqadm8CY
+./data/chordlab/rs200/georgia_on_my_mind.lab;Georgia on My Mind;Ray Charles;rs200;;0Y4yqadm8CY
 ./data/chordlab/rs200/gimme_shelter.lab;Gimme Shelter;The Rolling Stones;rs200;;EJRdDhnTRoo
 ./data/chordlab/rs200/go_your_own_way.lab;Go Your Own Way;Fleetwood Mac;rs200;;DubafeFeJ7Y
 ./data/chordlab/rs200/god_only_knows.lab;God Only Knows;The Beach Boys;rs200;;u90beUXTKwo
@@ -90,7 +88,7 @@ filepath;song;artist;subset;album;videoId
 ./data/chordlab/rs200/in_bloom.lab;In Bloom;Nirvana;rs200;;ng_vqlKtxLs
 ./data/chordlab/rs200/in_my_life.lab;In My Life;The Beatles;rs200;;mBqqeqcJM_0
 ./data/chordlab/rs200/in_the_midnight_hour.lab;In The Midnight Hour;Wilson Pickett;rs200;;Il-usrZxGns
-./data/chordlab/rs200/in_the_still_of_the_nite.lab;In the Still of the Nite;The Five Satins;rs200;;AdtTN51_raM
+./data/chordlab/rs200/in_the_still_of_the_night.lab;In the Still of the Night;The Five Satins;rs200;;AdtTN51_raM
 ./data/chordlab/rs200/its_a_mans_mans_mans_world.lab;It's a Man's Man's Man's World;James Brown;rs200;;hK97cdbbsQw
 ./data/chordlab/rs200/ive_been_loving_you_too_long.lab;I've Been Loving You Too Long (to Stop Now);Otis Redding;rs200;;T0zROagSE7U
 ./data/chordlab/rs200/jailhouse_rock.lab;Jailhouse Rock;Elvis Presley;rs200;;NarifIg046A
