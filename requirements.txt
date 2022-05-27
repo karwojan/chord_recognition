@@ -4,3 +4,4 @@ matplotlib==3.5.1
 pytube==12.1.0
 ytmusicapi==0.22.0
 tqdm==4.64.0
+lark==1.1.2
