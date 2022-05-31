@@ -1,9 +1,9 @@
 import pandas as pd
 from glob import glob
 
-rs200_original = pd.read_csv("./data/chordlab//rs200/rs200.txt", delimiter="\t", header=None, names=["filepath", "song_rank", "song", "artist", "year", "original"])
+rs200_original = pd.read_csv("./data/chordlab/rs200/rs200.txt", delimiter="\t", header=None, names=["filepath", "song_rank", "song", "artist", "year", "original"])
 rs200 = pd.DataFrame()
-rs200["filepath"] = "./data/chordlab/rs200/" + rs200_original["filepath"] + ".lab"
+rs200["filepath"] = "./data/chordlab/rs200/" + rs200_original["filepath"] + "_dt.clt"
 rs200["song"] = rs200_original["song"]
 rs200["artist"] = rs200_original["artist"]
 rs200["subset"] = "rs200"

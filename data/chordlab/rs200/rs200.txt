@@ -15,7 +15,7 @@ bitter_sweet_symphony	382	Bitter Sweet Symphony	The Verve	1997	*
 bizarre_love_triangle	201	Bizarre Love Triangle	New Order	1986	*
 blitzkrieg_bop	92	Blitzkrieg Bop	The Ramones	1976	*
 blowin_in_the_wind	14	Blowin' in the Wind	Bob Dylan	1963	*
-blue_suede_shoes    95	Blue Suede Shoes	Carl Perkins	1956	*
+blue_suede_shoes	95	Blue Suede Shoes	Carl Perkins	1956	*
 blueberry_hill	81	Blueberry Hill	Fats Domino	1956	*
 bo_diddley	62	Bo Diddley	Bo Diddley	1955	*
 bohemian_rhapsody	163	Bohemian Rhapsody	Queen	1975	
