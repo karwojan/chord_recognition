@@ -12,7 +12,7 @@ rs200_dt_parser = lark.Lark.open("./src/annotation_parser/rs200_dt_grammar.lark"
 def parse_annotation(path: str):
     with open(path) as f:
         text = f.read()
-    if path.endswith(".lab"):
+    if path.endswith(".lab") or path.endswith(".txt"):
         return labfile_transformer.transform(labfile_parser.parse(text))
     elif path.endswith("_dt.clt"):
         return rs200_dt_transformer.transform(rs200_dt_parser.parse(text))

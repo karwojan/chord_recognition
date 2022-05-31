@@ -51,5 +51,15 @@ uspop["artist"] = uspop["filepath"].str.split("/", expand=True)[4]
 uspop["artist"] = uspop["artist"].str.replace(r"_", " ", regex=True)
 uspop["subset"] = "uspop"
 
-compound = pd.concat([rs200, rwc_pop, isophonics, billboard, uspop])
+robbie = pd.DataFrame()
+robbie["filepath"] = glob("./data/chordlab/robbie_williams/**/*.txt", recursive=True)
+robbie["song"] = robbie["filepath"].str.split("/", expand=True)[5]
+robbie["song"] = robbie["song"].str.replace(r"^([0123456789abc]+-)+", "", regex=True)
+robbie["song"] = robbie["song"].str.replace(r"GTChords.txt", "", regex=False)
+robbie["album"] = robbie["filepath"].str.split("/", expand=True)[4]
+robbie["album"] = robbie["album"].str.replace(r"\d{4}-", "", regex=True)
+robbie["artist"] = "Robbie Williams"
+robbie["subset"] = "robbie_williams"
+
+compound = pd.concat([rs200, rwc_pop, isophonics, billboard, uspop, robbie])
 compound.to_csv("./data/index.csv", sep=";", header=True, index=False)
