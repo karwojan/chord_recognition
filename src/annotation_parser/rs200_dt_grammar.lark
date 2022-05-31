@@ -1,21 +1,18 @@
 cltfile: line (_WHITES line) * _WHITES
 line: FLOAT _WHITES FLOAT _WHITES chord _WHITES INTEGER _WHITES INTEGER _WHITES INTEGER _WHITES INTEGER | FLOAT _WHITES FLOAT _WHITES "End"
-chord: ( major_triad | minor_triad | seventh ) [ "/" applied_chord ]
-applied_chord: MODIFIER* ( MAJOR_TRIAD | MINOR_TRIAD )
-major_triad: MODIFIER* MAJOR_TRIAD [ MAJOR_SUBCATEGORY ] [ TRIAD_INVERSION ]
-minor_triad: MODIFIER* MINOR_TRIAD [ MINOR_SUBCATEGORY ] [ TRIAD_INVERSION ]
-seventh: MODIFIER* ( MAJOR_TRIAD | MINOR_TRIAD ) [ SEVENTH_MODIFIER ] SEVENTH_INVERSION
+chord: ( triad | seventh ) [ "/" ( major_triad  | minor_triad ) ]
+seventh: ( major_triad | minor_triad ) [ SEVENTH_MODIFIER ] SEVENTH_INVERSION
+triad: ( major_triad | minor_triad ) [ TRIAD_MODIFIER ] [ TRIAD_INVERSION ]
+major_triad: MODIFIER* UPPER_RN
+minor_triad: MODIFIER* LOWER_RN
 TRIAD_INVERSION: "6" | "64"
+TRIAD_MODIFIER: "o" | "a" | "s4" | "11" | "b5"
 SEVENTH_INVERSION: "7" | "65" | "43" | "42"
 SEVENTH_MODIFIER: "d" | "h" | "x"
-MINOR_SUBCATEGORY: "o" | MISC_SUBCATEGORY
-MAJOR_SUBCATEGORY: "a" | MISC_SUBCATEGORY
-MISC_SUBCATEGORY: "s4" | "11" | "b5"
-MAJOR_TRIAD: "I" | "II" | "III" | "IV" | "V" | "VI" | "VII"
-MINOR_TRIAD: "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii"
+UPPER_RN: "I" | "II" | "III" | "IV" | "V" | "VI" | "VII"
+LOWER_RN: "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii"
 MODIFIER: "b" | "#"
 DIGIT: "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 INTEGER: DIGIT+
 FLOAT: "-"? DIGIT+ "." DIGIT+ ("e" "-"? DIGIT+)?
 _WHITES: /\s+/
-END: "End"

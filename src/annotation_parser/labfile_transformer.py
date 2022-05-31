@@ -1,9 +1,11 @@
 import lark
-from src.annotation_parser.chord_model import Interval, Pitchname, Chord
+from src.annotation_parser.chord_model import Interval, Chord
 
 
 class LabFileTransformer(lark.Transformer):
 
+    _naturals = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+    _modifiers = {"b": -1, "#": +1}
     _shorthands = {
         "1": {Interval(1)},
         "5": {Interval(1), Interval(5)},
@@ -32,11 +34,11 @@ class LabFileTransformer(lark.Transformer):
         "min13": {Interval(1), Interval(3, -1), Interval(5), Interval(7, -1), Interval(9), Interval(11), Interval(13)},
     }
 
+    def NATURAL(self, token):
+        return self._naturals[token]
+
     def MODIFIER(self, token):
-        if token == "b":
-            return -1
-        else:
-            return +1
+        return self._modifiers[token]
 
     def INTEGER(self, token):
         return int(token)
@@ -45,7 +47,7 @@ class LabFileTransformer(lark.Transformer):
         return float(token)
 
     def pitchname(self, children):
-        return Pitchname(children[0], sum(children[1:]))
+        return sum(children) % 12
 
     def interval(self, children):
         return Interval(children[-1], sum(children[:-1]))
