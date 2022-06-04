@@ -1,5 +1,5 @@
 import lark
-from src.annotation_parser.chord_model import Interval, Chord
+from src.annotation_parser.chord_model import Interval, Chord, ChordOccurence
 
 
 class Rs200DtTransformer(lark.Transformer):
@@ -78,10 +78,10 @@ class Rs200DtTransformer(lark.Transformer):
         if len(children) == 7:
             intervals, bass = children[2]
             root = children[6]
-            chord = Chord(root, intervals, bass)
+            chord = Chord(root, set(intervals), bass)
             return start_time, chord
         else:
             return start_time, None
 
     def cltfile(self, children):
-        return [(a[0], b[0], a[1]) for a, b in zip(children[:-1], children[1:])]
+        return [ChordOccurence(a[0], b[0], a[1]) for a, b in zip(children[:-1], children[1:])]

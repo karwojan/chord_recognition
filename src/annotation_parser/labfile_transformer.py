@@ -1,5 +1,5 @@
 import lark
-from src.annotation_parser.chord_model import Interval, Chord
+from src.annotation_parser.chord_model import Interval, Chord, ChordOccurence
 
 
 class LabFileTransformer(lark.Transformer):
@@ -78,7 +78,7 @@ class LabFileTransformer(lark.Transformer):
         return Chord(pitchname, components, bass)
 
     def line(self, children):
-        return (children[0], children[1], children[2])
+        return ChordOccurence(children[0], children[1], children[2])
 
     def labfile(self, children):
         return children
