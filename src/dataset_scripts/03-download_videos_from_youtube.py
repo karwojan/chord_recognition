@@ -9,20 +9,19 @@ index = pd.read_csv("./data/index.csv", sep=";")
 
 
 def download_video(idx_and_song):
-    idx, song = idx_and_song
-    if len(glob(f"./data/audio/{idx}_*")) > 0:
-        print(f"Video {song['videoId']} for song {song['song']} already downloaded!")
-    else:
+    _, song = idx_and_song
+    video_id = song['videoId']
+    if len(glob(f"./data/audio/{video_id}_*")) == 0:
         try:
             YouTube(
-                f"http://youtube.com/watch?v={song['videoId']}"
+                f"http://youtube.com/watch?v={video_id}"
             ).streams.filter(only_audio=True).order_by(
                 "abr"
             ).desc().first().download(
-                "./data/audio/", filename_prefix=f"{idx}_"
+                "./data/audio/", filename_prefix=f"{video_id}_"
             )
         except pytube.exceptions.VideoUnavailable:
-            print(f"Video {song['videoId']} for song {song['song']} is unavailable!")
+            print(f"Video {video_id} for song {song['song']} is unavailable!")
 
 
 executor = ThreadPoolExecutor(max_workers=3)
