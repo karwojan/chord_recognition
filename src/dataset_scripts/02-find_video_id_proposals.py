@@ -15,14 +15,14 @@ def normalize_name(name: str):
 
 def equal_by_names(song, search_result):
     if isinstance(song["album"], str):
-        equal_album = normalize_name(song["album"]) == normalize_name(
+        equal_album = normalize_name(song["album"]) in normalize_name(
             search_result["album"]["name"]
         )
     else:
         equal_album = True
-    equal_title = normalize_name(song["song"]) == normalize_name(search_result["title"])
+    equal_title = normalize_name(song["song"]) in normalize_name(search_result["title"])
     equal_artist = any(
-        normalize_name(song["artist"]) == normalize_name(artist["name"])
+        normalize_name(song["artist"]) in normalize_name(artist["name"])
         for artist in search_result["artists"]
     )
     return equal_album and equal_title and equal_artist
@@ -35,26 +35,22 @@ def find_song(idx_and_song):
     if isinstance(song["album"], str):
         query += " " + song["album"]
     search_results = YTMusic().search(query, filter="songs")[:10]
-
     # SELECTION STEP 1: select videos basing on names
     video_ids = [s["videoId"] for s in search_results if equal_by_names(song, s)]
-    # print(f"Found {len(video_ids)} videos for song {song['song']} basing on names.")
-    if len(video_ids) == 0:
-        return None, None
-
+    # print(f"Found {len(video_ids)} videos for song \"{song['song']}\" basing on names.")
     # SELECTION STEP 2: select videos basing on CSR
-    with tempfile.TemporaryDirectory() as tmpdir:
-        audio_filepaths = [download_video(video_id, tmpdir) for video_id in video_ids]
-        metrics = [
-            evaluate_video(song["filepath"], audio_filepath)
-            for audio_filepath in audio_filepaths
-        ]
-    best_metrics = max(metrics, key=lambda m: m[2] if m[2] is not None else 0)
-    # print(f"Best matching video for song {song['song']} has CSR = {best_metrics[2]}")
-    if best_metrics[2] is not None:
-        return video_ids[metrics.index(best_metrics)], best_metrics
-    else:
-        return None, None
+    if len(video_ids) > 0:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            audio_filepaths = [download_video(video_id, tmpdir) for video_id in video_ids]
+            metrics = [
+                evaluate_video(song["filepath"], audio_filepath)
+                for audio_filepath in audio_filepaths
+            ]
+        best_metrics = max(metrics, key=lambda m: m[2] if m[2] is not None else 0)
+        # print(f"Best matching video for song \"{song['song']}\" has CSR = {best_metrics[2]}")
+        if best_metrics[2] is not None:
+            return video_ids[metrics.index(best_metrics)], best_metrics
+    return None, (None, None, None)
 
 
 index = pd.read_csv("./data/index.csv", sep=";")
