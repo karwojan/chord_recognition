@@ -1,9 +1,6 @@
 filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/1999_dt.clt;1999;Prince;rs200;;weUhBGA8mxo;-0.13;30.93;0.43
 ./data/chordlab/rs200/a_change_is_gonna_come_dt.clt;A Change Is Gonna Come;Sam Cooke;rs200;;Z5zDRtEC0x0;0.65;-2.22;0.9
-./data/chordlab/rs200/a_day_in_the_life_dt.clt;A Day in the Life;The Beatles;rs200;;UYeV7jLBXvA;0.27;-38.22;0.62
-./data/chordlab/rs200/a_hard_days_night_dt.clt;A Hard Day's Night;The Beatles;rs200;;zx2TFk0vh1I;-0.01;-2.08;0.86
-./data/chordlab/rs200/a_whiter_shade_of_pale_dt.clt;A Whiter Shade of Pale;Procol Harum;rs200;;aYMWMiFX29s;-0.05;-5.76;0.81
 ./data/chordlab/rs200/all_along_the_watchtower_dt.clt;All Along the Watchtower;The Jimi Hendrix Experience;rs200;;8J-lkuhpatU;-0.32;-1.02;0.49
 ./data/chordlab/rs200/all_apologies_dt.clt;All Apologies;Nirvana;rs200;;Ba_08WWIWV8;1.04;-1.1;0.98
 ./data/chordlab/rs200/all_i_have_to_do_is_dream_dt.clt;All I Have to Do Is Dream;The Everly Brothers;rs200;;WOsMgYA3sxQ;0.3;0.24;0.92
@@ -19,11 +16,9 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/blue_suede_shoes_dt.clt;Blue Suede Shoes;Carl Perkins;rs200;;MuXNi8wmIhg;-0.94;-1.72;0.9
 ./data/chordlab/rs200/blueberry_hill_dt.clt;Blueberry Hill;Fats Domino;rs200;;JZHP8_z7jrU;1.9;-0.31;0.86
 ./data/chordlab/rs200/bo_diddley_dt.clt;Bo Diddley;Bo Diddley;rs200;;WJLy-Fnedy8;-1.74;-1.02;0.91
-./data/chordlab/rs200/bohemian_rhapsody_dt.clt;Bohemian Rhapsody;Queen;rs200;;bSnlKl_PoQU;-0.3;2.61;0.73
 ./data/chordlab/rs200/born_to_be_wild_dt.clt;Born To Be Wild;Steppenwolf;rs200;;93fAJe8WVjA;0.39;-1.98;0.9
 ./data/chordlab/rs200/born_to_run_dt.clt;Born to Run;Bruce Springsteen;rs200;;Wu4_zVxmufY;0.05;-5.16;0.85
 ./data/chordlab/rs200/both_sides_now_dt.clt;Both Sides Now;Joni Mitchell;rs200;;7m_t3_1vbX8;0.24;0.4;0.66
-./data/chordlab/rs200/bridge_over_troubled_water_dt.clt;Bridge over Troubled Water;Simon and Garfunkel;rs200;;tZzt5RPdaNg;0.4;-6.87;0.82
 ./data/chordlab/rs200/california_dreamin_dt.clt;California Dreamin';The Mamas & the Papas;rs200;;XJIAvpqwJJU;-4.31;-2.66;0.54
 ./data/chordlab/rs200/california_girls_dt.clt;California Girls;The Beach Boys;rs200;;9UMKSugpwGo;-0.3;0.45;0.8
 ./data/chordlab/rs200/california_love_dt.clt;California Love;Dr. Dre and 2Pac;rs200;;LRt6TdSvHag;1.48;-4.22;0.75
@@ -31,15 +26,12 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/changes_dt.clt;Changes;David Bowie;rs200;;aOveiRJNeuY;0.53;-2.56;0.69
 ./data/chordlab/rs200/come_as_you_are_dt.clt;Come As You Are;Nirvana;rs200;;ZEMBDKMtHqM;0.85;-8.2;0.95
 ./data/chordlab/rs200/crazy_dt.clt;Crazy;Patsy Cline;rs200;;DXWCaQPXE_0;0.04;1.09;0.82
-./data/chordlab/rs200/crying_dt.clt;Crying;Roy Orbison;rs200;;yMATM0A5Ask;0.18;-0.68;0.89
 ./data/chordlab/rs200/da_doo_ron_ron_dt.clt;Da Doo Ron Ron;The Crystals;rs200;;Ga_XtKgG4Rg;-0.24;-2.07;0.89
 ./data/chordlab/rs200/dancing_in_the_street_dt.clt;Dancing in the Street;Martha and the Vandellas;rs200;;VKjMuG3LTTo;0.0;-3.88;0.93
-./data/chordlab/rs200/dancing_queen_dt.clt;Dancing Queen;Abba;rs200;;YkLLcIKhJ64;0.86;-1.18;0.44
 ./data/chordlab/rs200/dont_worry_baby_dt.clt;Don't Worry Baby;The Beach Boys;rs200;;6embFRuqxa4;0.67;-0.44;0.86
 ./data/chordlab/rs200/dream_on_dt.clt;Dream On;Aerosmith;rs200;;cvCFRGn7EEQ;0.38;-1.6;0.68
 ./data/chordlab/rs200/earth_angel_dt.clt;Earth Angel;The Penguins;rs200;;QLMvskbYryI;-0.15;-0.7;0.82
 ./data/chordlab/rs200/eight_miles_high_dt.clt;Eight Miles High;The Byrds;rs200;;S9NUYiyT2N8;-0.02;-2.28;0.92
-./data/chordlab/rs200/eleanor_rigby_dt.clt;Eleanor Rigby;The Beatles;rs200;;6gluNoLVKiQ;0.39;0.4;0.82
 ./data/chordlab/rs200/enter_sandman_dt.clt;Enter Sandman;Metallica;rs200;;YxRxd8aNd6I;-0.02;-3.19;0.81
 ./data/chordlab/rs200/every_breath_you_take_dt.clt;Every Breath You Take;The Police;rs200;;sKIW7AG3J9w;-3.77;-78.74;0.07
 ./data/chordlab/rs200/everyday_people_dt.clt;Everyday People;Sly and the Family Stone;rs200;;EQ-cBthmUPI;0.25;-0.78;0.88
@@ -61,7 +53,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/great_balls_of_fire_dt.clt;Great Balls Of Fire;Jerry Lee Lewis;rs200;;jO8KMFfJWLQ;-5.94;0.41;0.75
 ./data/chordlab/rs200/hallelujah_dt.clt;Hallelujah;Jeff Buckley;rs200;;MYrXK5ek_PQ;1.45;-3.02;0.7
 ./data/chordlab/rs200/heartbreak_hotel_dt.clt;Heartbreak Hotel;Elvis Presley;rs200;;LGwO2BaDJQc;-1.58;-1.57;0.65
-./data/chordlab/rs200/help_dt.clt;Help!;The Beatles;rs200;;MKUex3fci5c;-0.02;-1.91;0.96
 ./data/chordlab/rs200/heroes_dt.clt;Heroes;David Bowie;rs200;;YLp2cW7ICCU;0.48;-5.69;0.88
 ./data/chordlab/rs200/hey_jude_dt.clt;Hey Jude;The Beatles;rs200;;mQER0A0ej0M;0.68;0.01;0.86
 ./data/chordlab/rs200/honky_tonk_women_dt.clt;Honky Tonk Women;The Rolling Stones;rs200;;G-eRyFnLe9w;3.4;-84.92;0.48
@@ -76,7 +67,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/i_got_you_dt.clt;I Got You (I Feel Good);James Brown;rs200;;A7pRUj9RBp0;-0.4;-1.6;0.46
 ./data/chordlab/rs200/i_heard_it_through_the_grapevine_dt.clt;I Heard It Through the Grapevine;Marvin Gaye;rs200;;kAPj9oP4q_w;0.08;1.08;0.86
 ./data/chordlab/rs200/i_only_have_eyes_for_you_dt.clt;I Only Have Eyes for You;The Flamingos;rs200;;mQfldItafQU;-0.02;1.93;0.88
-./data/chordlab/rs200/i_saw_her_standing_there_dt.clt;I Saw Her Standing There;The Beatles;rs200;;oxwAB3SECtc;0.07;-1.85;0.94
 ./data/chordlab/rs200/i_still_havent_found_what_im_looking_for_dt.clt;I Still Haven't Found What I'm Looking For;U2;rs200;;neG5xgZbHOg;-1.35;-10.61;0.84
 ./data/chordlab/rs200/i_walk_the_line_dt.clt;I Walk the Line;Johnny Cash;rs200;;p59nHOMaBq0;1.03;-9.28;0.93
 ./data/chordlab/rs200/i_wanna_be_sedated_dt.clt;I Wanna Be Sedated;The Ramones;rs200;;V4RQsPECTdM;-0.07;-3.88;0.94
@@ -86,7 +76,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/im_waiting_for_the_man_dt.clt;I'm Waiting for the Man;The Velvet Underground;rs200;;99og_g7rXnA;0.2;-4.99;0.92
 ./data/chordlab/rs200/imagine_dt.clt;Imagine;John Lennon;rs200;;rAn-AWXtHv0;0.01;-2.46;0.93
 ./data/chordlab/rs200/in_bloom_dt.clt;In Bloom;Nirvana;rs200;;-pmmTxLAZ_Q;-0.03;1.98;0.87
-./data/chordlab/rs200/in_my_life_dt.clt;In My Life;The Beatles;rs200;;YBcdt6DsLQA;0.11;-1.67;0.88
 ./data/chordlab/rs200/in_the_midnight_hour_dt.clt;In The Midnight Hour;Wilson Pickett;rs200;;Il-usrZxGns;0.11;-7.62;0.89
 ./data/chordlab/rs200/in_the_still_of_the_night_dt.clt;In the Still of the Night;The Five Satins;rs200;;ErnYN6yIQ9M;0.18;-0.66;0.64
 ./data/chordlab/rs200/its_a_mans_mans_mans_world_dt.clt;It's a Man's Man's Man's World;James Brown;rs200;;Zeyk3CrRiQU;-0.93;1.42;0.62
@@ -96,7 +85,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/jumpin_jack_flash_dt.clt;Jumpin' Jack Flash;The Rolling Stones;rs200;;3I77s5NuC40;-3.9;1.99;0.6
 ./data/chordlab/rs200/kashmir_dt.clt;Kashmir;Led Zeppelin;rs200;;YMS-bseEE-M;-0.48;-5.71;0.77
 ./data/chordlab/rs200/layla_dt.clt;Layla;Derek and the Dominos;rs200;;C_OAXvSV154;-2.53;-51.74;0.31
-./data/chordlab/rs200/let_it_be_dt.clt;Let It Be;The Beatles;rs200;;QDYfEBY9NM4;0.2;-3.65;0.83
 ./data/chordlab/rs200/lets_get_it_on_dt.clt;Let's Get It On;Marvin Gaye;rs200;;FnzUKC2tdjA;0.59;0.6;0.54
 ./data/chordlab/rs200/lets_stay_together_dt.clt;Let's Stay Together;Al Green;rs200;;2FEJINHoRcU;0.02;-12.96;0.78
 ./data/chordlab/rs200/light_my_fire_dt.clt;Light My Fire;The Doors;rs200;;qoX6AKuYWL8;0.28;0.27;0.47
@@ -106,7 +94,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/london_calling_dt.clt;London Calling;The Clash;rs200;;U96B4e5lZlQ;-0.05;-4.25;0.66
 ./data/chordlab/rs200/long_tall_sally_dt.clt;Long Tall Sally;Little Richard;rs200;;s17ZRAIb3vM;-0.11;-1.81;0.8
 ./data/chordlab/rs200/lose_yourself_dt.clt;Lose Yourself;Eminem;rs200;;Wj7lL6eDOqc;0.2;0.38;0.64
-./data/chordlab/rs200/loser_dt.clt;Loser;Beck;rs200;;2hQ9st3ex7M;-1.21;-20.76;0.88
 ./data/chordlab/rs200/losing_my_religion_dt.clt;Losing My Religion;R.E.M.;rs200;;japBNRP47-8;-0.99;-0.48;0.91
 ./data/chordlab/rs200/louie_louie_dt.clt;Louie Louie;The Kingsmen;rs200;;ZNjeNzd0o0Q;-3.21;0.85;0.5
 ./data/chordlab/rs200/love_and_happiness_dt.clt;Love and Happiness;Al Green;rs200;;DKhxhuwZ-eA;0.71;1.15;0.85
@@ -121,7 +108,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/my_girl_dt.clt;My Girl;The Temptations;rs200;;hYg6YqbX3WQ;-0.05;1.42;0.89
 ./data/chordlab/rs200/mystery_train_dt.clt;Mystery Train;Elvis Presley;rs200;;7dBoYg8_Q2s;0.24;-9.4;0.96
 ./data/chordlab/rs200/no_woman_no_cry_dt.clt;No Woman, No Cry;Bob Marley & The Wailers;rs200;;ACIYuW91Zms;0.92;-14.77;0.68
-./data/chordlab/rs200/norwegian_wood_dt.clt;Norwegian Wood (This Bird Has Flown);The Beatles;rs200;;Y_V6y1ZCg_8;0.21;-1.49;0.9
 ./data/chordlab/rs200/not_fade_away_dt.clt;Not Fade Away;Buddy Holly and the Crickets;rs200;;TLtIfQslVHs;0.23;0.74;0.75
 ./data/chordlab/rs200/nothing_compares_2_u_dt.clt;Nothing Compares 2 U;Sinead O'Connor;rs200;;LGrUWn-nt-U;-0.52;-10.0;0.75
 ./data/chordlab/rs200/nuthin_but_a_g_thang_dt.clt;Nuthin' But a 'G' Thang;Dr. Dre;rs200;;qqQL9JIlEg0;-0.18;8.91;0.26
@@ -132,7 +118,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/paranoid_android_dt.clt;Paranoid Android;Radiohead;rs200;;DExBeFCx3mQ;0.11;1.08;0.71
 ./data/chordlab/rs200/people_get_ready_dt.clt;People Get Ready;The Impressions;rs200;;S3N3UK2e6j8;0.2;-2.71;0.63
 ./data/chordlab/rs200/please_please_please_dt.clt;Please, Please, Please;James Brown;rs200;;5wDCQEUSglo;0.04;0.18;0.71
-./data/chordlab/rs200/proud_mary_dt.clt;Proud Mary;Creedence Clearwater Revival;rs200;;B7qaxICoPEY;0.03;-4.74;0.95
 ./data/chordlab/rs200/purple_haze_dt.clt;Purple Haze;The Jimi Hendrix Experience;rs200;;EWivpZP3bIs;-4.06;-15.47;0.01
 ./data/chordlab/rs200/purple_rain_dt.clt;Purple Rain;Prince;rs200;;edDiY323768;-0.25;-115.34;0.88
 ./data/chordlab/rs200/rave_on_dt.clt;Rave On;Buddy Holly and the Crickets;rs200;;CZtfEMt-WiE;-0.88;-0.42;0.63
@@ -152,23 +137,17 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/she_loves_you_dt.clt;She Loves You;The Beatles;rs200;;nGbWU8S3vzs;-0.1;-0.07;0.82
 ./data/chordlab/rs200/should_i_stay_or_should_i_go_dt.clt;Should I Stay or Should I Go;The Clash;rs200;;wjZMcWaniA4;-0.57;2.4;0.54
 ./data/chordlab/rs200/shout_dt.clt;Shout (Parts 1 and 2);The Isley Brothers;rs200;;uJ26KfnBW2A;-1.64;1.47;0.52
-./data/chordlab/rs200/smells_like_teen_spirit_dt.clt;Smells Like Teen Spirit;Nirvana;rs200;;3op7xRxm6iU;-0.1;1.39;0.24
-./data/chordlab/rs200/stairway_to_heaven_dt.clt;Stairway To Heaven;Led Zeppelin;rs200;;iXQUu5Dti4g;0.18;8.82;0.68
 ./data/chordlab/rs200/stand_by_me_dt.clt;Stand By Me;Ben E. King;rs200;;rGERTwurRa0;-0.69;-13.27;0.87
-./data/chordlab/rs200/strawberry_fields_forever_dt.clt;Strawberry Fields Forever;The Beatles;rs200;;10LSq_J5ol4;-9.61;-28.2;0.66
 ./data/chordlab/rs200/summer_babe_dt.clt;Summer Babe;Pavement;rs200;;9ZsMXzuFhOA;0.03;-3.44;0.83
 ./data/chordlab/rs200/summertime_blues_dt.clt;Summertime Blues;Eddie Cochran;rs200;;QLP6BJjuTAU;-0.23;-0.3;0.79
 ./data/chordlab/rs200/sunshine_of_your_love_dt.clt;Sunshine of Your Love;Cream;rs200;;KWKXNoKgLQU;-0.17;-9.29;0.68
-./data/chordlab/rs200/superstition_dt.clt;Superstition;Stevie Wonder;rs200;;ftdZ363R9kQ;1.12;0.16;0.92
 ./data/chordlab/rs200/suspicious_minds_dt.clt;Suspicious Minds;Elvis Presley;rs200;;xt8XQLvKBUs;0.21;-3.34;0.94
 ./data/chordlab/rs200/sweet_child_o_mine_dt.clt;Sweet Child O' Mine;Guns N' Roses;rs200;;jq_FWScqyG8;-0.18;-2.77;0.9
 ./data/chordlab/rs200/sympathy_for_the_devil_dt.clt;Sympathy for the Devil;The Rolling Stones;rs200;;qmppOF0_DHE;17.45;-34.52;0.47
 ./data/chordlab/rs200/take_me_to_the_river_dt.clt;Take Me to the River;Al Green;rs200;;Fw_roSV6r0k;0.42;4.79;0.91
 ./data/chordlab/rs200/tangled_up_in_blue_dt.clt;Tangled Up in Blue;Bob Dylan;rs200;;XUD8JjsSZ7k;-0.06;-1.22;0.88
-./data/chordlab/rs200/tears_in_heaven_dt.clt;Tears in Heaven;Eric Clapton;rs200;;h-33Y9T9iQA;0.64;-4.49;0.72
 ./data/chordlab/rs200/thatll_be_the_day_dt.clt;That'll Be the Day;Buddy Holly;rs200;;7cxMyI6CKOw;-0.47;-1.58;0.91
 ./data/chordlab/rs200/thats_all_right_dt.clt;That's All Right;Elvis Presley;rs200;;AyTe7Wp78aw;-0.02;-1.11;0.99
-./data/chordlab/rs200/the_boxer_dt.clt;The Boxer;Simon and Garfunkel;rs200;;dqJQ0aU-lro;0.0;-1.21;0.89
 ./data/chordlab/rs200/the_dock_of_the_bay_dt.clt;(Sittin' on) the Dock of the Bay;Otis Redding;rs200;;KyadSUVDPcI;-0.2;-8.21;0.93
 ./data/chordlab/rs200/the_message_dt.clt;The Message;Grandmaster Flash & the Furious Five;rs200;;;;;
 ./data/chordlab/rs200/the_sounds_of_silence_dt.clt;The Sounds of Silence;Simon and Garfunkel;rs200;;bjkPQYWNTlg;-0.23;1.24;0.86
@@ -185,18 +164,14 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/rs200/whats_going_on_dt.clt;What's Going On;Marvin Gaye;rs200;;ApthDWoPMFQ;-0.05;-23.58;0.64
 ./data/chordlab/rs200/when_a_man_loves_a_woman_dt.clt;When a Man Loves a Woman;Percy Sledge;rs200;;eU9Qz0BoGmk;0.28;-4.13;0.85
 ./data/chordlab/rs200/when_doves_cry_dt.clt;When Doves Cry;Prince and the Revolution;rs200;;oTUSeac7IuQ;11.1;0.52;0.33
-./data/chordlab/rs200/while_my_guitar_gently_weeps_dt.clt;While My Guitar Gently Weeps;The Beatles;rs200;;YFDg-pgE0Hk;0.21;2.35;0.85
 ./data/chordlab/rs200/who_do_you_love_dt.clt;Who Do You Love;Bo Diddley;rs200;;0iLcqaIS-48;0.85;0.14;0.99
 ./data/chordlab/rs200/whole_lotta_love_dt.clt;Whole Lotta Love;Led Zeppelin;rs200;;Cy39fcBaFQ0;-0.26;-82.76;0.56
 ./data/chordlab/rs200/whole_lotta_shakin_goin_on_dt.clt;Whole Lotta Shakin' Goin On;Jerry Lee Lewis;rs200;;GN8VV8CHnrk;-0.12;-3.84;0.94
 ./data/chordlab/rs200/will_you_love_me_tomorrow_dt.clt;Will You Love Me Tomorrow;The Shirelles;rs200;;Zp2vKcYtsMU;0.14;2.99;0.85
-./data/chordlab/rs200/with_or_without_you_dt.clt;With or Without You;U2;rs200;;6Q2mFw4VYBo;-0.26;-4.28;0.81
 ./data/chordlab/rs200/wont_get_fooled_again_dt.clt;Won't Get Fooled Again;The Who;rs200;;_NzLs-xSss0;0.37;-2.36;0.65
-./data/chordlab/rs200/yesterday_dt.clt;Yesterday;The Beatles;rs200;;NrgmdOz227I;0.02;-2.04;0.74
 ./data/chordlab/rs200/you_cant_always_get_what_you_want_dt.clt;You Can't Always Get What You Want;The Rolling Stones;rs200;;ZUqSNbJuGOw;-1.11;-2.52;0.77
 ./data/chordlab/rs200/you_really_got_me_dt.clt;You Really Got Me;The Kinks;rs200;;bZ4uGV6Goy0;-21.55;-1.82;0.17
 ./data/chordlab/rs200/you_send_me_dt.clt;You Send Me;Sam Cooke;rs200;;nELNyHyO4PI;0.08;-1.09;0.89
-./data/chordlab/rs200/your_song_dt.clt;Your Song;Elton John;rs200;;FT3D1Cu6g10;0.1;-4.26;0.8
 ./data/chordlab/rs200/youve_lost_that_lovin_feelin_dt.clt;You've Lost That Lovin' Feelin';The Righteous Brothers;rs200;;gPl37xWo-K0;0.73;7.17;0.63
 ./data/chordlab/rwc_pop/N001-M01-T01.lab;Eien no replica;Kazuo Nishi;rwc_pop;;dH7DQfDAR4A;-0.5;-40.43;0.16
 ./data/chordlab/rwc_pop/N002-M01-T02.lab;Magic in your eyes;Hiromi Yoshii;rwc_pop;;Q3iKIh-45wc;-0.55;-188.99;0.12
@@ -536,7 +511,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0040/full.lab;The Power;Snap;billboard;;AmJbjNoxd9U;-8.54;-4.77;0.51
 ./data/chordlab/mcgill_billboard/0041/full.lab;Absolutely Right;Five Man Electrical Band;billboard;;eGoeRyo0PbY;0.03;0.22;0.66
 ./data/chordlab/mcgill_billboard/0044/full.lab;Some Like It Hot;The Power Station;billboard;;rRifNARpNL4;-1.93;9.09;0.59
-./data/chordlab/mcgill_billboard/0050/full.lab;Love Me Do;The Beatles;billboard;;0pGOFX1D_jg;-0.18;1.04;0.92
 ./data/chordlab/mcgill_billboard/0051/full.lab;Carrie;Cliff Richard;billboard;;5KdqDzXpmHQ;0.28;1.03;0.69
 ./data/chordlab/mcgill_billboard/0054/full.lab;Last Kiss;J. Frank Wilson & The Cavaliers;billboard;;0PhOf9myHQM;0.35;0.47;0.87
 ./data/chordlab/mcgill_billboard/0055/full.lab;Smoking Gun;The Robert Cray Band;billboard;;O9dcaw_cw6k;-0.35;-185.14;0.91
@@ -554,8 +528,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0086/full.lab;Space Oddity;David Bowie;billboard;;5PgdZDXg0z0;0.66;5.61;0.85
 ./data/chordlab/mcgill_billboard/0089/full.lab;Fire And Ice;Pat Benatar;billboard;;0g_P9oFp1qE;0.62;3.25;0.87
 ./data/chordlab/mcgill_billboard/0092/full.lab;Shock The Monkey;Peter Gabriel;billboard;;4TUvAC-jFQ4;-0.57;0.85;0.77
-./data/chordlab/mcgill_billboard/0095/full.lab;Drivin' Wheel;Foghat;billboard;;X5EjPVpiFao;4.07;0.96;0.77
-./data/chordlab/mcgill_billboard/0100/full.lab;Maggie May;Rod Stewart;billboard;;Z8Y_8nzWh2M;-0.16;4.06;0.74
 ./data/chordlab/mcgill_billboard/0101/full.lab;A Lesson In Leavin';Dottie West;billboard;;PE0kS8fFDsY;14.07;-0.11;0.81
 ./data/chordlab/mcgill_billboard/0102/full.lab;For The Good Times;Ray Price;billboard;;tLbTL9-kkJQ;1.77;-4.25;0.79
 ./data/chordlab/mcgill_billboard/0105/full.lab;The Spirit Of Radio;Rush;billboard;;wPBinohXHLc;1.18;-3.11;0.6
@@ -564,7 +536,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0112/full.lab;Letter Full Of Tears;Gladys Knight & The Pips;billboard;;c-FpjbEsuyY;0.04;-3.45;0.63
 ./data/chordlab/mcgill_billboard/0115/full.lab;Sweet Little Rock And Roll;Chuck Berry;billboard;;NoVUjmogA3I;1.85;0.41;0.88
 ./data/chordlab/mcgill_billboard/0116/full.lab;Let It Rain;Eric Clapton;billboard;;1VKpMI5Msa4;-0.07;-2.57;0.87
-./data/chordlab/mcgill_billboard/0120/full.lab;Be My Baby;The Ronettes;billboard;;22G-D_MJDbY;2.43;1.92;0.92
 ./data/chordlab/mcgill_billboard/0123/full.lab;Silent Night;Bing Crosby;billboard;;Y80nUlsZ0Ws;0.44;-3.76;0.92
 ./data/chordlab/mcgill_billboard/0124/full.lab;Promises;Eric Clapton;billboard;;U8P0EVFKV74;0.03;2.21;0.87
 ./data/chordlab/mcgill_billboard/0127/full.lab;Stop The Wedding;Etta James;billboard;;zHAmfTd3rro;-0.13;1.93;0.82
@@ -572,7 +543,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0131/full.lab;I Wouldn't Have Missed It For The World;Ronnie Milsap;billboard;;OFSe5Hwx5iI;-0.06;-4.55;0.72
 ./data/chordlab/mcgill_billboard/0134/full.lab;I Had Too Much To Dream (Last Night);The Electric Prunes;billboard;;xmhyerDCzTU;0.08;0.25;0.86
 ./data/chordlab/mcgill_billboard/0140/full.lab;La Grange;ZZ Top;billboard;;FJaaWz-AJd0;0.03;3.24;0.95
-./data/chordlab/mcgill_billboard/0141/full.lab;Shock The Monkey;Peter Gabriel;billboard;;4TUvAC-jFQ4;-0.57;0.85;0.77
 ./data/chordlab/mcgill_billboard/0148/full.lab;Spirits In The Material World;The Police;billboard;;DFsLJcCJJm0;-0.18;4.62;0.72
 ./data/chordlab/mcgill_billboard/0149/full.lab;Just When I Needed You Most;Randy Vanwarmer;billboard;;GoMn41bFqVA;0.3;-5.5;0.82
 ./data/chordlab/mcgill_billboard/0150/full.lab;What's Love Got To Do With It;Tina Turner;billboard;;1avX1lX7gSs;-0.07;1.27;0.79
@@ -612,22 +582,18 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0215/full.lab;Magic Man;Heart;billboard;;AZTo3iJng7U;-0.72;-0.24;0.83
 ./data/chordlab/mcgill_billboard/0216/full.lab;Do Your Thing;Isaac Hayes;billboard;;J8vHPFEepI8;-0.16;4.49;0.78
 ./data/chordlab/mcgill_billboard/0217/full.lab;Jessie's Girl;Rick Springfield;billboard;;4ejfFIj5rrA;-0.08;-4.69;0.61
-./data/chordlab/mcgill_billboard/0218/full.lab;Fernando;Abba;billboard;;b-U3-Sla8GM;8.27;-14.36;0.86
 ./data/chordlab/mcgill_billboard/0221/full.lab;Feel Like Makin' Love;Roberta Flack;billboard;;ySlLq9t2qgc;-0.24;-0.76;0.77
 ./data/chordlab/mcgill_billboard/0222/full.lab;For Ol' Times Sake;Elvis Presley;billboard;;cBdUUWgbpps;-0.17;0.64;0.91
 ./data/chordlab/mcgill_billboard/0223/full.lab;Wanna Be Startin' Somethin';Michael Jackson;billboard;;4Ibtio5coYQ;-0.23;3.55;0.68
 ./data/chordlab/mcgill_billboard/0224/full.lab;Galveston;Glen Campbell;billboard;;2LYp89CeX6k;1.71;-6.86;0.84
 ./data/chordlab/mcgill_billboard/0228/full.lab;Still Cruisin;The Beach Boys;billboard;;1rsNioVxmwc;3.26;-0.33;0.64
-./data/chordlab/mcgill_billboard/0229/full.lab;Honky Tonk Women;The Rolling Stones;billboard;;G-eRyFnLe9w;3.5;-84.69;0.47
 ./data/chordlab/mcgill_billboard/0235/full.lab;Back Home Again;John Denver;billboard;;M_iJJ8xDZq8;0.37;-4.9;0.92
 ./data/chordlab/mcgill_billboard/0236/full.lab;Tonight, Tonight, Tonight;Genesis;billboard;;1lKBHKLms_I;0.11;0.65;0.64
 ./data/chordlab/mcgill_billboard/0239/full.lab;Sail On Sailor;The Beach Boys;billboard;;jKNp615HH4E;0.01;-0.37;0.84
-./data/chordlab/mcgill_billboard/0240/full.lab;Just The Way You Are;Billy Joel;billboard;;dBqyX0UUzVQ;0.42;1.97;0.72
 ./data/chordlab/mcgill_billboard/0241/full.lab;White Christmas;Bing Crosby;billboard;;jlMQgX_q0uI;-1.38;-8.85;0.57
 ./data/chordlab/mcgill_billboard/0242/full.lab;Because I Love You (The Postman Song);Stevie B;billboard;;lqd-TAabVVw;0.23;-41.17;0.83
 ./data/chordlab/mcgill_billboard/0245/full.lab;It Amazes Me;John Denver;billboard;;hLQhFcZ0Ha4;0.12;-3.45;0.8
 ./data/chordlab/mcgill_billboard/0246/full.lab;Rhinestone Cowboy;Glen Campbell;billboard;;P-KrwFTqgFI;0.42;0.58;0.77
-./data/chordlab/mcgill_billboard/0247/full.lab;Last Kiss;J. Frank Wilson & The Cavaliers;billboard;;0PhOf9myHQM;0.35;0.47;0.87
 ./data/chordlab/mcgill_billboard/0248/full.lab;I'd Love To Change The World;Ten Years After;billboard;;ZwaymGxUOzg;-0.94;-3.51;0.63
 ./data/chordlab/mcgill_billboard/0249/full.lab;Old Time Rock & Roll;Bob Seger;billboard;;cvhpqW0AqmQ;0.08;-0.36;0.87
 ./data/chordlab/mcgill_billboard/0250/full.lab;Handy Man;Jimmy Jones;billboard;;lcDnqN91oSs;-0.06;-0.74;0.85
@@ -636,7 +602,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0257/full.lab;Shape Of Things To Come;Max Frost & The Troopers;billboard;;dSInh0W7FHs;0.18;-5.43;0.66
 ./data/chordlab/mcgill_billboard/0258/full.lab;Don't Treat Me Bad;Firehouse;billboard;;bU-1g2CB9HU;4.04;4.25;0.24
 ./data/chordlab/mcgill_billboard/0259/full.lab;Born To Be Alive;Patrick Hernandez;billboard;;vb5a-GYty-o;7.58;25.3;0.27
-./data/chordlab/mcgill_billboard/0260/full.lab;She's A Lady;Tom Jones;billboard;;x8G4xrYfWmw;-0.73;-22.95;0.38
 ./data/chordlab/mcgill_billboard/0261/full.lab;In-A-Gadda-Da-Vida;Iron Butterfly;billboard;;SEPRSS3CFU0;5.42;1.8;0.81
 ./data/chordlab/mcgill_billboard/0264/full.lab;Dandelion;The Rolling Stones;billboard;;mBnGoS0n_VE;0.03;13.95;0.92
 ./data/chordlab/mcgill_billboard/0265/full.lab;(Last Night) I Didn't Get To Sleep At All;The 5th Dimension;billboard;;7sBfPmHJPZI;0.23;0.78;0.86
@@ -645,7 +610,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0270/full.lab;In My Room;The Beach Boys;billboard;;p0GESTUyhps;1.53;1.24;0.86
 ./data/chordlab/mcgill_billboard/0271/full.lab;Addicted To Love;Robert Palmer;billboard;;sW4rk5sMsB0;10.99;3.06;0.92
 ./data/chordlab/mcgill_billboard/0276/full.lab;Patches;Clarence Carter;billboard;;kfMUo5djCYA;-0.14;4.68;0.76
-./data/chordlab/mcgill_billboard/0279/full.lab;Born To Be Alive;Patrick Hernandez;billboard;;vb5a-GYty-o;7.58;25.3;0.27
 ./data/chordlab/mcgill_billboard/0280/full.lab;It Takes Two;Marvin Gaye,Kim Weston;billboard;;sIpoTg54lHc;0.19;1.07;0.97
 ./data/chordlab/mcgill_billboard/0281/full.lab;There's The Girl;Heart;billboard;;ks9mfAjsl8o;0.44;0.07;0.93
 ./data/chordlab/mcgill_billboard/0282/full.lab;Gotta Serve Somebody;Bob Dylan;billboard;;JOK0v2QYy9Y;-0.44;4.7;0.94
@@ -655,7 +619,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0292/full.lab;25 Or 6 To 4;Chicago;billboard;;iPYH4s7_e34;-0.22;-0.66;0.51
 ./data/chordlab/mcgill_billboard/0293/full.lab;Every Little Thing She Does Is Magic;The Police;billboard;;5WEjz2YoH80;0.11;-15.84;0.66
 ./data/chordlab/mcgill_billboard/0294/full.lab;Mr. Bojangles;Jerry Jeff Walker;billboard;;3d9wwCXvWS4;0.0;0.68;0.8
-./data/chordlab/mcgill_billboard/0295/full.lab;Just The Way You Are;Billy Joel;billboard;;dBqyX0UUzVQ;0.42;1.97;0.72
 ./data/chordlab/mcgill_billboard/0296/full.lab;Lyin' Eyes;Eagles;billboard;;2dANDhfWU8g;0.23;-4.18;0.93
 ./data/chordlab/mcgill_billboard/0297/full.lab;That's The Way I Feel About Cha;Bobby Womack;billboard;;Zn7lqHymzwM;0.63;1.6;0.67
 ./data/chordlab/mcgill_billboard/0303/full.lab;Break It To Me Gently;Juice Newton;billboard;;Pbu4DwSeH7k;0.06;-3.15;0.9
@@ -688,14 +651,12 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0355/full.lab;I Rise, I Fall;Johnny Tillotson;billboard;;lq9sdYNlXF8;0.77;-0.36;0.93
 ./data/chordlab/mcgill_billboard/0356/full.lab;Dum Dum;Brenda Lee;billboard;;u8qL6OJ1p5g;-0.43;3.6;0.76
 ./data/chordlab/mcgill_billboard/0359/full.lab;Just Like Heaven;The Cure;billboard;;6i00VcgzT3w;-0.39;-3.89;0.36
-./data/chordlab/mcgill_billboard/0360/full.lab;I Want To Take You Higher;Ike & Tina Turner;billboard;;6cIQQZr-vhw;0.18;2.4;0.92
 ./data/chordlab/mcgill_billboard/0361/full.lab;This Song;George Harrison;billboard;;uj9vk4DuSvg;-0.37;0.11;0.94
 ./data/chordlab/mcgill_billboard/0362/full.lab;Last Kiss;Wednesday;billboard;;wgzklH-YGck;2.29;-1.52;0.06
 ./data/chordlab/mcgill_billboard/0367/full.lab;Undercover Angel;Alan O'Day;billboard;;WdzDg_bJbTo;0.34;-45.24;0.59
 ./data/chordlab/mcgill_billboard/0370/full.lab;Kisses On The Wind;Neneh Cherry;billboard;;DC4t2a-o1w8;-0.09;3.98;0.74
 ./data/chordlab/mcgill_billboard/0371/full.lab;Losing You;Brenda Lee;billboard;;gBzM6Xi0Zp0;-0.33;-0.23;0.84
 ./data/chordlab/mcgill_billboard/0372/full.lab;Scarlet Fever;Kenny Rogers;billboard;;1emQGhAusTk;-0.02;-4.19;0.92
-./data/chordlab/mcgill_billboard/0378/full.lab;The Humpty Dance;Digital Underground;billboard;;OOo_PTaZFLs;0.42;-0.4;0.78
 ./data/chordlab/mcgill_billboard/0381/full.lab;Hocus Pocus;Focus;billboard;;i00s_m5SOCI;-0.32;-187.21;0.46
 ./data/chordlab/mcgill_billboard/0382/full.lab;Where The Streets Have No Name;Pet Shop Boys;billboard;;veg31f7a3Ww;3.64;4.62;0.93
 ./data/chordlab/mcgill_billboard/0383/full.lab;Sunshine Superman;Donovan;billboard;;iUCek40b5Es;-1.0;4.7;0.91
@@ -709,7 +670,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0397/full.lab;Kozmic Blues;Janis Joplin;billboard;;zvrJbxWrMBQ;-0.17;-1.81;0.78
 ./data/chordlab/mcgill_billboard/0400/full.lab;Woman To Woman;Shirley Brown;billboard;;AvZoN02EbCs;0.35;1.75;0.72
 ./data/chordlab/mcgill_billboard/0401/full.lab;The Goonies R Good Enough;Cyndi Lauper;billboard;;wiuStBd4Czk;0.01;-0.9;0.95
-./data/chordlab/mcgill_billboard/0402/full.lab;Last Kiss;J. Frank Wilson & The Cavaliers;billboard;;0PhOf9myHQM;0.35;0.47;0.87
 ./data/chordlab/mcgill_billboard/0403/full.lab;I Never Loved A Man (The Way I Love You);Aretha Franklin;billboard;;mfbja9sKWJ8;0.23;0.7;0.85
 ./data/chordlab/mcgill_billboard/0404/full.lab;He's A Rebel;The Crystals;billboard;;T12_Dmn1S6g;2.13;6.98;0.6
 ./data/chordlab/mcgill_billboard/0407/full.lab;Wild Horses;Gino Vannelli;billboard;;CWGCiHzPetM;0.3;-76.35;0.07
@@ -722,21 +682,17 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0433/full.lab;If I Could Reach You;The 5th Dimension;billboard;;yAWyNKqp2D4;0.21;-6.9;0.85
 ./data/chordlab/mcgill_billboard/0434/full.lab;Where Or When;Dion;billboard;;2Tbd1m8MEME;-0.06;-3.13;0.74
 ./data/chordlab/mcgill_billboard/0443/full.lab;Better Things;The Kinks;billboard;;pz1uZR9UtM0;-0.23;5.19;0.23
-./data/chordlab/mcgill_billboard/0444/full.lab;I Really Don't Want To Know;Elvis Presley;billboard;;b7OQRgnT7-M;1.03;-8.74;0.79
 ./data/chordlab/mcgill_billboard/0445/full.lab;Old Days;Chicago;billboard;;NISFqBLMARY;0.15;0.76;0.73
-./data/chordlab/mcgill_billboard/0446/full.lab;Back Home Again;John Denver;billboard;;M_iJJ8xDZq8;0.37;-4.9;0.92
 ./data/chordlab/mcgill_billboard/0451/full.lab;Got It Made;Crosby, Stills, Nash;billboard;;GTxr8pBlbyw;-0.01;-29.93;0.28
 ./data/chordlab/mcgill_billboard/0452/full.lab;Don't Say You Love Me;Billy Squier;billboard;;yQCYD2iCeHI;-0.2;-4.94;0.77
 ./data/chordlab/mcgill_billboard/0455/full.lab;Walk On The Wild Side (Part 1);Jimmy Smith;billboard;;88hfXPQsOow;-5.9;0.35;0.68
 ./data/chordlab/mcgill_billboard/0456/full.lab;With A Little Luck;Paul McCartney;billboard;;_MXCDJI_KiY;-0.08;-0.93;0.76
 ./data/chordlab/mcgill_billboard/0457/full.lab;Not Fade Away;The Rolling Stones;billboard;;tYf9nR9Z1eM;3.63;-0.49;0.87
-./data/chordlab/mcgill_billboard/0458/full.lab;Addicted To Love;Robert Palmer;billboard;;sW4rk5sMsB0;10.99;3.06;0.92
 ./data/chordlab/mcgill_billboard/0464/full.lab;Flesh For Fantasy;Billy Idol;billboard;;DmJWOfMKm34;-7.76;2.13;0.69
 ./data/chordlab/mcgill_billboard/0465/full.lab;Give To Live;Sammy Hagar;billboard;;EtnNcX-LfFM;0.0;57.28;0.16
 ./data/chordlab/mcgill_billboard/0468/full.lab;Ain't Too Proud To Beg;The Temptations;billboard;;_ObVQPBD0Uw;0.9;0.98;0.7
 ./data/chordlab/mcgill_billboard/0469/full.lab;In Your Soul;Corey Hart;billboard;;_vPoZO6dtkw;-0.24;1.37;0.91
 ./data/chordlab/mcgill_billboard/0472/full.lab;Sweet Music Man;Kenny Rogers;billboard;;1He-5eRellI;-0.04;-5.94;0.9
-./data/chordlab/mcgill_billboard/0473/full.lab;Come Together;The Beatles;billboard;;oVW6wJ7MYDM;0.09;0.51;0.91
 ./data/chordlab/mcgill_billboard/0474/full.lab;Silver Threads And Golden Needles;The Cowsills;billboard;;LlHDlgyG150;0.0;-0.25;0.8
 ./data/chordlab/mcgill_billboard/0475/full.lab;Daydream Believer;Anne Murray;billboard;;RIrPU1yA90o;0.02;3.08;0.87
 ./data/chordlab/mcgill_billboard/0476/full.lab;I Adore Mi Amor;Color Me Badd;billboard;;9ulUxGu-4a4;-0.31;-7.58;0.7
@@ -750,17 +706,13 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0484/full.lab;Heart In Hand;Brenda Lee;billboard;;x9vAH_p6QlU;0.9;-0.7;0.85
 ./data/chordlab/mcgill_billboard/0485/full.lab;Rich Girl;Daryl Hall & John Oates;billboard;;322tGmZMCUA;0.02;3.12;0.66
 ./data/chordlab/mcgill_billboard/0501/full.lab;Last Dance;Donna Summer;billboard;;cd7eNPx5kjk;0.88;-0.03;0.63
-./data/chordlab/mcgill_billboard/0502/full.lab;I've Been Loving You Too Long (To Stop Now);Otis Redding;billboard;;FioAvlnOUUw;0.77;15.22;0.36
-./data/chordlab/mcgill_billboard/0503/full.lab;Good Vibrations;Marky Mark;billboard;;4C2lhVUb95U;-15.31;-6.44;0.64
 ./data/chordlab/mcgill_billboard/0504/full.lab;The Joker;Steve Miller Band;billboard;;q3mfENm6VJc;-0.02;2.75;0.75
 ./data/chordlab/mcgill_billboard/0507/full.lab;Still;Commodores;billboard;;FLYWGvVq-bI;0.46;-6.1;0.75
-./data/chordlab/mcgill_billboard/0508/full.lab;For Ol' Times Sake;Elvis Presley;billboard;;cBdUUWgbpps;-0.17;0.64;0.91
 ./data/chordlab/mcgill_billboard/0511/full.lab;Oh My Angel;Bertha Tillman;billboard;;bmWvdd13VME;1.21;-3.58;0.82
 ./data/chordlab/mcgill_billboard/0512/full.lab;Going To A Go-Go;The Rolling Stones;billboard;;y3PIQMWrV0w;0.19;-0.5;0.8
 ./data/chordlab/mcgill_billboard/0516/full.lab;Those Lazy-Hazy-Crazy Days Of Summer;"Nat ""King"" Cole";billboard;;vw2UK_d4Q2g;1.89;-0.79;0.76
 ./data/chordlab/mcgill_billboard/0517/full.lab;All Those Years Ago;George Harrison;billboard;;agspPmU_XiE;0.49;3.37;0.88
 ./data/chordlab/mcgill_billboard/0518/full.lab;Suite: Judy Blue Eyes;Crosby, Stills & Nash;billboard;;OvGfQCsfzUo;1.88;2.58;0.53
-./data/chordlab/mcgill_billboard/0522/full.lab;Young Hearts Run Free;Candi Staton;billboard;;27AuSYoA1UA;-0.45;-32.03;0.1
 ./data/chordlab/mcgill_billboard/0525/full.lab;Trampled Under Foot;Led Zeppelin;billboard;;jswVIOU62A4;-0.54;-4.84;0.95
 ./data/chordlab/mcgill_billboard/0526/full.lab;Love Comes Quickly;Pet Shop Boys;billboard;;ctz0Eeam8-I;0.06;0.95;0.87
 ./data/chordlab/mcgill_billboard/0531/full.lab;Running Up That Hill;Kate Bush;billboard;;d7fmB8J2hJw;0.4;-6.65;0.63
@@ -784,15 +736,12 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0579/full.lab;Heart Full Of Soul;The Yardbirds;billboard;;3ZYIu_VGLQU;0.44;3.08;0.39
 ./data/chordlab/mcgill_billboard/0580/full.lab;I Found A Love;The Falcons;billboard;;kTyXCE53QNY;1.55;-0.13;0.88
 ./data/chordlab/mcgill_billboard/0583/full.lab;Amor;Ben E. King;billboard;;NFb3GT7jfZI;-0.27;2.27;0.89
-./data/chordlab/mcgill_billboard/0588/full.lab;We Are The Champions;Queen;billboard;;Gk781Z0ErmA;-0.01;-2.93;0.7
 ./data/chordlab/mcgill_billboard/0589/full.lab;Southern Cross;Crosby, Stills & Nash;billboard;;IHL-6cUtZj0;-0.29;-3.94;0.86
 ./data/chordlab/mcgill_billboard/0590/full.lab;Talk To Me;Chico DeBarge;billboard;;QLZ9d4wev7c;3.88;4.25;0.32
 ./data/chordlab/mcgill_billboard/0591/full.lab;The Long Run;Eagles;billboard;;skC2GToR1uY;0.7;0.14;0.93
 ./data/chordlab/mcgill_billboard/0592/full.lab;All She Wants Is;Duran Duran;billboard;;0pFwBnfFLDw;2.98;-5.28;0.63
-./data/chordlab/mcgill_billboard/0597/full.lab;Time Is On My Side;The Rolling Stones;billboard;;jkDDk_BKLT8;0.03;0.09;0.95
 ./data/chordlab/mcgill_billboard/0598/full.lab;Wish Someone Would Care;Irma Thomas;billboard;;zxwSw8Sf4I8;-0.99;-0.04;0.86
 ./data/chordlab/mcgill_billboard/0599/full.lab;Hey Stoopid;Alice Cooper;billboard;;qL0XlxFeP_o;26.91;0.23;0.81
-./data/chordlab/mcgill_billboard/0600/full.lab;"Tarzan Boy (From ""Teenage Mutant Ninja Turtles III"")";Baltimora;billboard;;xkmgcvr5Ezc;-0.5;-141.59;0.63
 ./data/chordlab/mcgill_billboard/0601/full.lab;I Can Help;Billy Swan;billboard;;BdZZeU8Vf3E;-1.54;-64.17;0.76
 ./data/chordlab/mcgill_billboard/0606/full.lab;I Love;Tom T. Hall;billboard;;CMyXyLoRXGA;0.44;-1.99;0.91
 ./data/chordlab/mcgill_billboard/0607/full.lab;Everlasting Love;Carl Carlton;billboard;;SqT1y5Qi6l0;-0.1;-0.36;0.65
@@ -804,8 +753,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0619/full.lab;If I Could Build My Whole World Around You;Marvin Gaye,Tammi Terrell;billboard;;_9eWZ1wK9tw;0.09;3.28;0.76
 ./data/chordlab/mcgill_billboard/0620/full.lab;"Twistin  The Night Away (From ""Innerspace"")";Rod Stewart;billboard;;hpbGL2byib4;0.45;6.05;0.78
 ./data/chordlab/mcgill_billboard/0621/full.lab;Ghostbusters;Ray Parker Jr.;billboard;;TaV1r341wYk;0.09;2.45;0.45
-./data/chordlab/mcgill_billboard/0628/full.lab;Hold On;Wilson Phillips;billboard;;i5tFjYp3_jk;-1.77;-27.11;0.59
-./data/chordlab/mcgill_billboard/0629/full.lab;Beat It;Michael Jackson;billboard;;kOn-HdEg6AQ;-0.33;5.21;0.71
 ./data/chordlab/mcgill_billboard/0634/full.lab;Brass Monkey;Beastie Boys;billboard;;acY2VSskD80;0.38;145.39;0.68
 ./data/chordlab/mcgill_billboard/0635/full.lab;The Little Old Lady (From Pasadena);Jan & Dean;billboard;;5BFGFv04VJA;3.88;7.98;0.86
 ./data/chordlab/mcgill_billboard/0636/full.lab;After The Lovin';Engelbert Humperdinck;billboard;;qR29-1KbWn8;-0.74;-8.58;0.65
@@ -817,23 +764,16 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0651/full.lab;It's Raining Men;The Weather Girls;billboard;;I8G404FAMRk;-0.38;1.81;0.87
 ./data/chordlab/mcgill_billboard/0655/full.lab;Sunrise;Eric Carmen;billboard;;dR_qmrv7iE0;-9.51;6.92;0.6
 ./data/chordlab/mcgill_billboard/0656/full.lab;Years From Now;Dr. Hook;billboard;;OwK8umBeD3A;-0.47;3.59;0.74
-./data/chordlab/mcgill_billboard/0657/full.lab;In Your Soul;Corey Hart;billboard;;_vPoZO6dtkw;-0.24;1.37;0.91
 ./data/chordlab/mcgill_billboard/0658/full.lab;Ask Me;Elvis Presley;billboard;;7Mvnr2DJir4;-0.08;-0.53;0.66
-./data/chordlab/mcgill_billboard/0659/full.lab;Harden My Heart;Quarterflash;billboard;;R4q4NDGRyb0;0.23;-13.34;0.89
-./data/chordlab/mcgill_billboard/0660/full.lab;There's The Girl;Heart;billboard;;ks9mfAjsl8o;0.44;0.07;0.93
 ./data/chordlab/mcgill_billboard/0663/full.lab;He's So Shy;Pointer Sisters;billboard;;f_EByXD8q6A;-0.23;3.1;0.77
 ./data/chordlab/mcgill_billboard/0664/full.lab;Looking For A Love;The J. Geils Band;billboard;;hLZW_XrmhBg;0.18;1.6;0.92
-./data/chordlab/mcgill_billboard/0669/full.lab;You Can't Roller Skate In A Buffalo Herd;Roger Miller;billboard;;psiWLKzbpEw;-0.14;-3.18;0.82
 ./data/chordlab/mcgill_billboard/0670/full.lab;Silent Lucidity;Queensryche;billboard;;3GIv4NCmbvU;0.42;-4.76;0.86
 ./data/chordlab/mcgill_billboard/0671/full.lab;Heaven's Just A Sin Away;The Kendalls;billboard;;FgYyUfTd_8o;0.17;-0.02;0.96
 ./data/chordlab/mcgill_billboard/0672/full.lab;Baby Workout;Jackie Wilson;billboard;;5ux8Uch3TTY;1.0;103.21;0.04
 ./data/chordlab/mcgill_billboard/0675/full.lab;With A Little Help From My Friends;Joe Cocker;billboard;;ZgADWQRiCy8;-0.4;-70.78;0.15
 ./data/chordlab/mcgill_billboard/0678/full.lab;Chained And Bound;Otis Redding;billboard;;JeXavMmkuyU;3.22;-0.05;0.87
-./data/chordlab/mcgill_billboard/0681/full.lab;With Or Without You;U2;billboard;;oNvWDP_GkiY;-0.66;0.99;0.77
-./data/chordlab/mcgill_billboard/0682/full.lab;Brandy (You're A Fine Girl);Looking Glass;billboard;;CFhFyvk0yS8;0.07;1.77;0.6
 ./data/chordlab/mcgill_billboard/0683/full.lab;That Girl;Stevie Wonder;billboard;;4a0cmyOL9s8;0.69;2.21;0.49
 ./data/chordlab/mcgill_billboard/0684/full.lab;Feelin' Stronger Every Day;Chicago;billboard;;Pq5NNlKe7PU;-0.47;1.17;0.81
-./data/chordlab/mcgill_billboard/0685/full.lab;Silent Lucidity;Queensryche;billboard;;3GIv4NCmbvU;0.42;-4.76;0.86
 ./data/chordlab/mcgill_billboard/0688/full.lab;On The Road Again;Canned Heat;billboard;;_b9kSFADP3w;2.61;-0.81;0.86
 ./data/chordlab/mcgill_billboard/0689/full.lab;The Anaheim, Azusa & Cucamonga Sewing Circle, Book Review And Timing Association;Jan & Dean;billboard;;AU0LXa8m-KA;-0.68;-8.24;0.77
 ./data/chordlab/mcgill_billboard/0690/full.lab;Queen Of Hearts;Juice Newton;billboard;;2L7R-XOittY;-0.21;2.87;0.86
@@ -851,18 +791,13 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0722/full.lab;Where Are You;Dinah Washington;billboard;;m435Q6DvDhM;-0.19;0.57;0.65
 ./data/chordlab/mcgill_billboard/0723/full.lab;Maybe Tomorrow;Badfinger;billboard;;csATs2arha0;0.4;-3.3;0.83
 ./data/chordlab/mcgill_billboard/0726/full.lab;Would It Make Any Difference To You;Etta James;billboard;;VedwdTakETI;-0.11;-5.13;0.9
-./data/chordlab/mcgill_billboard/0727/full.lab;Eight Days A Week;The Beatles;billboard;;0soSE-RMH3s;0.27;-0.81;0.69
 ./data/chordlab/mcgill_billboard/0728/full.lab;Breaking Up Is Hard To Do;Neil Sedaka;billboard;;2M584bP_FeE;-0.32;-0.61;0.67
 ./data/chordlab/mcgill_billboard/0729/full.lab;Pretty In Pink;Psychedelic Furs;billboard;;eqnCkWaDMYs;-0.33;1.13;0.77
-./data/chordlab/mcgill_billboard/0730/full.lab;(Marie's the Name) His Latest Flame;Elvis Presley;billboard;;83WmvD8hqOU;0.39;1.13;0.77
 ./data/chordlab/mcgill_billboard/0731/full.lab;Lucille;Kenny Rogers;billboard;;Wvr5Z0NsDm8;0.0;-2.24;0.92
 ./data/chordlab/mcgill_billboard/0734/full.lab;I Will;Dean Martin;billboard;;rS6qhoEsgac;-0.62;-2.81;0.79
 ./data/chordlab/mcgill_billboard/0735/full.lab;Getaway;Earth, Wind & Fire;billboard;;JE8gX6JPziM;-0.53;5.04;0.77
 ./data/chordlab/mcgill_billboard/0736/full.lab;Do I Do;Stevie Wonder;billboard;;FBtUiN_OA9I;0.02;27.26;0.7
-./data/chordlab/mcgill_billboard/0737/full.lab;Shadow Dancing;Andy Gibb;billboard;;Bc7j45ocwdY;-0.66;0.43;0.82
 ./data/chordlab/mcgill_billboard/0741/full.lab;Love Is A Battlefield;Pat Benatar;billboard;;-J9Ss0TgKkY;0.41;12.15;0.72
-./data/chordlab/mcgill_billboard/0742/full.lab;The Power;Snap;billboard;;AmJbjNoxd9U;-8.54;-4.77;0.51
-./data/chordlab/mcgill_billboard/0743/full.lab;One Way Or Another;Blondie;billboard;;PFioWmokVgc;-0.11;-6.57;0.9
 ./data/chordlab/mcgill_billboard/0747/full.lab;Baby Can I Hold You;Tracy Chapman;billboard;;5tDtNUEKZDQ;-0.37;-3.86;0.86
 ./data/chordlab/mcgill_billboard/0748/full.lab;Crying Time;Ray Charles;billboard;;zGpUeOyyps4;2.57;-3.11;0.83
 ./data/chordlab/mcgill_billboard/0749/full.lab;D'yer Mak'er;Led Zeppelin;billboard;;xje-1sw3T0s;-1.77;10.84;0.58
@@ -870,18 +805,11 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0758/full.lab;Come Monday;Jimmy Buffett;billboard;;Qwx-MlbAyJ0;0.09;-3.53;0.91
 ./data/chordlab/mcgill_billboard/0759/full.lab;Foggy Mountain Breakdown;Flatt & Scruggs;billboard;;GkTPe2KCz9E;0.4;-0.85;0.85
 ./data/chordlab/mcgill_billboard/0762/full.lab;Walk Like A Man;Grand Funk Railroad;billboard;;j6C4b7wzZVo;-0.17;-3.74;0.83
-./data/chordlab/mcgill_billboard/0766/full.lab;Ask Me;Elvis Presley;billboard;;7Mvnr2DJir4;-0.08;-0.53;0.66
 ./data/chordlab/mcgill_billboard/0767/full.lab;The Night Chicago Died;Paper Lace;billboard;;p_HrTzgfJD4;0.55;-2.37;0.81
-./data/chordlab/mcgill_billboard/0768/full.lab;That Girl;Stevie Wonder;billboard;;4a0cmyOL9s8;0.69;2.21;0.49
-./data/chordlab/mcgill_billboard/0769/full.lab;All Through The Night;Cyndi Lauper;billboard;;uH9oRCraBnM;-0.39;0.58;0.87
 ./data/chordlab/mcgill_billboard/0770/full.lab;Hair;The Cowsills;billboard;;W1fJdAWfxao;0.52;-7.46;0.68
 ./data/chordlab/mcgill_billboard/0773/full.lab;I Want To Walk You Home;Fats Domino;billboard;;NoA8VVJIzlg;0.42;1.32;0.96
-./data/chordlab/mcgill_billboard/0776/full.lab;Along Comes A Woman;Chicago;billboard;;bDSZ0rwmFh0;-0.81;3.57;0.62
 ./data/chordlab/mcgill_billboard/0777/full.lab;Rescue Me;Fontella Bass;billboard;;YAlLtocFjhg;-0.06;-1.08;0.77
-./data/chordlab/mcgill_billboard/0780/full.lab;Time Is On My Side;The Rolling Stones;billboard;;jkDDk_BKLT8;0.03;0.09;0.95
 ./data/chordlab/mcgill_billboard/0781/full.lab;On Broadway;The Drifters;billboard;;5XtYvR8ryj8;0.13;1.35;0.97
-./data/chordlab/mcgill_billboard/0782/full.lab;Because I Love You (The Postman Song);Stevie B;billboard;;lqd-TAabVVw;0.23;-41.17;0.83
-./data/chordlab/mcgill_billboard/0783/full.lab;Hot Child In The City;Nick Gilder;billboard;;fgeFJ-zhCWo;-3.88;-24.92;0.76
 ./data/chordlab/mcgill_billboard/0788/full.lab;Last Date;Floyd Cramer;billboard;;gQvxfYg0gzI;0.73;-4.14;0.92
 ./data/chordlab/mcgill_billboard/0789/full.lab;Hey! Baby;Bruce Channel;billboard;;R3i8OZ-JCi0;-0.28;1.85;0.7
 ./data/chordlab/mcgill_billboard/0790/full.lab;Everybody Loves Me But You;Brenda Lee;billboard;;CC733sGafUU;0.01;0.01;0.96
@@ -889,13 +817,11 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0792/full.lab;Almost Grown;Chuck Berry;billboard;;f7QNlS1I28Y;-0.01;0.05;0.87
 ./data/chordlab/mcgill_billboard/0793/full.lab;My Way;Elvis Presley;billboard;;D5ILs03QsoQ;-1.89;-6.04;0.54
 ./data/chordlab/mcgill_billboard/0794/full.lab;Catch My Fall;Billy Idol;billboard;;9TLw38QuxCE;7.41;2.11;0.87
-./data/chordlab/mcgill_billboard/0795/full.lab;I Want You;Marvin Gaye;billboard;;xOS0XbQiOfg;0.08;2.79;0.74
 ./data/chordlab/mcgill_billboard/0796/full.lab;You're The First, The Last, My Everything;Barry White;billboard;;642TbkUbRBY;0.07;0.98;0.93
 ./data/chordlab/mcgill_billboard/0797/full.lab;I Don't Love You Anymore;Teddy Pendergrass;billboard;;DRsSANuSDH8;0.61;5.69;0.45
 ./data/chordlab/mcgill_billboard/0798/full.lab;Straight From The Heart;The Allman Brothers Band;billboard;;52_NhineSFY;-0.1;0.78;0.69
 ./data/chordlab/mcgill_billboard/0803/full.lab;True Colors;Cyndi Lauper;billboard;;Uat_lTjrFpk;-0.08;-4.32;0.75
 ./data/chordlab/mcgill_billboard/0804/full.lab;September;Earth, Wind & Fire;billboard;;QMs9PlBji4c;0.26;-70.33;0.35
-./data/chordlab/mcgill_billboard/0805/full.lab;Just A Dream;Jimmy Clanton;billboard;;CiCb6EmacUE;0.52;-0.98;0.88
 ./data/chordlab/mcgill_billboard/0806/full.lab;We're All Alone;Rita Coolidge;billboard;;ZdbGDLC4qhI;0.84;0.34;0.74
 ./data/chordlab/mcgill_billboard/0807/full.lab;You Took The Words Right Out Of My Mouth;Meat Loaf;billboard;;3bIae-Cf-kc;-49.55;-25.45;0.23
 ./data/chordlab/mcgill_billboard/0810/full.lab;Unskinny Bop;Poison;billboard;;iDs91D7WpcE;-0.28;-0.15;0.83
@@ -913,17 +839,12 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0833/full.lab;You Can Call Me Al;Paul Simon;billboard;;OMbfT3Wppjo;0.05;3.04;0.42
 ./data/chordlab/mcgill_billboard/0834/full.lab;Good Morning Starshine;Oliver;billboard;;-8jsHLP4L9I;0.41;-0.32;0.85
 ./data/chordlab/mcgill_billboard/0838/full.lab;Surfin' Safari;The Beach Boys;billboard;;CnfwABFQ6d4;0.19;-1.08;0.81
-./data/chordlab/mcgill_billboard/0839/full.lab;When Will I Be Loved;Linda Ronstadt;billboard;;r4TdEG2drsU;-0.04;-3.15;0.77
 ./data/chordlab/mcgill_billboard/0842/full.lab;Goodbye Yellow Brick Road;Elton John;billboard;;wy709iNG6i8;0.23;-2.65;0.85
-./data/chordlab/mcgill_billboard/0843/full.lab;If I Could Turn Back Time;Cher;billboard;;BUbjmLrp9dc;-0.84;1.97;0.64
 ./data/chordlab/mcgill_billboard/0844/full.lab;Burning Down The House;Talking Heads;billboard;;G_Tu4GkgYYg;-2.99;2.94;0.8
 ./data/chordlab/mcgill_billboard/0845/full.lab;Got My Mind Set On You;George Harrison;billboard;;Mou5RWkTNnU;0.49;1.35;0.76
-./data/chordlab/mcgill_billboard/0846/full.lab;Dance Away;Roxy Music;billboard;;vhKOuLP1w4U;0.58;0.81;0.83
 ./data/chordlab/mcgill_billboard/0847/full.lab;Sweet Surrender;Bread;billboard;;siX--bzWWEw;0.49;-4.82;0.69
 ./data/chordlab/mcgill_billboard/0848/full.lab;Liar, Liar;The Castaways;billboard;;kznFYB6eENs;-0.19;-0.18;0.77
-./data/chordlab/mcgill_billboard/0849/full.lab;Do You Love Me;The Contours;billboard;;LlKRp2KrJuQ;0.63;1.12;0.85
 ./data/chordlab/mcgill_billboard/0850/full.lab;Jump (for My Love);The Pointer Sisters;billboard;;AtU9JBYi1Js;-9.03;-19.04;0.39
-./data/chordlab/mcgill_billboard/0853/full.lab;I Saw Her Standing There;The Beatles;billboard;;oxwAB3SECtc;0.17;-2.07;0.92
 ./data/chordlab/mcgill_billboard/0857/full.lab;Get Up (I Feel Like Being Like A) Sex Machine (Part 1);James Brown;billboard;;U40NEzTDyAs;-2.79;0.13;0.9
 ./data/chordlab/mcgill_billboard/0864/full.lab;Elvira;Oak Ridge Boys;billboard;;2mgxsXu3D9A;0.02;3.07;0.91
 ./data/chordlab/mcgill_billboard/0865/full.lab;Don't Talk To Strangers;Rick Springfield;billboard;;Tzl5k4vENss;-0.29;3.49;0.63
@@ -940,17 +861,12 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0891/full.lab;Happy Jack;The Who;billboard;;j-wrC4_nbZc;1.77;-2.03;0.89
 ./data/chordlab/mcgill_billboard/0894/full.lab;On And On And On;Abba;billboard;;dlUQM5PD51o;0.51;0.41;0.91
 ./data/chordlab/mcgill_billboard/0895/full.lab;A Dream Goes On Forever;Todd Rundgren;billboard;;d-0vMkq758A;0.02;34.76;0.14
-./data/chordlab/mcgill_billboard/0896/full.lab;California Nights;Lesley Gore;billboard;;9KvzNL-p9TI;-0.3;3.69;0.75
 ./data/chordlab/mcgill_billboard/0901/full.lab;Country Road;James Taylor;billboard;;Ub4VAXqfZvk;0.7;4.48;0.67
 ./data/chordlab/mcgill_billboard/0902/full.lab;Honey, Honey;Abba;billboard;;hSy7bWlsbGU;-0.24;1.37;0.93
-./data/chordlab/mcgill_billboard/0903/full.lab;Be My Baby;The Ronettes;billboard;;22G-D_MJDbY;2.43;1.92;0.92
 ./data/chordlab/mcgill_billboard/0904/full.lab;Till The End Of The Day;The Kinks;billboard;;-bVkiI0L8pA;12.67;-18.57;0.27
 ./data/chordlab/mcgill_billboard/0905/full.lab;Teach Your Children;Crosby, Stills & Nash;billboard;;xE1-hPM6YHA;-0.07;-2.59;0.9
-./data/chordlab/mcgill_billboard/0910/full.lab;Time For Me To Fly;REO Speedwagon;billboard;;fjRGFhb0qiA;-0.08;-22.04;0.29
-./data/chordlab/mcgill_billboard/0911/full.lab;Hold On;Wilson Phillips;billboard;;i5tFjYp3_jk;-1.77;-27.11;0.59
 ./data/chordlab/mcgill_billboard/0914/full.lab;If Not You;Dr. Hook;billboard;;JSgGCA0qOUg;-0.2;3.82;0.9
 ./data/chordlab/mcgill_billboard/0915/full.lab;Sweet Caroline (Good Times Never Seemed So Good);Bobby Womack;billboard;;z1yH6DDQ-ww;-0.06;2.32;0.92
-./data/chordlab/mcgill_billboard/0916/full.lab;Promises;Eric Clapton;billboard;;U8P0EVFKV74;0.03;2.21;0.87
 ./data/chordlab/mcgill_billboard/0917/full.lab;Love Song;Anne Murray;billboard;;QTMgAmvFN_g;1.19;-31.03;0.23
 ./data/chordlab/mcgill_billboard/0926/full.lab;Perfidia;The Ventures;billboard;;dyg6nB5jk_c;-0.71;-1.38;0.78
 ./data/chordlab/mcgill_billboard/0927/full.lab;Out Of Sight, Out Of Mind;Little Anthony & The Imperials;billboard;;MLe4NeesAoE;0.07;-3.0;0.8
@@ -974,11 +890,9 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/0985/full.lab;Dancing Machine;The Jacksons;billboard;;kLK90Xbcy3I;-0.28;2.27;0.64
 ./data/chordlab/mcgill_billboard/0986/full.lab;You Make Me Feel Like Dancing;Leo Sayer;billboard;;6D1kuhKRGQ4;0.49;-43.52;0.42
 ./data/chordlab/mcgill_billboard/0987/full.lab;Baby I'm Burnin';Dolly Parton;billboard;;pl0q1x7nRf8;-0.29;5.37;0.65
-./data/chordlab/mcgill_billboard/0988/full.lab;If;Bread;billboard;;n-cK70DXsSA;0.39;-3.04;0.69
 ./data/chordlab/mcgill_billboard/0991/full.lab;The Bitch Is Back;Elton John;billboard;;7GCMjuF82y4;-1.68;-7.43;0.69
 ./data/chordlab/mcgill_billboard/0992/full.lab;Nightshift;Commodores;billboard;;e-wxnOQYIT4;0.37;2.56;0.92
 ./data/chordlab/mcgill_billboard/0993/full.lab;There Goes My Everything;Elvis Presley;billboard;;-hzA6f5NyF4;0.28;-15.38;0.87
-./data/chordlab/mcgill_billboard/0996/full.lab;I Want To Take You Higher;Ike & Tina Turner;billboard;;6cIQQZr-vhw;0.18;2.4;0.92
 ./data/chordlab/mcgill_billboard/1003/full.lab;Baby Come Back;Player;billboard;;flaU5KG8O-s;-0.22;2.58;0.68
 ./data/chordlab/mcgill_billboard/1007/full.lab;Unchained Melody;Righteous Brothers;billboard;;5zzjjkPA5dg;-0.03;-3.18;0.95
 ./data/chordlab/mcgill_billboard/1012/full.lab;All This Time;Sting;billboard;;izDm772fGEE;0.23;7.72;0.71
@@ -987,7 +901,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/1019/full.lab;The Arms Of Orion;Prince (With Sheena Easton);billboard;;9lFa75IUfuc;0.23;-36.19;0.23
 ./data/chordlab/mcgill_billboard/1020/full.lab;Hey You! Get Off My Mountain;The Dramatics;billboard;;irvjOcus_aQ;-0.47;3.35;0.7
 ./data/chordlab/mcgill_billboard/1021/full.lab;Soul Dance Number Three;Wilson Pickett;billboard;;IJermkVMcHQ;0.62;1.49;0.97
-./data/chordlab/mcgill_billboard/1022/full.lab;Surrender;Cheap Trick;billboard;;4gH9-YxLvyk;0.17;1.99;0.88
 ./data/chordlab/mcgill_billboard/1025/full.lab;Over The Hills And Far Away;Led Zeppelin;billboard;;PHr4WNZLVnk;0.7;-4.66;0.67
 ./data/chordlab/mcgill_billboard/1032/full.lab;Down And Out In New York City;James Brown;billboard;;YkKxiREGDx4;-0.25;3.74;0.71
 ./data/chordlab/mcgill_billboard/1033/full.lab;Goin' Back;The Byrds;billboard;;pjmYyXiA3lA;0.33;-0.54;0.82
@@ -1008,7 +921,6 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/1062/full.lab;Tuff Enuff;The Fabulous Thunderbirds;billboard;;qYggOT21jmg;-0.44;0.9;0.86
 ./data/chordlab/mcgill_billboard/1063/full.lab;This Little Girl;Dion;billboard;;BD5n2CHMpy4;0.49;1.16;0.87
 ./data/chordlab/mcgill_billboard/1064/full.lab;Sad Eyes;Robert John;billboard;;yJyfnNUEytw;0.35;1.55;0.64
-./data/chordlab/mcgill_billboard/1067/full.lab;Hurts To Be In Love;Gino Vannelli;billboard;;gEQNipBhanQ;1.25;-65.8;0.24
 ./data/chordlab/mcgill_billboard/1068/full.lab;Never Can Say Goodbye;Gloria Gaynor;billboard;;Fl9vYOxfQ1I;-0.11;1.28;0.8
 ./data/chordlab/mcgill_billboard/1069/full.lab;Must Of Got Lost;The J. Geils Band;billboard;;avSyXCCY8IA;0.73;3.1;0.69
 ./data/chordlab/mcgill_billboard/1070/full.lab;Every Time I Think Of You;The Babys;billboard;;fmXw_s4kRME;0.51;3.68;0.87
@@ -1019,50 +931,38 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/1086/full.lab;Don't Leave Me This Way;Thelma Houston;billboard;;WzAPgUpAWMI;3.06;1.67;0.79
 ./data/chordlab/mcgill_billboard/1087/full.lab;There But For Fortune;Joan Baez;billboard;;M9q9t03W61s;0.49;0.08;0.76
 ./data/chordlab/mcgill_billboard/1094/full.lab;There's No Other (Like My Baby);The Crystals;billboard;;h0CIdpKEHiw;0.7;-9.79;0.25
-./data/chordlab/mcgill_billboard/1097/full.lab;After The Love Has Gone;Earth, Wind & Fire;billboard;;CDwFIrvA494;0.12;-101.7;0.23
 ./data/chordlab/mcgill_billboard/1098/full.lab;Private Dancer;Tina Turner;billboard;;FCMsBpkFJHM;0.37;-0.49;0.73
-./data/chordlab/mcgill_billboard/1099/full.lab;Where Are You;Dinah Washington;billboard;;m435Q6DvDhM;-0.19;0.57;0.65
-./data/chordlab/mcgill_billboard/1100/full.lab;If I Could Build My Whole World Around You;Marvin Gaye,Tammi Terrell;billboard;;_9eWZ1wK9tw;0.09;3.28;0.76
 ./data/chordlab/mcgill_billboard/1101/full.lab;(I was) Born To Cry;Dion;billboard;;GAHSLchGBEo;-0.46;-0.78;0.85
 ./data/chordlab/mcgill_billboard/1102/full.lab;Rock This Town;Stray Cats;billboard;;q1GPU2dIr8I;0.09;-151.11;0.5
-./data/chordlab/mcgill_billboard/1103/full.lab;The Twist;Chubby Checker;billboard;;zkpdhaiHCaQ;-0.39;-0.69;0.84
 ./data/chordlab/mcgill_billboard/1104/full.lab;What You Get Is What You See;Tina Turner;billboard;;8zVyvdF2L_g;-0.24;0.15;0.8
-./data/chordlab/mcgill_billboard/1107/full.lab;Ob-La-Di, Ob-La-Da;The Beatles;billboard;;_J9NpHKrKMw;0.12;0.14;0.92
 ./data/chordlab/mcgill_billboard/1110/full.lab;Reelin' & Rockin';Chuck Berry;billboard;;mlantjoLbjE;-0.14;-1.57;0.77
 ./data/chordlab/mcgill_billboard/1111/full.lab;Land Of 1000 Dances;Chris Kenner;billboard;;3joI5VtuNV0;-0.01;0.89;0.99
 ./data/chordlab/mcgill_billboard/1112/full.lab;Never Knew Love Like This Before;Stephanie Mills;billboard;;qvqTE9NiopE;-0.11;-0.15;0.75
 ./data/chordlab/mcgill_billboard/1113/full.lab;Lonely Weekends;Charlie Rich;billboard;;n1ysCfsvH7I;-0.17;6.3;0.64
 ./data/chordlab/mcgill_billboard/1114/full.lab;Wichita Lineman;Glen Campbell;billboard;;Q8P_xTBpAcY;0.94;2.4;0.74
-./data/chordlab/mcgill_billboard/1117/full.lab;If I Could Build My Whole World Around You;Marvin Gaye,Tammi Terrell;billboard;;_9eWZ1wK9tw;0.09;3.28;0.76
 ./data/chordlab/mcgill_billboard/1118/full.lab;Funny Girl;Barbra Streisand;billboard;;3XZUEMqR5nA;-0.13;-0.18;0.66
 ./data/chordlab/mcgill_billboard/1119/full.lab;Will The Wolf Survive;Los Lobos;billboard;;hpBozsYoD-I;0.81;-4.33;0.83
-./data/chordlab/mcgill_billboard/1120/full.lab;Big Iron;Marty Robbins;billboard;;r7nnpwLZidA;-0.07;-3.27;0.86
 ./data/chordlab/mcgill_billboard/1121/full.lab;A Hazy Shade Of Winter;Simon & Garfunkel;billboard;;FQRTpN_UuFs;-0.17;0.54;0.77
 ./data/chordlab/mcgill_billboard/1124/full.lab;Carry Me;David Crosby,Graham Nash;billboard;;ZBGXGE_nMuM;-0.77;1.27;0.42
 ./data/chordlab/mcgill_billboard/1125/full.lab;Treat Her Right;Roy Head;billboard;;b1P3rlnuTyY;-0.22;0.02;0.88
 ./data/chordlab/mcgill_billboard/1126/full.lab;Invisible Touch;Genesis;billboard;;PJt06VrU1u4;0.39;2.08;0.8
 ./data/chordlab/mcgill_billboard/1127/full.lab;One Less Bell To Answer;The 5th Dimension;billboard;;42g30Rh_LVc;0.21;-1.41;0.58
-./data/chordlab/mcgill_billboard/1133/full.lab;Cruisin';Smokey Robinson;billboard;;fgiEYVpjpdI;-0.01;-84.37;0.65
 ./data/chordlab/mcgill_billboard/1134/full.lab;Mighty Good Lovin';The Miracles;billboard;;k5wgf2MPOmU;0.12;0.52;0.84
 ./data/chordlab/mcgill_billboard/1135/full.lab;Loving Her Was Easier (Than Anything I'll Ever Do Again);Kris Kristofferson;billboard;;H9Q881SJlvQ;-0.19;-5.53;0.95
-./data/chordlab/mcgill_billboard/1136/full.lab;Get Together;The Youngbloods;billboard;;enARFK7cQNI;0.37;-2.22;0.92
 ./data/chordlab/mcgill_billboard/1139/full.lab;Are You Sure Hank Done It This Way;Waylon Jennings;billboard;;Egf9zj2wIVk;-0.26;2.0;0.87
 ./data/chordlab/mcgill_billboard/1140/full.lab;Oh Father;Madonna;billboard;;BIkR-1LN-fE;-12.31;-12.25;0.79
 ./data/chordlab/mcgill_billboard/1141/full.lab;Talk Back Trembling Lips;Johnny Tillotson;billboard;;rRqh-rkOgMg;1.35;-0.28;0.93
-./data/chordlab/mcgill_billboard/1142/full.lab;A Hard Day's Night;The Beatles;billboard;;zx2TFk0vh1I;-0.53;1.45;0.75
 ./data/chordlab/mcgill_billboard/1143/full.lab;I Love A Rainy Night;Eddie Rabbitt;billboard;;NWoL65SexB4;0.05;-0.04;0.89
 ./data/chordlab/mcgill_billboard/1146/full.lab;Abraham, Martin And John;Dion;billboard;;rwn8hIyiHvI;0.91;-4.25;0.82
 ./data/chordlab/mcgill_billboard/1147/full.lab;A Cowboys Work Is Never Done;Sonny & Cher;billboard;;MUMrxVaqQIA;18.37;1.96;0.8
 ./data/chordlab/mcgill_billboard/1148/full.lab;I Don't Want Your Love;Duran Duran;billboard;;K_lYIJ6KG98;-1.51;-11.48;0.58
 ./data/chordlab/mcgill_billboard/1149/full.lab;Going To Chicago Blues;Count Basie;billboard;;IE7-vOO69OM;5.96;0.42;0.62
-./data/chordlab/mcgill_billboard/1150/full.lab;Rock This Town;Stray Cats;billboard;;q1GPU2dIr8I;0.09;-151.11;0.5
 ./data/chordlab/mcgill_billboard/1151/full.lab;(You're My) Soul And Inspiration;The Righteous Brothers;billboard;;uCQiNJPGTmg;-0.76;3.67;0.16
 ./data/chordlab/mcgill_billboard/1152/full.lab;Love Came To Me;Dion;billboard;;HyymBQgRQ-M;-0.04;0.4;0.96
 ./data/chordlab/mcgill_billboard/1153/full.lab;The Sounds Of Silence;Simon & Garfunkel;billboard;;91HkvzUiFhs;0.35;0.06;0.8
 ./data/chordlab/mcgill_billboard/1154/full.lab;Think Of Me;Buck Owens;billboard;;T_zNlG5TovA;0.05;-0.42;0.94
 ./data/chordlab/mcgill_billboard/1155/full.lab;Running On Empty;Jackson Browne;billboard;;lFQKvtbD6Kw;-0.02;-6.29;0.75
 ./data/chordlab/mcgill_billboard/1161/full.lab;Daddy's Home;Cliff Richard;billboard;;E6-KPW9mYxA;0.28;-9.83;0.84
-./data/chordlab/mcgill_billboard/1162/full.lab;Cruisin';Smokey Robinson;billboard;;fgiEYVpjpdI;-0.01;-84.37;0.65
 ./data/chordlab/mcgill_billboard/1163/full.lab;My Love;Paul McCartney;billboard;;jhZMFLHnGIU;-1.17;-3.74;0.82
 ./data/chordlab/mcgill_billboard/1164/full.lab;Ten Percent;Double Exposure;billboard;;iib0ba2CSco;-0.74;-249.87;0.25
 ./data/chordlab/mcgill_billboard/1167/full.lab;Rebel Yell;Billy Idol;billboard;;seHlHzYpWBU;0.42;-0.38;0.78
@@ -1074,42 +974,30 @@ filepath;song;artist;subset;album;video_id;start_diff;stop_diff;csr
 ./data/chordlab/mcgill_billboard/1178/full.lab;I Want You Back;The Jacksons;billboard;;OFw5xkD3bjE;0.18;2.21;0.52
 ./data/chordlab/mcgill_billboard/1181/full.lab;Kicks;Paul Revere & The Raiders;billboard;;JRSHuS03VhI;-0.18;0.67;0.72
 ./data/chordlab/mcgill_billboard/1182/full.lab;My World Fell Down;Sagittarius;billboard;;xYol-vW_brI;0.51;2.52;0.3
-./data/chordlab/mcgill_billboard/1183/full.lab;Private Dancer;Tina Turner;billboard;;FCMsBpkFJHM;0.37;-0.49;0.73
 ./data/chordlab/mcgill_billboard/1193/full.lab;She's A Woman;The Beatles;billboard;;bsA8cAFJTB0;-3.33;-2.46;0.78
 ./data/chordlab/mcgill_billboard/1194/full.lab;The Year That Clayton Delaney Died;Tom T. Hall;billboard;;Kpxj65nNZUk;-0.19;-2.77;0.94
 ./data/chordlab/mcgill_billboard/1201/full.lab;Three Times A Lady;Commodores;billboard;;h2IHexgN6Ns;0.21;-9.23;0.68
-./data/chordlab/mcgill_billboard/1204/full.lab;Heartbreaker;Pat Benatar;billboard;;fJIQ8Z5Lk4s;1.04;-8.32;0.75
 ./data/chordlab/mcgill_billboard/1211/full.lab;You Don't Own Me;Lesley Gore;billboard;;ZRTCx_1Reec;0.36;0.06;0.91
 ./data/chordlab/mcgill_billboard/1212/full.lab;Baby Don't Go;Sonny & Cher;billboard;;dWNJtUd4WjA;0.2;3.07;0.77
-./data/chordlab/mcgill_billboard/1213/full.lab;I Don't Want To Spoil The Party;The Beatles;billboard;;zqVDvLDLsjI;0.04;-2.13;0.88
 ./data/chordlab/mcgill_billboard/1218/full.lab;Behind Closed Doors;Charlie Rich;billboard;;DJ5GhOi2h5Q;0.02;-4.65;0.85
 ./data/chordlab/mcgill_billboard/1221/full.lab;I'm In Love;Wilson Pickett;billboard;;LMDdgmbRlvw;1.18;4.06;0.8
-./data/chordlab/mcgill_billboard/1222/full.lab;Carrie;Cliff Richard;billboard;;5KdqDzXpmHQ;0.28;1.03;0.69
 ./data/chordlab/mcgill_billboard/1223/full.lab;I'll Tumble 4 Ya;Culture Club;billboard;;LU1cYc0iaVY;-7.35;1.17;0.58
-./data/chordlab/mcgill_billboard/1226/full.lab;All She Wants Is;Duran Duran;billboard;;0pFwBnfFLDw;2.98;-5.28;0.63
-./data/chordlab/mcgill_billboard/1227/full.lab;25 Or 6 To 4;Chicago;billboard;;iPYH4s7_e34;-0.22;-0.66;0.51
 ./data/chordlab/mcgill_billboard/1228/full.lab;Saturday Night;Bay City Rollers;billboard;;MsUj1OlcwI0;-1.36;-2.35;0.76
-./data/chordlab/mcgill_billboard/1229/full.lab;You've Got A Friend;Roberta Flack,Donny Hathaway;billboard;;RwMlpBbvB_I;0.91;1.62;0.73
-./data/chordlab/mcgill_billboard/1235/full.lab;For Ol' Times Sake;Elvis Presley;billboard;;cBdUUWgbpps;-0.17;0.64;0.91
 ./data/chordlab/mcgill_billboard/1240/full.lab;Alive Again;Chicago;billboard;;J9SQ3vWPfJU;-1.73;0.89;0.84
 ./data/chordlab/mcgill_billboard/1245/full.lab;Paper Roses;Marie Osmond;billboard;;xm--79YlEso;1.47;-1.57;0.88
 ./data/chordlab/mcgill_billboard/1246/full.lab;Happy Man;Greg Kihn Band;billboard;;5ofYwO5KjFM;0.0;5.73;0.8
 ./data/chordlab/mcgill_billboard/1247/full.lab;20-75;Willie Mitchell;billboard;;fg1L2K5Ip1w;-0.48;1.6;0.72
 ./data/chordlab/mcgill_billboard/1248/full.lab;That's Old Fashioned (That's The Way Love Should Be);The Everly Brothers;billboard;;EIzETziK7IU;-0.05;-2.29;0.42
 ./data/chordlab/mcgill_billboard/1249/full.lab;Rock'n Me;Steve Miller Band;billboard;;_3_8M2eEdok;0.2;5.0;0.83
-./data/chordlab/mcgill_billboard/1250/full.lab;Baby Don't Change Your Mind;Gladys Knight & The Pips;billboard;;kscYbB2NDVI;0.72;1.02;0.64
 ./data/chordlab/mcgill_billboard/1257/full.lab;Lovin' You;Minnie Riperton;billboard;;REe_U1MxIKM;-0.84;2.72;0.68
 ./data/chordlab/mcgill_billboard/1258/full.lab;Lady;Kenny Rogers;billboard;;BkYihryVnPs;0.16;-10.13;0.8
 ./data/chordlab/mcgill_billboard/1261/full.lab;El Condor Pasa;Simon & Garfunkel;billboard;;1PKzDvqxAiE;9.68;0.13;0.86
-./data/chordlab/mcgill_billboard/1266/full.lab;Honky Tonk Women;The Rolling Stones;billboard;;G-eRyFnLe9w;3.5;-84.69;0.47
 ./data/chordlab/mcgill_billboard/1267/full.lab;Rock And Roll, Hoochie Koo;Rick Derringer;billboard;;0Y_An0SmXe4;-8.44;-8.37;0.34
 ./data/chordlab/mcgill_billboard/1268/full.lab;Frankenstein;Edgar Winter;billboard;;P57rRpl2hpo;-0.22;-13.41;0.56
 ./data/chordlab/mcgill_billboard/1269/full.lab;Who Wears These Shoes?;Elton John;billboard;;n0fQntP8990;0.19;0.68;0.93
 ./data/chordlab/mcgill_billboard/1270/full.lab;Lambada;Kaoma;billboard;;ZRMcMuxRuKQ;-0.14;0.35;0.9
-./data/chordlab/mcgill_billboard/1271/full.lab;The Rose;Bette Midler;billboard;;2fnaFzFluM0;-9.95;-5.98;0.69
 ./data/chordlab/mcgill_billboard/1272/full.lab;Sidewalk Surfin';Jan & Dean;billboard;;4LJ0OBJb8QE;2.26;9.89;0.71
 ./data/chordlab/mcgill_billboard/1273/full.lab;We Don't Talk Anymore;Cliff Richard;billboard;;-B_Blwz8CN0;0.12;-1.1;0.64
-./data/chordlab/mcgill_billboard/1274/full.lab;She Bop;Cyndi Lauper;billboard;;iMI9sUnIO4g;-0.15;2.53;0.88
 ./data/chordlab/mcgill_billboard/1277/full.lab;American Storm;Bob Seger;billboard;;0IBcWdUJNUY;0.57;15.87;0.67
 ./data/chordlab/mcgill_billboard/1280/full.lab;Treat Her Like A Lady;Cornelius Brothers & Sister Rose;billboard;;JM08H4P1JFw;0.1;3.19;0.93
 ./data/chordlab/mcgill_billboard/1281/full.lab;When It's Love;Van Halen;billboard;;KcHrNHS9KTQ;0.07;-3.25;0.82
