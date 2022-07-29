@@ -21,16 +21,3 @@ def download_video(video_id: str, output_path: str) -> str:
         except pytube.exceptions.VideoUnavailable:
             print(f"Video {video_id} is unavailable!")
             return None
-
-
-def download_videos(index: pd.DataFrame, max_workers: int = 3):
-    executor = ThreadPoolExecutor(max_workers=max_workers)
-    list(
-        tqdm(
-            executor.map(
-                lambda idx_and_song: download_video(idx_and_song[1]["videoId"]),
-                list(index.iterrows()),
-            ),
-            total=len(index),
-        )
-    )
