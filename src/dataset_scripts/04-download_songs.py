@@ -4,16 +4,20 @@ from tqdm import tqdm
 
 from src.dataset_scripts.downloading import download_video
 
+
+def _download(idx_and_song):
+    idx, song = idx_and_song
+    if not pd.isna(song["purpose"]):
+        return download_video(song["video_id"], "./data/audio")
+    else:
+        return None
+
+
 index = pd.read_csv("./data/index.csv", sep=";")
-
 executor = ThreadPoolExecutor()
-
 audio_filepaths = list(
     tqdm(
-        executor.map(
-            lambda idx_and_song: download_video(idx_and_song[1]["video_id"], "./data/audio/"),
-            list(index.iterrows()),
-        ),
+        executor.map(_download, list(index.iterrows())),
         total=len(index),
     )
 )
