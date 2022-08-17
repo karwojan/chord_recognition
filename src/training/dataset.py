@@ -2,10 +2,12 @@ import warnings
 import pandas as pd
 import numpy as np
 import librosa
+from datetime import timedelta
 from torch.utils.data import Dataset
 from dataclasses import dataclass
 
 from src.annotation_parser import parse_annotation_file
+from tqdm import tqdm
 
 
 @dataclass
@@ -18,6 +20,7 @@ class SongDatasetItem:
 class SongDataset(Dataset):
     def __init__(
         self,
+        purpose: str,
         sample_rate: int,
         frame_size: int,
         hop_size: int,
@@ -27,6 +30,7 @@ class SongDataset(Dataset):
         spectrogram_method: str = None,
     ):
         # store parameters
+        self.purpose = purpose
         self.sample_rate = sample_rate
         self.frame_size = frame_size
         self.frame_duration = frame_size / sample_rate
@@ -45,9 +49,16 @@ class SongDataset(Dataset):
             t = int(t * sample_rate)
             return int(round(t // hop_size + t % hop_size / frame_size))
 
-        for _, song_metadata in pd.read_csv("./data/index.csv", sep=";").iterrows():
+        durations = []
+        songs_metadata = pd.read_csv("./data/index.csv", sep=";").query("purpose == @purpose")
+        for _, song_metadata in tqdm(songs_metadata.iterrows(), total=songs_metadata.shape[0]):
+            # check if there is audio file for this song
+            if pd.isna(song_metadata.audio_filepath):
+                continue
+
             # get song duration in seconds and in frames
             duration = librosa.get_duration(filename=song_metadata.audio_filepath)
+            durations.append(duration)
             n_frames = int(np.ceil(duration * sample_rate / hop_size))
 
             # assign annotations (labels) to frames
@@ -65,6 +76,7 @@ class SongDataset(Dataset):
                 )
                 for _ in range(n_items)
             ]
+        print(f"Loaded {len(durations)} songs ({timedelta(seconds=int(sum(durations)))}).")
 
         # prepare indices to gather frames from item
         self.item_indices = np.reshape(
@@ -122,6 +134,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     ds = SongDataset(
+        "train",
         sample_rate=44100,
         frame_size=4410,
         hop_size=4410,
