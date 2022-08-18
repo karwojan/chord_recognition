@@ -1,20 +1,57 @@
+import os
 import warnings
 import pandas as pd
 import numpy as np
 import librosa
+from typing import Callable, Any, Dict
 from datetime import timedelta
 from torch.utils.data import Dataset
-from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
 
 from src.annotation_parser import parse_annotation_file
 from tqdm import tqdm
 
 
-@dataclass
-class SongDatasetItem:
-    path: str
-    n_frames: int
-    labels: np.ndarray
+def preprocess_cqt(
+    audio: np.ndarray,
+    sample_rate: int,
+    frame_size: int,
+    hop_size: int,
+    fmin=librosa.note_to_hz("C1"),
+    n_bins=6 * 24,
+    bins_per_octave=24,
+) -> np.ndarray:
+    return np.log(
+        np.abs(
+            librosa.cqt(
+                audio,
+                sr=sample_rate,
+                hop_length=hop_size,
+                fmin=fmin,
+                n_bins=n_bins,
+                bins_per_octave=bins_per_octave,
+            ).T
+        )
+        + 10e-6
+    )
+
+
+def preprocess_just_split(
+    audio: np.ndarray, sample_rate: int, frame_size: int, hop_size: int
+) -> np.ndarray:
+    # find number of whole frames in audio
+    n_frames = len(audio) // hop_size
+    while ((n_frames - 1) * hop_size + frame_size) > audio:
+        n_frames = n_frames - 1
+
+    # split into frames
+    return audio[
+        np.reshape(
+            np.tile(np.arange(frame_size), n_frames)
+            + np.repeat(np.arange(n_frames) * hop_size, frame_size),
+            (n_frames, frame_size),
+        )
+    ]
 
 
 class SongDataset(Dataset):
@@ -26,9 +63,12 @@ class SongDataset(Dataset):
         hop_size: int,
         frames_per_item: int,
         items_per_song_factor: float,
+        audio_preprocessing: Callable[[np.ndarray, int, int, int, Any], np.ndarray],
+        audio_preprocessing_kwargs: Dict[str, Any] = {},
         labels_vocabulary: str = "root_only",
-        spectrogram_method: str = None,
     ):
+        super().__init__()
+
         # store parameters
         self.purpose = purpose
         self.sample_rate = sample_rate
@@ -40,107 +80,94 @@ class SongDataset(Dataset):
         self.item_size = frames_per_item * hop_size + (frame_size - hop_size)
         self.item_duration = self.item_size / sample_rate
         self.items_per_song_factor = items_per_song_factor
-        self.spectrogram_method = spectrogram_method
-
-        # prepare items
-        self.items = []
+        self.audio_preprocessing = audio_preprocessing
+        self.audio_preprocessing_kwargs = audio_preprocessing_kwargs
+        self.cache_path = "./data/cache"
 
         def _time_to_frame_index(t):
             t = int(t * sample_rate)
             return int(round(t // hop_size + t % hop_size / frame_size))
 
-        durations = []
-        songs_metadata = pd.read_csv("./data/index.csv", sep=";").query("purpose == @purpose")
-        for _, song_metadata in tqdm(songs_metadata.iterrows(), total=songs_metadata.shape[0]):
-            # check if there is audio file for this song
-            if pd.isna(song_metadata.audio_filepath):
-                continue
+        def _load_item(idx_and_song_metadata):
+            song_metadata = idx_and_song_metadata[1]
+            cached_item_path = os.path.join(self.cache_path, f"{song_metadata.name}.npz")
 
-            # get song duration in seconds and in frames
-            duration = librosa.get_duration(filename=song_metadata.audio_filepath)
-            durations.append(duration)
-            n_frames = int(np.ceil(duration * sample_rate / hop_size))
+            if os.path.exists(cached_item_path):
+                n_frames = np.load(cached_item_path)["audio"].shape[0]
+            else:
+                # load audio file (supress librosa warnings)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    audio = librosa.load(
+                        path=song_metadata.audio_filepath, sr=self.sample_rate
+                    )[0]
 
-            # assign annotations (labels) to frames
-            labels_per_frames = np.zeros(shape=(n_frames,), dtype=int)
-            for chord in parse_annotation_file(song_metadata.filepath):
-                labels_per_frames[
-                    _time_to_frame_index(chord.start): _time_to_frame_index(chord.stop)
-                ] = chord.to_label_occurence(labels_vocabulary).label
-
-            # store items (n_items references to the same song)
-            n_items = int(self.items_per_song_factor * n_frames)
-            self.items += [
-                SongDatasetItem(
-                    song_metadata.audio_filepath, n_frames, labels_per_frames
+                # preprocess - split into frames
+                audio = self.audio_preprocessing(
+                    audio,
+                    self.sample_rate,
+                    self.frame_size,
+                    self.hop_size,
+                    **self.audio_preprocessing_kwargs,
                 )
-                for _ in range(n_items)
-            ]
-        print(f"Loaded {len(durations)} songs ({timedelta(seconds=int(sum(durations)))}).")
+                n_frames = audio.shape[0]
 
-        # prepare indices to gather frames from item
-        self.item_indices = np.reshape(
-            np.tile(np.arange(frame_size), frames_per_item)
-            + np.repeat(np.arange(frames_per_item) * hop_size, frame_size),
-            (frames_per_item, frame_size),
+                # assign annotations (labels) to frames
+                labels = np.zeros(shape=(n_frames,), dtype=int)
+                for chord in parse_annotation_file(song_metadata.filepath):
+                    labels[
+                        _time_to_frame_index(chord.start): _time_to_frame_index(chord.stop)
+                    ] = chord.to_label_occurence(labels_vocabulary).label
+
+                # store in cache
+                np.savez(cached_item_path, audio=audio, labels=labels)
+
+            # prepare items
+            items = [cached_item_path] * int(self.items_per_song_factor * n_frames)
+
+            return items, n_frames
+
+        # load items
+        songs_metadata = pd.read_csv("./data/index.csv", sep=";").query(
+            "purpose == @purpose and not audio_filepath != audio_filepath"
+        )
+        items_per_song, n_frames_per_song = zip(
+            *tqdm(
+                ThreadPoolExecutor().map(_load_item, songs_metadata.iterrows()),
+                total=songs_metadata.shape[0],
+            )
+        )
+        self.items = [item for items in items_per_song for item in items]
+        print(
+            f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_duration))})."
         )
 
     def __len__(self):
         return len(self.items)
 
     def __getitem__(self, index):
-        item = self.items[index]
-        start_frame_index = np.random.randint(item.n_frames - self.frames_per_item)
+        item = np.load(self.items[index])
+        audio = item["audio"]
+        labels = item["labels"]
+        start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
 
-        # load samples
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            audio = librosa.load(
-                path=item.path,
-                sr=self.sample_rate,
-                offset=start_frame_index * self.hop_duration,
-                duration=self.item_duration,
-            )[0]
-        # pad to item size (just in case)
-        audio = np.pad(audio, ((0, len(audio) - self.item_size),), mode="edge")
-
-        # split into frames (with optional change to frequency domain)
-        if self.spectrogram_method is None:
-            audio = audio[self.item_indices]
-        elif self.spectrogram_method == "cqt":
-            audio = np.log(
-                np.abs(
-                    librosa.cqt(
-                        audio,
-                        sr=self.sample_rate,
-                        hop_length=self.hop_size,
-                        fmin=librosa.note_to_hz("C1"),
-                        n_bins=6 * 24,
-                        bins_per_octave=24,
-                    )
-                )
-                + 10e-6
-            )[:, : self.frames_per_item].T
-
-        # get labels
-        labels = self.items[index].labels[
-            start_frame_index: start_frame_index + self.frames_per_item
-        ]
-
-        return audio, labels
+        return (
+            audio[start_frame_index: start_frame_index + self.frames_per_item],
+            labels[start_frame_index: start_frame_index + self.frames_per_item],
+        )
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     ds = SongDataset(
-        "train",
+        "validate",
         sample_rate=44100,
         frame_size=4410,
         hop_size=4410,
         frames_per_item=100,
         items_per_song_factor=1.0,
-        spectrogram_method="cqt",
+        audio_preprocessing=preprocess_cqt,
     )
     for i in range(3):
         plt.subplot(3, 1, i + 1)
