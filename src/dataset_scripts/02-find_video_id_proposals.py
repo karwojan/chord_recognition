@@ -38,8 +38,7 @@ def find_song(idx_and_song):
     if isinstance(song["album"], str):
         query += " " + song["album"]
     try:
-        yt = YTMusic()
-        search_results = yt.search(query, filter="songs")[:10]
+        search_results = YTMusic().search(query, filter="songs")[:10]
     except Exception as e:
         print(e)
         return None, (None, None, None)
@@ -48,7 +47,6 @@ def find_song(idx_and_song):
     print(f"Found {len(video_ids)} videos for song \"{song['song']}\" basing on names.")
     if len(video_ids) == 0:
         video_ids = [s["videoId"] for s in search_results]
-        video_ids += [s["videoId"] for s in yt.search(query, filter="videos")[:3]]
     # SELECTION STEP 2: select videos basing on CSR
     if len(video_ids) > 0:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -57,8 +55,8 @@ def find_song(idx_and_song):
                 evaluate_video(song["filepath"], audio_filepath)
                 for audio_filepath in audio_filepaths
             ]
-        best_metrics = min(metrics, key=lambda m: (abs(m[0]) + abs(m[1])) if m[2] is not None else 1000)
-        print(f"Best matching video for song \"{song['song']}\" has metrics = {best_metrics}")
+        best_metrics = max(metrics, key=lambda m: m[2] if m[2] is not None else 0)
+        print(f"Best matching video for song \"{song['song']}\" has CSR = {best_metrics[2]}")
         if best_metrics[2] is not None:
             return video_ids[metrics.index(best_metrics)], best_metrics
     return None, (None, None, None)
