@@ -8,7 +8,8 @@ import mlflow
 from tqdm import tqdm
 from einops import rearrange
 
-from src.training.dataset import SongDataset, preprocess_cqt
+from src.training.dataset import SongDataset
+from src.training.preprocessing import CQTPreprocessing
 from src.training.btc_model import BTC_model
 
 
@@ -20,6 +21,8 @@ def create_argparser():
     parser.add_argument("--frame_size", type=int, required=True)
     parser.add_argument("--hop_size", type=int, required=True)
     parser.add_argument("--frames_per_item", type=int, required=True)
+    parser.add_argument("--items_per_song_factor", type=float, required=True)
+    parser.add_argument("--pitch_shift_augment", action="store_true")
 
     # training
     parser.add_argument("--n_epochs", type=int, required=True)
@@ -42,12 +45,12 @@ def train(args):
         "frame_size": args.frame_size,
         "hop_size": args.hop_size,
         "frames_per_item": args.frames_per_item,
-        "items_per_song_factor": 1 / args.frames_per_item,
-        "audio_preprocessing": preprocess_cqt,
+        "items_per_song_factor": args.items_per_song_factor,
+        "audio_preprocessing": CQTPreprocessing(),
         "labels_vocabulary": "maj_min",
         "subsets": ["isophonics", "robbie_williams", "uspop"]
     }
-    train_ds = SongDataset(["train"], **ds_kwargs)
+    train_ds = SongDataset(["train"], **ds_kwargs, pitch_shift_augment=args.pitch_shift_augment)
     train_dl = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
     )
