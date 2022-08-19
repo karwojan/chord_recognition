@@ -3,7 +3,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import librosa
-from typing import Callable, Any, Dict, List
+from typing import List
 from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
@@ -35,12 +35,8 @@ class SongDataset(Dataset):
         self.purposes = purposes
         self.sample_rate = sample_rate
         self.frame_size = frame_size
-        self.frame_duration = frame_size / sample_rate
         self.hop_size = hop_size
-        self.hop_duration = hop_size / sample_rate
         self.frames_per_item = frames_per_item
-        self.item_size = frames_per_item * hop_size + (frame_size - hop_size)
-        self.item_duration = self.item_size / sample_rate
         self.items_per_song_factor = items_per_song_factor
         self.audio_preprocessing = audio_preprocessing
         self.standardize_audio = standardize_audio
@@ -72,12 +68,11 @@ class SongDataset(Dataset):
                     )[0]
 
                 # preprocess - split into frames
-                audio = self.audio_preprocessing(
+                audio = self.audio_preprocessing.preprocess(
                     audio,
                     self.sample_rate,
                     self.frame_size,
                     self.hop_size,
-                    **self.audio_preprocessing_kwargs,
                 )
                 n_frames = audio.shape[0]
 
@@ -94,7 +89,9 @@ class SongDataset(Dataset):
                 np.savez(cached_item_path, audio=audio, labels=labels)
 
             # prepare items
-            items = [cached_item_path] * int(self.items_per_song_factor * n_frames)
+            items = [cached_item_path]
+            if self.frames_per_item > 0:
+                items = items * int(self.items_per_song_factor * n_frames)
 
             return items, n_frames, np.mean(audio), np.mean(audio**2)
 
@@ -119,7 +116,7 @@ class SongDataset(Dataset):
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
         print(
-            f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_duration))})."
+            f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_size / self.sample_rate))})."
         )
 
     def __len__(self):
@@ -131,14 +128,15 @@ class SongDataset(Dataset):
         audio = item["audio"]
         labels = item["labels"]
 
-        # select random item from this file
-        start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
-        audio = item["audio"][
-            start_frame_index: start_frame_index + self.frames_per_item
-        ]
-        labels = item["labels"][
-            start_frame_index: start_frame_index + self.frames_per_item
-        ]
+        # select random item from this file if item size is defined
+        if self.frames_per_item > 0:
+            start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
+            audio = item["audio"][
+                start_frame_index: start_frame_index + self.frames_per_item
+            ]
+            labels = item["labels"][
+                start_frame_index: start_frame_index + self.frames_per_item
+            ]
 
         # optionally standardize frames values
         if self.standardize_audio:
@@ -168,7 +166,7 @@ if __name__ == "__main__":
         sample_rate=44100,
         frame_size=4410,
         hop_size=4410,
-        frames_per_item=100,
+        frames_per_item=0,
         items_per_song_factor=1.0,
         audio_preprocessing=CQTPreprocessing(),
         standardize_audio=True,
