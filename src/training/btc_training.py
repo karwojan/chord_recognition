@@ -45,12 +45,13 @@ def train(args):
         "items_per_song_factor": 1 / args.frames_per_item,
         "audio_preprocessing": preprocess_cqt,
         "labels_vocabulary": "maj_min",
+        "subsets": ["isophonics", "robbie_williams", "uspop"]
     }
-    train_ds = SongDataset("train", **ds_kwargs)
+    train_ds = SongDataset(["train"], **ds_kwargs)
     train_dl = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
     )
-    validate_ds = SongDataset("validate", **ds_kwargs)
+    validate_ds = SongDataset(["validate"], **ds_kwargs)
     validate_dl = DataLoader(
         validate_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
     )
