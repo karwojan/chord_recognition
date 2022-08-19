@@ -96,7 +96,9 @@ class SongDataset(Dataset):
             )
 
             if os.path.exists(cached_item_path):
-                n_frames = np.load(cached_item_path)["audio"].shape[0]
+                item = np.load(cached_item_path)
+                audio = item["audio"]
+                n_frames = audio.shape[0]
             else:
                 # load audio file (supress librosa warnings)
                 with warnings.catch_warnings():
@@ -130,7 +132,7 @@ class SongDataset(Dataset):
             # prepare items
             items = [cached_item_path] * int(self.items_per_song_factor * n_frames)
 
-            return items, n_frames
+            return items, n_frames, np.mean(audio), np.mean(audio ** 2)
 
         # load index
         songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -143,13 +145,15 @@ class SongDataset(Dataset):
             )
 
         # load items
-        items_per_song, n_frames_per_song = zip(
+        items_per_song, n_frames_per_song, mean_per_song, mean_2_per_song = zip(
             *tqdm(
                 ThreadPoolExecutor().map(_load_item, songs_metadata.iterrows()),
                 total=songs_metadata.shape[0],
             )
         )
         self.items = [item for items in items_per_song for item in items]
+        self.mean = np.mean(mean_per_song)
+        self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean ** 2)
         print(
             f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_duration))})."
         )
@@ -159,7 +163,7 @@ class SongDataset(Dataset):
 
     def __getitem__(self, index):
         item = np.load(self.items[index])
-        audio = item["audio"]
+        audio = (item["audio"] - self.mean) / self.std
         labels = item["labels"]
         start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
 
@@ -182,6 +186,7 @@ if __name__ == "__main__":
         audio_preprocessing=preprocess_cqt,
         subsets=["isophonics", "rs200"]
     )
+    print(ds.mean, ds.std)
     for i in range(3):
         plt.subplot(3, 1, i + 1)
         item = ds[i]
