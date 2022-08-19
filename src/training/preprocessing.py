@@ -37,13 +37,12 @@ class CQTPreprocessing(Preprocessing):
 
     def pitch_shift_augment(self, audio: np.ndarray, shift: int) -> np.ndarray:
         shift = shift * self.bins_per_octave // 12
-        minimum = np.min(audio)
         if shift > 0:
             audio = audio[:, :-shift]
-            audio = np.pad(audio, ((0, 0), (shift, 0)), mode="constant", constant_values=minimum)
+            audio = np.pad(audio, ((0, 0), (shift, 0)), mode="minimum")
         elif shift < 0:
             audio = audio[:, -shift:]
-            audio = np.pad(audio, ((0, 0), (0, -shift)), mode="constant", constant_values=minimum)
+            audio = np.pad(audio, ((0, 0), (0, -shift)), mode="minimum")
         return audio
 
 
