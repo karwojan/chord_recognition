@@ -3,7 +3,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import librosa
-from typing import Callable, Any, Dict
+from typing import Callable, Any, Dict, List
 from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
@@ -57,7 +57,7 @@ def preprocess_just_split(
 class SongDataset(Dataset):
     def __init__(
         self,
-        purpose: str,
+        purposes: List[str],
         sample_rate: int,
         frame_size: int,
         hop_size: int,
@@ -66,11 +66,12 @@ class SongDataset(Dataset):
         audio_preprocessing: Callable[[np.ndarray, int, int, int, Any], np.ndarray],
         audio_preprocessing_kwargs: Dict[str, Any] = {},
         labels_vocabulary: str = "root_only",
+        subsets: List[str] = None,
     ):
         super().__init__()
 
         # store parameters
-        self.purpose = purpose
+        self.purposes = purposes
         self.sample_rate = sample_rate
         self.frame_size = frame_size
         self.frame_duration = frame_size / sample_rate
@@ -90,7 +91,9 @@ class SongDataset(Dataset):
 
         def _load_item(idx_and_song_metadata):
             song_metadata = idx_and_song_metadata[1]
-            cached_item_path = os.path.join(self.cache_path, f"{song_metadata.name}.npz")
+            cached_item_path = os.path.join(
+                self.cache_path, f"{song_metadata.name}.npz"
+            )
 
             if os.path.exists(cached_item_path):
                 n_frames = np.load(cached_item_path)["audio"].shape[0]
@@ -116,7 +119,9 @@ class SongDataset(Dataset):
                 labels = np.zeros(shape=(n_frames,), dtype=int)
                 for chord in parse_annotation_file(song_metadata.filepath):
                     labels[
-                        _time_to_frame_index(chord.start): _time_to_frame_index(chord.stop)
+                        _time_to_frame_index(chord.start): _time_to_frame_index(
+                            chord.stop
+                        )
                     ] = chord.to_label_occurence(labels_vocabulary).label
 
                 # store in cache
@@ -127,10 +132,17 @@ class SongDataset(Dataset):
 
             return items, n_frames
 
-        # load items
-        songs_metadata = pd.read_csv("./data/index.csv", sep=";").query(
-            "purpose == @purpose and not audio_filepath != audio_filepath"
+        # load index
+        songs_metadata = pd.read_csv("./data/index.csv", sep=";")
+        songs_metadata = songs_metadata.query(
+            " or ".join([f"purpose == '{purpose}'" for purpose in purposes])
         )
+        if subsets is not None:
+            songs_metadata = songs_metadata.query(
+                " or ".join([f"subset == '{subset}'" for subset in subsets])
+            )
+
+        # load items
         items_per_song, n_frames_per_song = zip(
             *tqdm(
                 ThreadPoolExecutor().map(_load_item, songs_metadata.iterrows()),
@@ -161,13 +173,14 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     ds = SongDataset(
-        "validate",
+        ["validate"],
         sample_rate=44100,
         frame_size=4410,
         hop_size=4410,
         frames_per_item=100,
         items_per_song_factor=1.0,
         audio_preprocessing=preprocess_cqt,
+        subsets=["isophonics", "rs200"]
     )
     for i in range(3):
         plt.subplot(3, 1, i + 1)
