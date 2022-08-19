@@ -7,51 +7,11 @@ from typing import Callable, Any, Dict, List
 from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
-
-from src.annotation_parser import parse_annotation_file
 from tqdm import tqdm
 
-
-def preprocess_cqt(
-    audio: np.ndarray,
-    sample_rate: int,
-    frame_size: int,
-    hop_size: int,
-    fmin=librosa.note_to_hz("C1"),
-    n_bins=6 * 24,
-    bins_per_octave=24,
-) -> np.ndarray:
-    return np.log(
-        np.abs(
-            librosa.cqt(
-                audio,
-                sr=sample_rate,
-                hop_length=hop_size,
-                fmin=fmin,
-                n_bins=n_bins,
-                bins_per_octave=bins_per_octave,
-            ).T
-        )
-        + 10e-6
-    )
-
-
-def preprocess_just_split(
-    audio: np.ndarray, sample_rate: int, frame_size: int, hop_size: int
-) -> np.ndarray:
-    # find number of whole frames in audio
-    n_frames = len(audio) // hop_size
-    while ((n_frames - 1) * hop_size + frame_size) > audio:
-        n_frames = n_frames - 1
-
-    # split into frames
-    return audio[
-        np.reshape(
-            np.tile(np.arange(frame_size), n_frames)
-            + np.repeat(np.arange(n_frames) * hop_size, frame_size),
-            (n_frames, frame_size),
-        )
-    ]
+from src.training.preprocessing import Preprocessing
+from src.annotation_parser import parse_annotation_file
+from src.annotation_parser.chord_model import Chord
 
 
 class SongDataset(Dataset):
@@ -63,8 +23,9 @@ class SongDataset(Dataset):
         hop_size: int,
         frames_per_item: int,
         items_per_song_factor: float,
-        audio_preprocessing: Callable[[np.ndarray, int, int, int, Any], np.ndarray],
-        audio_preprocessing_kwargs: Dict[str, Any] = {},
+        audio_preprocessing: Preprocessing,
+        standardize_audio: bool = True,
+        pitch_shift_augment: bool = False,
         labels_vocabulary: str = "root_only",
         subsets: List[str] = None,
     ):
@@ -82,7 +43,10 @@ class SongDataset(Dataset):
         self.item_duration = self.item_size / sample_rate
         self.items_per_song_factor = items_per_song_factor
         self.audio_preprocessing = audio_preprocessing
-        self.audio_preprocessing_kwargs = audio_preprocessing_kwargs
+        self.standardize_audio = standardize_audio
+        self.pitch_shift_augment = pitch_shift_augment
+        self.labels_vocabulary = labels_vocabulary
+        self.subsets = subsets
         self.cache_path = "./data/cache"
 
         def _time_to_frame_index(t):
@@ -132,7 +96,7 @@ class SongDataset(Dataset):
             # prepare items
             items = [cached_item_path] * int(self.items_per_song_factor * n_frames)
 
-            return items, n_frames, np.mean(audio), np.mean(audio ** 2)
+            return items, n_frames, np.mean(audio), np.mean(audio**2)
 
         # load index
         songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -153,7 +117,7 @@ class SongDataset(Dataset):
         )
         self.items = [item for items in items_per_song for item in items]
         self.mean = np.mean(mean_per_song)
-        self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean ** 2)
+        self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
         print(
             f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_duration))})."
         )
@@ -162,19 +126,42 @@ class SongDataset(Dataset):
         return len(self.items)
 
     def __getitem__(self, index):
+        # load whole preprocessed audio file
         item = np.load(self.items[index])
-        audio = (item["audio"] - self.mean) / self.std
+        audio = item["audio"]
         labels = item["labels"]
-        start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
 
-        return (
-            audio[start_frame_index: start_frame_index + self.frames_per_item],
-            labels[start_frame_index: start_frame_index + self.frames_per_item],
-        )
+        # select random item from this file
+        start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
+        audio = item["audio"][
+            start_frame_index: start_frame_index + self.frames_per_item
+        ]
+        labels = item["labels"][
+            start_frame_index: start_frame_index + self.frames_per_item
+        ]
+
+        # optionally standardize frames values
+        if self.standardize_audio:
+            audio = (audio - self.mean) / self.std
+
+        # optionally augment pitch
+        if self.pitch_shift_augment:
+            shift = np.random.randint(10) - 5
+            audio = self.audio_preprocessing.pitch_shift_augment(audio, shift)
+            labels = np.array([
+                Chord.from_label(label, self.labels_vocabulary)
+                .shift(shift)
+                .to_label(self.labels_vocabulary)
+                for label in labels
+            ])
+
+        return audio, labels
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    from src.training.preprocessing import CQTPreprocessing
+    # from src.training.dataset import SongDataset
 
     ds = SongDataset(
         ["validate"],
@@ -183,13 +170,16 @@ if __name__ == "__main__":
         hop_size=4410,
         frames_per_item=100,
         items_per_song_factor=1.0,
-        audio_preprocessing=preprocess_cqt,
-        subsets=["isophonics", "rs200"]
+        audio_preprocessing=CQTPreprocessing(),
+        standardize_audio=True,
+        pitch_shift_augment=True,
+        subsets=["isophonics", "rs200"],
     )
     print(ds.mean, ds.std)
-    for i in range(3):
-        plt.subplot(3, 1, i + 1)
+    n = 3
+    for i in range(n):
+        plt.subplot(1, n, i + 1)
         item = ds[i]
         print(item[0].shape, item[1].shape)
-        plt.imshow(item[0])
+        plt.imshow(item[0].T)
     plt.show()
