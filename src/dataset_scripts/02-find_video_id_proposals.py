@@ -14,7 +14,7 @@ def normalize_name(name: str):
 
 
 def equal_by_names(song, search_result):
-    if isinstance(song["album"], str):
+    if not pd.isna(song["album"]) and not pd.isna(search_result["album"]):
         equal_album = normalize_name(song["album"]) in normalize_name(
             search_result["album"]["name"]
         )
@@ -30,23 +30,34 @@ def equal_by_names(song, search_result):
 
 def find_song(idx_and_song):
     _, song = idx_and_song
+
     # check if video is already selected
-    if "video_id" in song and isinstance(song["video_id"], str):
-        return song["video_id"], (song["start_diff"], song["stop_diff"], song["csr"])
-    # find songs basing on title, artist and album (optional)
+    if "video_id" in song and not pd.isna(song["video_id"]):
+        # evaluate video if not evaluated yet
+        if pd.isna(song["csr"]):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                audio_filepath = download_video(song["video_id"], tmpdir)
+                metrics = evaluate_video(song["filepath"], audio_filepath)
+        else:
+            metrics = (song["start_diff"], song["stop_diff"], song["csr"])
+        return song["video_id"], metrics
+
+    # search songs basing on title, artist and album (optional)
     query = song["song"] + " " + song["artist"]
-    if isinstance(song["album"], str):
+    if not pd.isna(song["album"]):
         query += " " + song["album"]
     try:
         search_results = YTMusic().search(query, filter="songs")[:10]
     except Exception as e:
         print(e)
         return None, (None, None, None)
+
     # SELECTION STEP 1: select videos basing on names
     video_ids = [s["videoId"] for s in search_results if equal_by_names(song, s)]
     print(f"Found {len(video_ids)} videos for song \"{song['song']}\" basing on names.")
     if len(video_ids) == 0:
         video_ids = [s["videoId"] for s in search_results]
+
     # SELECTION STEP 2: select videos basing on CSR
     if len(video_ids) > 0:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -59,6 +70,7 @@ def find_song(idx_and_song):
         print(f"Best matching video for song \"{song['song']}\" has CSR = {best_metrics[2]}")
         if best_metrics[2] is not None:
             return video_ids[metrics.index(best_metrics)], best_metrics
+
     return None, (None, None, None)
 
 
