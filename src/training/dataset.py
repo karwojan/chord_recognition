@@ -49,15 +49,12 @@ class SongDataset(Dataset):
             t = int(t * sample_rate)
             return int(round(t // hop_size + t % hop_size / frame_size))
 
-        def _load_item(idx_and_song_metadata):
-            song_metadata = idx_and_song_metadata[1]
-            cached_item_path = os.path.join(
-                self.cache_path, f"{song_metadata.name}.npz"
-            )
+        def _load_song(song_metadata):
+            cached_path = os.path.join(self.cache_path, f"{song_metadata.Index}.npz")
 
-            if os.path.exists(cached_item_path):
-                item = np.load(cached_item_path)
-                audio = item["audio"]
+            if os.path.exists(cached_path):
+                song = np.load(cached_path)
+                audio = song["audio"]
                 n_frames = audio.shape[0]
             else:
                 # load audio file (supress librosa warnings)
@@ -86,37 +83,40 @@ class SongDataset(Dataset):
                     ] = chord.to_label_occurence(labels_vocabulary).label
 
                 # store in cache
-                np.savez(cached_item_path, audio=audio, labels=labels)
+                np.savez(cached_path, audio=audio, labels=labels)
 
-            # prepare items
-            items = [cached_item_path]
-            if self.frames_per_item > 0:
-                items = items * int(self.items_per_song_factor * n_frames)
+            return song_metadata.Index, n_frames, np.mean(audio), np.mean(audio**2)
 
-            return items, n_frames, np.mean(audio), np.mean(audio**2)
-
-        # load index
-        songs_metadata = pd.read_csv("./data/index.csv", sep=";")
-        songs_metadata = songs_metadata.query(
+        # load index (songs metadata)
+        self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
+        self.songs_metadata = self.songs_metadata.query(
             " or ".join([f"purpose == '{purpose}'" for purpose in purposes])
         )
         if subsets is not None:
-            songs_metadata = songs_metadata.query(
+            self.songs_metadata = self.songs_metadata.query(
                 " or ".join([f"subset == '{subset}'" for subset in subsets])
             )
 
-        # load items
-        items_per_song, n_frames_per_song, mean_per_song, mean_2_per_song = zip(
+        # load songs
+        id_per_song, n_frames_per_song, mean_per_song, mean_2_per_song = zip(
             *tqdm(
-                ThreadPoolExecutor().map(_load_item, songs_metadata.iterrows()),
-                total=songs_metadata.shape[0],
+                ThreadPoolExecutor().map(_load_song, self.songs_metadata.itertuples()),
+                total=self.songs_metadata.shape[0],
             )
         )
-        self.items = [item for items in items_per_song for item in items]
+
+        # prepare list of items (mapping from dataset items to songs)
+        self.items = []
+        for song_id, n_frames in zip(id_per_song, n_frames_per_song):
+            n_items = int(self.items_per_song_factor * n_frames) if self.frames_per_item > 0 else 1
+            self.items += [song_id] * n_items
+
+        # store mean and std of whole dataset
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
+
         print(
-            f"Loaded {len(items_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_size / self.sample_rate))})."
+            f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_size / self.sample_rate))})."
         )
 
     def __len__(self):
@@ -124,19 +124,15 @@ class SongDataset(Dataset):
 
     def __getitem__(self, index):
         # load whole preprocessed audio file
-        item = np.load(self.items[index])
-        audio = item["audio"]
-        labels = item["labels"]
+        song = np.load(os.path.join(self.cache_path, f"{self.items[index]}.npz"))
+        audio = song["audio"]
+        labels = song["labels"]
 
         # select random item from this file if item size is defined
         if self.frames_per_item > 0:
             start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
-            audio = item["audio"][
-                start_frame_index: start_frame_index + self.frames_per_item
-            ]
-            labels = item["labels"][
-                start_frame_index: start_frame_index + self.frames_per_item
-            ]
+            audio = audio[start_frame_index: start_frame_index + self.frames_per_item]
+            labels = labels[start_frame_index: start_frame_index + self.frames_per_item]
 
         # optionally standardize frames values
         if self.standardize_audio:
@@ -166,7 +162,7 @@ if __name__ == "__main__":
         sample_rate=44100,
         frame_size=4410,
         hop_size=4410,
-        frames_per_item=0,
+        frames_per_item=100,
         items_per_song_factor=1.0,
         audio_preprocessing=CQTPreprocessing(),
         standardize_audio=True,
@@ -174,6 +170,7 @@ if __name__ == "__main__":
         subsets=["isophonics", "rs200"],
     )
     print(ds.mean, ds.std)
+    print("len(ds):", len(ds))
     n = 3
     for i in range(n):
         plt.subplot(1, n, i + 1)
