@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Set, List
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import numpy as np
 
 
@@ -16,7 +16,7 @@ class Chord:
     components: Set[Interval]
     bass: Interval
 
-    def to_label(self, vocabulary_name: str):
+    def to_label(self, vocabulary_name: str) -> int:
         vocabulary = vocabularies[vocabulary_name]
 
         # 'no chord' is always labeled 0
@@ -46,6 +46,35 @@ class Chord:
                     max(matching_chords, key=lambda chord: len(chord.components))
                 )
             )
+
+    @staticmethod
+    def from_label(label: int, vocabulary_name) -> Chord:
+        vocabulary = vocabularies[vocabulary_name]
+
+        if label == 0:
+            return Chord(None, None, None)
+
+        root = (label - 1) % 12
+
+        if len(vocabulary) == 0:
+            return Chord(root, set(), Interval(1))
+
+        pattern_chord = vocabulary[(label - 1) // 12]
+
+        return Chord(
+            root,
+            {replace(interval) for interval in pattern_chord.components},
+            replace(pattern_chord.bass),
+        )
+
+    def shift(self, shift: int) -> Chord:
+        if self.root is None:
+            return replace(self)
+        return Chord(
+            (self.root + shift) % 12,
+            {replace(interval) for interval in self.components},
+            replace(self.bass),
+        )
 
 
 @dataclass(frozen=True)
