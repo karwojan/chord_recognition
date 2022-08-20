@@ -21,7 +21,6 @@ def create_argparser():
     parser.add_argument("--frame_size", type=int, required=True)
     parser.add_argument("--hop_size", type=int, required=True)
     parser.add_argument("--frames_per_item", type=int, required=True)
-    parser.add_argument("--items_per_song_factor", type=float, required=True)
     parser.add_argument("--pitch_shift_augment", action="store_true")
 
     # training
@@ -44,17 +43,15 @@ def train(args):
         "sample_rate": args.sample_rate,
         "frame_size": args.frame_size,
         "hop_size": args.hop_size,
-        "frames_per_item": args.frames_per_item,
-        "items_per_song_factor": args.items_per_song_factor,
         "audio_preprocessing": CQTPreprocessing(),
         "labels_vocabulary": "maj_min",
         "subsets": ["isophonics", "robbie_williams", "uspop"]
     }
-    train_ds = SongDataset(["train"], **ds_kwargs, pitch_shift_augment=args.pitch_shift_augment)
+    train_ds = SongDataset(["train"], **ds_kwargs, frames_per_item=args.frames_per_item, pitch_shift_augment=args.pitch_shift_augment)
     train_dl = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
     )
-    validate_ds = SongDataset(["validate"], **ds_kwargs)
+    validate_ds = SongDataset(["validate"], **ds_kwargs, frames_per_item=args.frames_per_item)
     validate_dl = DataLoader(
         validate_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
     )

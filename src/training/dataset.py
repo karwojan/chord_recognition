@@ -22,7 +22,6 @@ class SongDataset(Dataset):
         frame_size: int,
         hop_size: int,
         frames_per_item: int,
-        items_per_song_factor: float,
         audio_preprocessing: Preprocessing,
         standardize_audio: bool = True,
         pitch_shift_augment: bool = False,
@@ -37,7 +36,6 @@ class SongDataset(Dataset):
         self.frame_size = frame_size
         self.hop_size = hop_size
         self.frames_per_item = frames_per_item
-        self.items_per_song_factor = items_per_song_factor
         self.audio_preprocessing = audio_preprocessing
         self.standardize_audio = standardize_audio
         self.pitch_shift_augment = pitch_shift_augment
@@ -105,10 +103,10 @@ class SongDataset(Dataset):
             )
         )
 
-        # prepare list of items (mapping from dataset items to songs)
+        # prepare list of items - multiple mappings to same song, proportionally to song length
         self.items = []
         for song_id, n_frames in zip(id_per_song, n_frames_per_song):
-            n_items = int(self.items_per_song_factor * n_frames) if self.frames_per_item > 0 else 1
+            n_items = n_frames // self.frames_per_item if self.frames_per_item > 0 else 1
             self.items += [song_id] * n_items
 
         # store mean and std of whole dataset
@@ -163,7 +161,6 @@ if __name__ == "__main__":
         frame_size=4410,
         hop_size=4410,
         frames_per_item=100,
-        items_per_song_factor=1.0,
         audio_preprocessing=CQTPreprocessing(),
         standardize_audio=True,
         pitch_shift_augment=True,
