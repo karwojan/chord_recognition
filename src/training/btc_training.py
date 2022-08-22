@@ -118,7 +118,8 @@ def train(args):
         mlflow.log_metric("validate / epoch / accuracy", all_correct_predictions / all_predictions)
 
     # evaluate model
-    evaluate(SongDataset(["train", "validate"], **ds_kwargs, frames_per_item=0), btc)
+    evaluate(SongDataset(["train"], **ds_kwargs, frames_per_item=0), btc, "train_ds_evaluation")
+    evaluate(SongDataset(["validate"], **ds_kwargs, frames_per_item=0), btc, "validate_ds_evaluation")
 
 
 if __name__ == "__main__":

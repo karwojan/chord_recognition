@@ -24,7 +24,7 @@ from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, cs
 from src.annotation_parser.labfile_printer import print_labfile
 
 
-def evaluate(dataset: SongDataset, btc_model: BTC_model):
+def evaluate(dataset: SongDataset, btc_model: BTC_model, output_dir_prefix: str):
     assert dataset.frames_per_item <= 0, "dataset must return whole songs"
     frames_per_item = btc_model.timestep
     btc_model.eval()
@@ -37,7 +37,7 @@ def evaluate(dataset: SongDataset, btc_model: BTC_model):
 
     plt.rcParams.update({'font.size': 5})  # for confusion matrix
 
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_dir = f"{output_dir_prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
     with torch.no_grad():
         all_csrs = []
@@ -123,7 +123,7 @@ def evaluate(dataset: SongDataset, btc_model: BTC_model):
                 plt.close()
 
                 # log to mlflow
-                mlflow.log_artifacts(tmp_dir, f"{timestamp}/{song_metadata.name}")
+                mlflow.log_artifacts(tmp_dir, f"{output_dir}/{song_metadata.name}")
 
             # store values for global metrics calculation
             all_csrs.append(metrics["csr"])
@@ -146,4 +146,4 @@ def evaluate(dataset: SongDataset, btc_model: BTC_model):
             json.dump(global_metrics, f)
         ConfusionMatrixDisplay.from_predictions(labels, predictions, labels=recall_precision_kwargs["labels"])
         plt.savefig(os.path.join(tmp_dir, "global_confusion_matrix.png"), dpi=200)
-        mlflow.log_artifacts(tmp_dir, f"{timestamp}")
+        mlflow.log_artifacts(tmp_dir, output_dir)
