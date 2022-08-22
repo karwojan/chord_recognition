@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from src.training.preprocessing import Preprocessing
 from src.annotation_parser import parse_annotation_file
-from src.annotation_parser.chord_model import Chord
+from src.annotation_parser.chord_model import Chord, vocabularies
 
 
 class SongDataset(Dataset):
@@ -41,6 +41,7 @@ class SongDataset(Dataset):
         self.pitch_shift_augment = pitch_shift_augment
         self.labels_vocabulary = labels_vocabulary
         self.subsets = subsets
+        self.n_classes = 1 + max(len(vocabularies[labels_vocabulary]), 1) * 12
         self.cache_path = "./data/cache"
 
         def _time_to_frame_index(t):
@@ -149,6 +150,9 @@ class SongDataset(Dataset):
 
         return audio, labels
 
+    def get_song_metadata(self, index):
+        return self.songs_metadata.loc[self.items[index]]
+
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
@@ -172,6 +176,7 @@ if __name__ == "__main__":
     for i in range(n):
         plt.subplot(1, n, i + 1)
         item = ds[i]
+        print(ds.get_song_metadata(i))
         print(item[0].shape, item[1].shape)
         plt.imshow(item[0].T)
     plt.show()

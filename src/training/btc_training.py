@@ -11,6 +11,7 @@ from einops import rearrange
 from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing
 from src.training.btc_model import BTC_model
+from src.training.btc_evaluate import evaluate
 
 
 def create_argparser():
@@ -115,6 +116,9 @@ def train(args):
                 all_predictions += len(prediction)
                 all_correct_predictions += torch.count_nonzero(prediction == rearrange(labels, "b c -> (b c)"))
         mlflow.log_metric("validate / epoch / accuracy", all_correct_predictions / all_predictions)
+
+    # evaluate model
+    evaluate(SongDataset(["train", "validate"], **ds_kwargs, frames_per_item=0), btc)
 
 
 if __name__ == "__main__":
