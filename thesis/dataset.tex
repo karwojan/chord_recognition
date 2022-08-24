@@ -1,4 +1,95 @@
 \chapter{Zbiór danych}
 
-\section{Źródłowe zbiory danych}
-Tak wygląda sytuacja jeśli chodzi o zbiory danych.
+\section{Wstęp}
+
+% potrzeba danych!
+Pierwszym i jednocześnie najważniejszym etapem w tworzeniu rozwiązania opartego o uczenie maszynowe
+jest zgromadzenie odpowiedniego zbioru danych. Jest to etap kluczowy, co wydaje się oczywiste po
+uwzględnieniu natury tychże algorytmów - wynajdują one pewne reguły w oparciu o podane przykłady.
+
+% potrzeba danych oznaczonych (jak zawsze) i nieoznaczonych (bo pomogą a są)
+Głęboki sieci neuronowe, co do zasady potrzebują ,,dużo'' (zazwyczaj wiele milionów) przykładów
+uczących, aby móc znaleźć poprawne reguły i wzorce - aby nauczyć się odpowiedniej ekstrakcji cech. W
+celu wytrenowania sieci do konkretnego zadania (np. do klasyfikacji obrazów), potrzeba zbioru
+zawierającego dane wejściowe do modelu i oczekiwane dane wyjściowe z modelu. Takie uczeni w oparciu
+o przykłady oznaczone (ze znaną wartością oczekiwaną) to \emph{uczenie nadzorowane}. Często jednak
+ilość danych oznaczonych jest ograniczona, można wtedy wykorzystać dane bez oznaczeń w różnych
+algorytmach \emph{uczenia nienadzorowanego}, aby nauczyć sieć struktury tych danych, bez
+ukierunkowania na konkretne zadanie. Dopiero później wykorzystuje się mniejszą ilość danych
+oznaczonych aby dotrenować sieć (\emph{finetuning}) i nauczyć ją rozwiązywać dany problem.
+
+% co zawiera ten rozdział - od szukania danych do wejścia do sieci + opis skryptów
+W ramach niniejszej pracy, ze względu na ograniczoną ilość danych oznaczonych, zastosowane zostało
+właśnie powyższe podejście. Do przeprowadzenia eksperymentów potrzebne były dwa zbiory: pierwszy to
+,,niewielki'' zbiór danych oznaczonych a drugi to ,,zdecydowanie większy'' zbiór danych bez
+oznaczeń. W tym rodzdziale opisany został proces pozyskiwania obu zbiorów danych z ogólnie
+dostępnych źródeł. Zawarto tutaj opis wszystkich kroków wykonanych w celu przygotowanie danych do
+treningu sieci, poczynając od wyszukiwania oznaczeń utworów muzycznych i przygotowanie parsera dla
+plików z tymi oznaczeniami, poprzez automatyczne wyszukiwania i pobieranie odpowiednich plików z
+nagraniami muzycznymi, aż po wstępne przetwarzanie danych do formatu odpowiedniego dla sieci
+neuronowej. Dodatkowo rozdział ten, poza opisem zastosowanych rozwiązań, zawiera również ogólny opis
+implementacji tychże rozwiązań, którą to implementację stanowią skrypty języka Python.
+
+
+\section{Dane oznaczone}
+
+% trudno o dane oznaczone w ACR
+Ze względu na powszechną dostępność dużej ilości danych w Internecie, zgromadzenie zbioru danych
+nieoznaczonych nie stanowiło szczególnego problemu. Znacznie trudniejsze okazało się zgromadzenie
+zbioru danych oznaczonych. Zadanie rozpoznawania akordów muzycznych, mimo iż będące jednym z
+głównych zadań z dziedziny \emph{MIR}, jest oczywiście bardzo mało popularne w stosunku do takich
+zadań jak klasyfikacja, czy segmentacja obrazów. Jest to również po prostu znacznie mniej przydatne
+w życiu codziennym i znacznie mniej się w tę dziedzinę inwestuje. Należy również uwzględnić fakt, że
+przygotowanie oznaczeń akordów do utworów muzycznych wymaga specjalistycznej wiedzy muzycznej,
+praktyki muzycznej i dużo czasu. Oznaczenia powstałe w ten sposób nadal pozostają subiektywne i będą
+się często różnić, w zależności od osoby, która utwory oznaczała. Wszystkie wymienione powody są
+przyczyną tego, że nie przygotowano więcej niż kilka publicznie dostępnych zbiorów oznaczeń akordów
+muzycznych, które mogą zostać wykorzystane do treningu modeli uczenia maszynowego.
+
+
+\section{Publiczne zbiory z oznaczeniami akordów}
+
+% zbiory są takie, co to inni wykorzystywali
+W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpoznawania akordów za
+pomocą sieci neuronowych - większość wykorzystywanych przez badaczy zbiorów danych udało się
+odnaleźć i wykorzystać. Zostały one opisane poniżej. Trzeba jeszcze zaznaczyć, że wszystkie te
+zbiory są udostępniane za darmo, ale jedynie jako same pliki tekstowe z oznaczeniami akordów. Pliki
+z nagranimi muzycznymi, ze względu na prawa autorskie, nie są udostępniane. Pozyskanie odpowiednich
+nagrań stanowi osobny problem, opisany w dalszej części rozdziału.
+
+\subsection{Zbiór Isophonics}
+
+\emph{Isophonics} to właściwie nazwa serwisu internetowego\footnote{www.isophonics.net/about},
+prowadzonego przez zespół naukowy \emph{Centre for Digital Music} z londyńskiego Uniwersytety
+Królowej Marii. Jest to duża i popularna na cały świat jednostka naukowa specjalizująca się w
+badaniach dotyczących przetwarzania muzyki cyfrowej. W serwisie tym dostępne są między innymi
+oprogramowanie oraz zbiory danych związane z różnymi aspektami przetwarzania sygnałów muzycznych.
+Można tam znaleźć najbardziej popularny i zapewne najstarszy zbiór z oznaczeniami akordów
+muzycznych, przygotowany dla 180 piosenek zespołu \emph{The Beatles}, szczegółowo opisany w
+\cite{harte_towards_nodate}. Zbiór ten rozrósł się o oznaczenia dla 20 utworów \emph{Queen}, 18
+utowrów \emph{Zweieck} i 7 utworów \emph{Carole King}. Wykorzystany format zapisu oznaczeń akordów
+również jest opisany w \cite{harte_towards_nodate} i jest wykorzystywany praktycznie jako standard,
+również w przypadku innych zbiorów danych. Warto wspomnieć jeszcze, że jest to pierwszy referencyjny
+zbiór wykorzystywany w konkursie MIREX, w zadaniu automatycznego rozpoznawania akordów.
+
+\subsection{Zbiór McGill Billboard}
+
+Zbiór \emph{McGill Billboard}\cite{burgoyne_expert_2011} został stworzony przez grupę \emph{DDMAL
+(Distributed Digital Music Archives \& Libraries Lab)}\footnote{https://ddmal.music.mcgill.ca/} z
+kandadyjskiego \emph{McGill University}. Jak nazwa wskazuje, zajmują się oni różnymi projektami
+związanymi z preztwarzaniem muzyki, w tym tworzą i utrzymują ten prawdopodobnie największy dostępny
+zbiór danych z oznaczeniami akordów.
+
+% pamiętać, żeby opisać wszystkie kroki, SKRYPTY i zerknąć na COMMITY
+
+
+\section{Pozyskanie plików z nagraniami muzycznymi}
+
+
+
+% - zorganizować zbiór danych nieoznaczonych
+% 
+% - wstępne przetwarzanie danych - format danych wejściowy i wyjściowy (wejściowy do sieci)
+%     - format i parsowanie plików z oznaczeniami i plików muzycznych
+%     - podział na ramki i dopasowanie labelek do ramek
+%     - augmentacja
