@@ -80,6 +80,7 @@ class BTC(pl.LightningModule):
             *[BTCBlock(dim, n_heads, dropout_p) for i in range(n_blocks)]
         )
         self.classification_head = nn.Linear(dim, n_classes)
+        self.norm = nn.LayerNorm(dim)
 
         # prepare metrics
         self.train_accuracy = Accuracy()
@@ -99,7 +100,7 @@ class BTC(pl.LightningModule):
         x = self.embedding(x) + self.positional_encoding
 
         # transformer blocks
-        x = self.blocks(x)
+        x = self.norm(self.blocks(x))
 
         # classification head
         return self.classification_head(x)
