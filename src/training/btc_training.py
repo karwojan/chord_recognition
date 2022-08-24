@@ -71,8 +71,8 @@ def train(args):
             audio, labels = audio.cuda(), labels.cuda()
             logits = btc(audio)
             loss = torch.nn.functional.cross_entropy(
-                rearrange(logits, "b s c -> b c s"),
-                labels
+                rearrange(logits, "b s c -> (b s) c"),
+                rearrange(labels, "b s -> (b s)")
             )
 
             optimizer.zero_grad()
