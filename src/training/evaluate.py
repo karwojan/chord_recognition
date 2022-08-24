@@ -4,7 +4,6 @@ from datetime import datetime
 import numpy as np
 from tqdm import tqdm
 from dataclasses import replace
-import mlflow
 import tempfile
 import json
 import matplotlib
@@ -16,6 +15,7 @@ from sklearn.metrics import (
     precision_score,
     ConfusionMatrixDisplay
 )
+from pytorch_lightning.loggers import MLFlowLogger
 
 from src.training.dataset import SongDataset
 from src.training.model import Transformer
@@ -24,7 +24,7 @@ from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, cs
 from src.annotation_parser.labfile_printer import print_labfile
 
 
-def evaluate(dataset: SongDataset, model: Transformer, output_dir_prefix: str, frames_per_item: int):
+def evaluate(dataset: SongDataset, model: Transformer, output_dir_prefix: str, frames_per_item: int, mlflow_logger: MLFlowLogger):
     assert dataset.frames_per_item <= 0, "dataset must return whole songs"
     model.eval()
 
@@ -119,7 +119,7 @@ def evaluate(dataset: SongDataset, model: Transformer, output_dir_prefix: str, f
                 plt.close()
 
                 # log to mlflow
-                mlflow.log_artifacts(tmp_dir, f"{output_dir}/{song_metadata.name}")
+                mlflow_logger.experiment.log_artifacts(mlflow_logger.run_id, tmp_dir, f"{output_dir}/{song_metadata.name}")
 
             # store values for global metrics calculation
             all_csrs.append(metrics["csr"])
@@ -142,4 +142,4 @@ def evaluate(dataset: SongDataset, model: Transformer, output_dir_prefix: str, f
             json.dump(global_metrics, f)
         ConfusionMatrixDisplay.from_predictions(labels, predictions, labels=recall_precision_kwargs["labels"])
         plt.savefig(os.path.join(tmp_dir, "global_confusion_matrix.png"), dpi=200)
-        mlflow.log_artifacts(tmp_dir, output_dir)
+        mlflow_logger.experiment.log_artifacts(mlflow_logger.run_id, tmp_dir, output_dir)

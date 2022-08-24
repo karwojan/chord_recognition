@@ -1,7 +1,6 @@
 import argparse
 
 from torch.utils.data import DataLoader
-import mlflow
 from tqdm import tqdm
 from einops import rearrange
 import pytorch_lightning as pl
@@ -76,12 +75,14 @@ def train(args):
         model,
         "train_ds_evaluation",
         args.frames_per_item,
+        logger
     )
     evaluate(
         SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
         model,
         "validate_ds_evaluation",
         args.frames_per_item,
+        logger
     )
 
 
