@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 
-from transformer import MultiheadSelfAttention, positional_encoding
+from src.training.transformer import MultiheadSelfAttention, positional_encoding
 
 
 class BTCSubBlock(nn.Module):
