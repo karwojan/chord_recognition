@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import pytorch_lightning as pl
+from torchmetrics import Accuracy
 from einops import rearrange
 
 from src.training.transformer import MultiheadSelfAttention, positional_encoding
@@ -24,7 +26,12 @@ class BTCSubBlock(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.msa(self.norm1(x)) + x
         x = self.dropout(x)
-        x = rearrange(self.cnn(rearrange(self.norm2(x), "b s c -> b c s")), "b c s -> b s c") + x
+        x = (
+            rearrange(
+                self.cnn(rearrange(self.norm2(x), "b s c -> b c s")), "b c s -> b s c"
+            )
+            + x
+        )
         return x
 
 
@@ -44,8 +51,16 @@ class BTCBlock(nn.Module):
         return self.norm(projected)
 
 
-class BTC(nn.Module):
-    def __init__(self, input_dim: int, dim: int, n_heads: int, n_blocks: int, n_classes: int, dropout_p: float):
+class BTC(pl.LightningModule):
+    def __init__(
+        self,
+        input_dim: int,
+        dim: int,
+        n_heads: int,
+        n_blocks: int,
+        n_classes: int,
+        dropout_p: float,
+    ):
         super().__init__()
         # store parameters
         self.input_dim = input_dim
@@ -66,7 +81,11 @@ class BTC(nn.Module):
         )
         self.classification_head = nn.Linear(dim, n_classes)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # prepare metrics
+        self.train_accuracy = Accuracy()
+        self.validate_accuracy = Accuracy()
+
+    def forward(self, x):
         # generate position encoding if necessary
         if self.positional_encoding.shape[0] < x.shape[1]:
             self.positional_encoding = positional_encoding(x.shape[1], self.dim).to(
@@ -85,9 +104,32 @@ class BTC(nn.Module):
         # classification head
         return self.classification_head(x)
 
+    def training_step(self, batch, batch_idx):
+        audio, labels = batch
+        logits = self(audio)
+        loss = torch.nn.functional.cross_entropy(
+            rearrange(logits, "b s c -> (b s) c"), rearrange(labels, "b s -> (b s)")
+        )
+
+        self.train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
+        self.log("loss", loss, on_epoch=True)
+        self.log("train_accuracy", self.train_accuracy, on_epoch=True, on_step=True)
+
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        audio, labels = batch
+        logits = self(audio)
+        self.validate_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
+        self.log("validate_accuracy", self.validate_accuracy)
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters())
+
 
 if __name__ == "__main__":
     from torchinfo import summary
 
     transformer = BTC(144, 128, 4, 8, 25, 0.2)
+    print(transformer(torch.rand(5, 100, 144)))
     summary(transformer, input_data=torch.rand(2, 108, 144))
