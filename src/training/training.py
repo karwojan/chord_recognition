@@ -8,8 +8,8 @@ import pytorch_lightning as pl
 
 from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing
-from src.training.btc import BTC
-from src.training.btc_evaluate import evaluate
+from src.training.model import Transformer
+from src.training.evaluate import evaluate
 
 
 def create_argparser():
@@ -56,7 +56,7 @@ def train(args):
     )
 
     # prepare model
-    btc = BTC(144, 128, 4, 8, train_ds.n_classes, dropout_p=0.2)
+    model = Transformer(144, 128, 4, 8, train_ds.n_classes, block_type="btc", dropout_p=0.2)
 
     # train model
     logger = pl.loggers.MLFlowLogger(experiment_name="btc_custom_implementation")
@@ -67,19 +67,19 @@ def train(args):
         logger=logger,
         log_every_n_steps=1,
     )
-    trainer.fit(btc, train_dl, validate_dl)
+    trainer.fit(model, train_dl, validate_dl)
 
     # evaluate model
-    btc.cuda()
+    model.cuda()
     evaluate(
         SongDataset(["train"], **ds_kwargs, frames_per_item=0),
-        btc,
+        model,
         "train_ds_evaluation",
         args.frames_per_item,
     )
     evaluate(
         SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
-        btc,
+        model,
         "validate_ds_evaluation",
         args.frames_per_item,
     )

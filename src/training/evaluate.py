@@ -18,15 +18,15 @@ from sklearn.metrics import (
 )
 
 from src.training.dataset import SongDataset
-from src.training.btc import BTC
+from src.training.model import Transformer
 from src.annotation_parser import parse_annotation_file
 from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, csr
 from src.annotation_parser.labfile_printer import print_labfile
 
 
-def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_item: int):
+def evaluate(dataset: SongDataset, model: Transformer, output_dir_prefix: str, frames_per_item: int):
     assert dataset.frames_per_item <= 0, "dataset must return whole songs"
-    btc.eval()
+    model.eval()
 
     recall_precision_kwargs = {
             "average": None,
@@ -56,7 +56,7 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
                 # extract frames of single item
                 item_audio = audio[i: i + frames_per_item]
                 # predict labels
-                prediction = torch.argmax(btc(item_audio.unsqueeze(0)), dim=2)[0]
+                prediction = torch.argmax(model(item_audio.unsqueeze(0)), dim=2)[0]
                 # fill all predictions with new predictions
                 if i > 0:
                     predictions[

@@ -1,10 +1,88 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import pytorch_lightning as pl
 from torchmetrics import Accuracy
-from einops import rearrange
+from einops import rearrange, repeat
 
-from src.training.transformer import MultiheadSelfAttention, positional_encoding
+
+def positional_encoding(sequence_length: int, dim: int) -> torch.Tensor:
+    pos = torch.arange(0, sequence_length)
+    wavelengths = 10000 ** (torch.linspace(0, dim, int(dim / 2)) / dim)
+    args = rearrange(pos, "s -> s 1") / rearrange(wavelengths, "d -> 1 d")
+    return torch.cat([torch.sin(args), torch.cos(args)], dim=1)
+
+
+class MultiheadSelfAttention(nn.Module):
+    def __init__(self, dim: int, n_heads: int, mask: str = None):
+        super().__init__()
+        self.dim = dim
+        self.n_heads = n_heads
+        self.mask = mask
+        self.qkv = nn.Linear(dim, 3 * dim)
+        self.out = nn.Linear(dim, dim)
+        self.factor = 1.0 / torch.sqrt(torch.tensor(dim // n_heads))
+        assert dim % n_heads == 0
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # calculate Q, K, V
+        Q, K, V = rearrange(
+            self.qkv(x),
+            "b s (head qkv c) -> qkv (b head) s c",
+            qkv=3,
+            head=self.n_heads,
+        )
+
+        # optional masking
+        b, s, _ = Q.shape
+        mask = torch.zeros((b, s, s)).to(x.device)
+        if self.mask == "right":
+            mask[
+                :,
+                repeat(torch.arange(s), "s -> S s", S=s)
+                > repeat(torch.arange(s), "s -> s S", S=s),
+            ] = -torch.inf
+        elif self.mask == "left":
+            mask[
+                :,
+                repeat(torch.arange(s), "s -> S s", S=s)
+                < repeat(torch.arange(s), "s -> s S", S=s),
+            ] = -torch.inf
+
+        # calculate attention weights
+        attention_weights = F.softmax(
+            torch.bmm(Q, rearrange(K, "b s c -> b c s")) * self.factor + mask, dim=-1
+        )
+
+        # apply attention
+        output = self.out(
+            rearrange(
+                torch.bmm(attention_weights, V),
+                "(b head) s c -> b s (head c)",
+                head=self.n_heads,
+            )
+        )
+        return output
+
+
+class TransformerBlock(nn.Module):
+    def __init__(self, dim: int, n_heads: int, dropout_p: float):
+        super().__init__()
+        self.msa = MultiheadSelfAttention(dim, n_heads)
+        self.mlp = nn.Sequential(
+            nn.Linear(dim, dim * 4), nn.GELU(), nn.Linear(dim * 4, dim)
+        )
+        self.norm1 = nn.LayerNorm(dim)
+        self.norm2 = nn.LayerNorm(dim)
+        self.dropout1 = nn.Dropout(dropout_p)
+        self.dropout2 = nn.Dropout(dropout_p)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.msa(self.norm1(x)) + x
+        x = self.dropout1(x)
+        x = self.mlp(self.norm2(x)) + x
+        x = self.dropout2(x)
+        return x
 
 
 class BTCSubBlock(nn.Module):
@@ -21,17 +99,19 @@ class BTCSubBlock(nn.Module):
         )
         self.norm1 = nn.LayerNorm(dim)
         self.norm2 = nn.LayerNorm(dim)
-        self.dropout = nn.Dropout(dropout_p)
+        self.dropout1 = nn.Dropout(dropout_p)
+        self.dropout2 = nn.Dropout(dropout_p)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.msa(self.norm1(x)) + x
-        x = self.dropout(x)
+        x = self.dropout1(x)
         x = (
             rearrange(
                 self.cnn(rearrange(self.norm2(x), "b s c -> b c s")), "b c s -> b s c"
             )
             + x
         )
+        x = self.dropout2(x)
         return x
 
 
@@ -51,7 +131,7 @@ class BTCBlock(nn.Module):
         return self.norm(projected)
 
 
-class BTC(pl.LightningModule):
+class Transformer(pl.LightningModule):
     def __init__(
         self,
         input_dim: int,
@@ -59,7 +139,8 @@ class BTC(pl.LightningModule):
         n_heads: int,
         n_blocks: int,
         n_classes: int,
-        dropout_p: float,
+        block_type: str,
+        dropout_p: float = 0.0,
     ):
         super().__init__()
         # store parameters
@@ -68,16 +149,23 @@ class BTC(pl.LightningModule):
         self.n_heads = n_heads
         self.n_blocks = n_blocks
         self.n_classes = n_classes
+        self.block_type = block_type
         self.dropout_p = dropout_p
 
         # prepare position encoding
         self.positional_encoding = torch.empty((0, 0))
 
         # prepare layers
+        if block_type == "transformer":
+            block = TransformerBlock
+        elif block_type == "btc":
+            block = BTCBlock
+        else:
+            raise ValueError(block_type)
         self.dropout = nn.Dropout(dropout_p)
         self.embedding = nn.Linear(input_dim, dim)
         self.blocks = nn.Sequential(
-            *[BTCBlock(dim, n_heads, dropout_p) for i in range(n_blocks)]
+            *[block(dim, n_heads, dropout_p) for i in range(n_blocks)]
         )
         self.classification_head = nn.Linear(dim, n_classes)
         self.norm = nn.LayerNorm(dim)
