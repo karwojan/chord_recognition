@@ -70,6 +70,7 @@ def train(args):
     trainer.fit(btc, train_dl, validate_dl)
 
     # evaluate model
+    btc.cuda()
     evaluate(
         SongDataset(["train"], **ds_kwargs, frames_per_item=0),
         btc,

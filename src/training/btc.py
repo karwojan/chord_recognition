@@ -89,15 +89,13 @@ class BTC(pl.LightningModule):
     def forward(self, x):
         # generate position encoding if necessary
         if self.positional_encoding.shape[0] < x.shape[1]:
-            self.positional_encoding = positional_encoding(x.shape[1], self.dim).to(
-                x.device
-            )
+            self.positional_encoding = positional_encoding(x.shape[1], self.dim)
 
         # dropout input
         x = self.dropout(x)
 
         # embedd input and add position encoding
-        x = self.embedding(x) + self.positional_encoding
+        x = self.embedding(x) + self.positional_encoding.to(x.device)
 
         # transformer blocks
         x = self.norm(self.blocks(x))
