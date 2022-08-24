@@ -10,7 +10,7 @@ from einops import rearrange
 
 from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing
-from src.training.btc_model import BTC_model
+from src.training.btc import BTC
 from src.training.btc_evaluate import evaluate
 
 
@@ -36,7 +36,7 @@ def train(args):
     # dist.init_process_group()
 
     # init mlflow
-    mlflow.set_experiment("btc_original_implementation")
+    mlflow.set_experiment("btc_custom_implementation")
     mlflow.log_params(args.__dict__)
 
     # init datasets and data loaders
@@ -58,25 +58,7 @@ def train(args):
     )
 
     # init model and optimizer
-    btc = BTC_model(
-        {
-            "feature_size": 144,
-            "timestep": args.frames_per_item,
-            "num_chords": 25,
-            "input_dropout": 0.2,
-            "layer_dropout": 0.2,
-            "attention_dropout": 0.2,
-            "relu_dropout": 0.2,
-            "num_layers": 8,
-            "num_heads": 4,
-            "hidden_size": 128,
-            "total_key_depth": 128,
-            "total_value_depth": 128,
-            "filter_size": 128,
-            "loss": "ce",
-            "probs_out": False,
-        }
-    ).cuda()
+    btc = BTC(144, 128, 4, 8, train_ds.n_classes, dropout_p=0.2).cuda()
     # btc = DistributedDataParallel(btc.cuda())
     optimizer = torch.optim.AdamW(btc.parameters())
 
@@ -87,19 +69,24 @@ def train(args):
         all_correct_predictions = 0
         for audio, labels in tqdm(train_dl, unit="batch", total=len(train_dl)):
             audio, labels = audio.cuda(), labels.cuda()
-            prediction, loss, weights, second = btc(audio, labels)
+            logits = btc(audio)
+            loss = torch.nn.functional.cross_entropy(
+                rearrange(logits, "b s c -> b c s"),
+                labels
+            )
 
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            optimizer.zero_grad()
 
             with torch.no_grad():
-                labels = rearrange(labels, "b c -> (b c)")
+                predictions = rearrange(torch.argmax(logits, dim=2), "b s -> (b s)")
+                labels = rearrange(labels, "b s -> (b s)")
                 mlflow.log_metric("train / batch / loss", loss)
-                mlflow.log_metric("train / batch / accuracy", torch.count_nonzero(prediction == labels) / len(prediction))
+                mlflow.log_metric("train / batch / accuracy", (predictions == labels).sum() / len(predictions))
 
-                all_predictions += len(prediction)
-                all_correct_predictions += torch.count_nonzero(prediction == labels)
+                all_predictions += len(predictions)
+                all_correct_predictions += (predictions == labels).sum()
         mlflow.log_metric("train / epoch / accuracy", all_correct_predictions / all_predictions)
 
         # validate
@@ -110,16 +97,16 @@ def train(args):
             for audio, labels in tqdm(
                 validate_dl, unit="batch", total=len(validate_dl)
             ):
-                audio, labels = audio.cuda(), labels.cuda()
-                prediction, loss, weights, second = btc(audio, labels)
+                audio, labels = audio.cuda(), rearrange(labels.cuda(), "b s -> (b s)")
+                predictions = rearrange(torch.argmax(btc(audio), dim=2), "b s -> (b s)")
 
-                all_predictions += len(prediction)
-                all_correct_predictions += torch.count_nonzero(prediction == rearrange(labels, "b c -> (b c)"))
+                all_predictions += len(predictions)
+                all_correct_predictions += (predictions == labels).sum()
         mlflow.log_metric("validate / epoch / accuracy", all_correct_predictions / all_predictions)
 
     # evaluate model
-    evaluate(SongDataset(["train"], **ds_kwargs, frames_per_item=0), btc, "train_ds_evaluation")
-    evaluate(SongDataset(["validate"], **ds_kwargs, frames_per_item=0), btc, "validate_ds_evaluation")
+    evaluate(SongDataset(["train"], **ds_kwargs, frames_per_item=0), btc, "train_ds_evaluation", args.frames_per_item)
+    evaluate(SongDataset(["validate"], **ds_kwargs, frames_per_item=0), btc, "validate_ds_evaluation", args.frames_per_item)
 
 
 if __name__ == "__main__":
