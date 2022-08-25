@@ -1,10 +1,12 @@
 import argparse
 import os
 
+import mlflow
+import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from einops import rearrange
-import pytorch_lightning as pl
+from torchmetrics import Accuracy, MeanMetric
 
 from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing
@@ -32,13 +34,24 @@ def create_argparser():
     parser.add_argument("--dropout_p", type=float, required=True)
 
     # training
+    parser.add_argument("--experiment_name", type=str, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
+    parser.add_argument("--lr", type=float, required=True)
+    parser.add_argument("--ddp", action="store_true")
 
     return parser
 
 
 def train(args):
+    # init mlflow
+    mlflow.set_experiment(args.experiment_name)
+    mlflow.log_params(args.__dict__)
+
+    # init torch distributed
+    if args.ddp:
+        torch.distributed.init_process_group(backend="nccl")
+
     # init datasets and data loaders
     ds_kwargs = {
         "sample_rate": args.sample_rate,
@@ -64,7 +77,7 @@ def train(args):
         validate_ds, batch_size=args.batch_size, shuffle=False, num_workers=5
     )
 
-    # prepare model
+    # prepare model and optimizer
     model = Transformer(
         train_ds.dim,
         args.model_dim,
@@ -73,37 +86,62 @@ def train(args):
         train_ds.n_classes,
         block_type=args.block_type,
         dropout_p=args.dropout_p,
-    )
+    ).cuda()
+    if args.ddp:
+        model = torch.nn.parallel.DistributedDataParallel(model)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
 
-    # train model
-    logger = pl.loggers.MLFlowLogger(experiment_name="btc_custom_implementation")
-    logger.log_hyperparams(args)
-    trainer = pl.Trainer(
-        max_epochs=args.n_epochs,
-        accelerator="gpu",
-        strategy="ddp",
-        devices=1,
-        num_nodes=int(os.environ.get("WORLD_SIZE", "1")),
-        logger=logger,
-        log_every_n_steps=1,
-    )
-    trainer.fit(model, train_dl, validate_dl)
+    # prepare metrics
+    train_accuracy = Accuracy().cuda()
+    validate_accuracy = Accuracy().cuda()
+    loss_metric = MeanMetric().cuda()
+
+    # training loop
+    for epoch in tqdm(range(args.n_epochs), unit="epoch"):
+        # train
+        model.train()
+        loss_metric.reset()
+        train_accuracy.reset()
+        for audio, labels in tqdm(train_dl, total=len(train_dl), unit="batch"):
+            audio, labels = audio.cuda(), labels.cuda()
+            logits = model(audio)
+            loss = torch.nn.functional.cross_entropy(
+                rearrange(logits, "b s c -> (b s) c"), rearrange(labels, "b s -> (b s)")
+            )
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            with torch.no_grad():
+                mlflow.log_metric("train / batch / loss", loss_metric(loss))
+                mlflow.log_metric("train / batch / accuracy", train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)")))
+
+        mlflow.log_metric("train / epoch / loss", loss_metric.compute(), epoch)
+        mlflow.log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
+
+        # validate
+        model.eval()
+        validate_accuracy.reset()
+        for audio, labels in tqdm(validate_dl, total=len(validate_dl), unit="batch"):
+            with torch.no_grad():
+                audio, labels = audio.cuda(), labels.cuda()
+                validate_accuracy(rearrange(model(audio), "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
+        mlflow.log_metric("validate / epoch / accuracy", validate_accuracy.compute(), epoch)
 
     # evaluate model
-    model.cuda()
+    model.eval()
     evaluate(
         SongDataset(["train"], **ds_kwargs, frames_per_item=0),
         model,
         "train_ds_evaluation",
         args.frames_per_item,
-        logger,
     )
     evaluate(
         SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
         model,
         "validate_ds_evaluation",
         args.frames_per_item,
-        logger,
     )
 
 

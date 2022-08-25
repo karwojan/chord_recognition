@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
 from torchmetrics import Accuracy
 from einops import rearrange, repeat
 
@@ -131,7 +130,7 @@ class BTCBlock(nn.Module):
         return self.norm(projected)
 
 
-class Transformer(pl.LightningModule):
+class Transformer(nn.Module):
     def __init__(
         self,
         input_dim: int,
@@ -190,28 +189,6 @@ class Transformer(pl.LightningModule):
 
         # classification head
         return self.classification_head(x)
-
-    def training_step(self, batch, batch_idx):
-        audio, labels = batch
-        logits = self(audio)
-        loss = torch.nn.functional.cross_entropy(
-            rearrange(logits, "b s c -> (b s) c"), rearrange(labels, "b s -> (b s)")
-        )
-
-        self.train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
-        self.log("loss", loss, on_epoch=True, sync_dist=True)
-        self.log("train_accuracy", self.train_accuracy, on_epoch=True, sync_dist=True)
-
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        audio, labels = batch
-        logits = self(audio)
-        self.validate_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
-        self.log("validate_accuracy", self.validate_accuracy, sync_dist=True)
-
-    def configure_optimizers(self):
-        return torch.optim.AdamW(self.parameters())
 
 
 if __name__ == "__main__":
