@@ -90,6 +90,7 @@ def train(args):
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
+    scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=5)
 
     # prepare metrics
     train_accuracy = Accuracy().cuda()
@@ -117,6 +118,7 @@ def train(args):
                 mlflow.log_metric("train / batch / loss", loss_metric(loss))
                 mlflow.log_metric("train / batch / accuracy", train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)")))
 
+        scheduler.step()
         mlflow.log_metric("train / epoch / loss", loss_metric.compute(), epoch)
         mlflow.log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
 
