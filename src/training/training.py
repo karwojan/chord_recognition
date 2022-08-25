@@ -1,5 +1,6 @@
 import argparse
 
+import os
 import mlflow
 import torch
 from torch.utils.data import DataLoader
@@ -59,6 +60,7 @@ def train(args):
     # init mlflow
     if is_rank_0():
         mlflow.set_experiment(args.experiment_name)
+        mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
         mlflow.log_params(args.__dict__)
 
     # init datasets and data loaders
