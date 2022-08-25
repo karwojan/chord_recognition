@@ -3,7 +3,7 @@ import argparse
 import os
 import mlflow
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 from einops import rearrange
 from torchmetrics import Accuracy, MeanMetric
@@ -79,13 +79,19 @@ def train(args):
         pitch_shift_augment=args.pitch_shift_augment
     )
     train_dl = DataLoader(
-        train_ds, batch_size=args.batch_size, shuffle=True, num_workers=5
+        train_ds,
+        batch_size=args.batch_size,
+        num_workers=5,
+        sampler=DistributedSampler(train_ds) if args.ddp else None,
     )
     validate_ds = SongDataset(
         ["validate"], **ds_kwargs, frames_per_item=args.frames_per_item
     )
     validate_dl = DataLoader(
-        validate_ds, batch_size=args.batch_size, shuffle=False, num_workers=5
+        validate_ds,
+        batch_size=args.batch_size,
+        num_workers=5,
+        sampler=DistributedSampler(validate_ds) if args.ddp else None,
     )
 
     # prepare model and optimizer
@@ -101,7 +107,9 @@ def train(args):
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
-    scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=5)
+    scheduler = torch.optim.lr_scheduler.LinearLR(
+        optimizer, start_factor=0.1, total_iters=5
+    )
 
     # prepare metrics
     train_accuracy = Accuracy().cuda()
@@ -110,6 +118,10 @@ def train(args):
 
     # training loop
     for epoch in tqdm(range(args.n_epochs), unit="epoch"):
+        if args.ddp:
+            train_dl.sampler.set_epoch(epoch)
+            validate_dl.sampler.set_epoch(epoch)
+
         # train
         model.train()
         loss_metric.reset()
@@ -127,7 +139,10 @@ def train(args):
 
             with torch.no_grad():
                 loss_metric(loss)
-                train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
+                train_accuracy(
+                    rearrange(logits, "b s c-> (b s) c"),
+                    rearrange(labels, "b s -> (b s)"),
+                )
 
         scheduler.step()
         log_metric("train / epoch / loss", loss_metric.compute(), epoch)
@@ -139,7 +154,10 @@ def train(args):
         for audio, labels in tqdm(validate_dl, total=len(validate_dl), unit="batch"):
             with torch.no_grad():
                 audio, labels = audio.cuda(), labels.cuda()
-                validate_accuracy(rearrange(model(audio), "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
+                validate_accuracy(
+                    rearrange(model(audio), "b s c-> (b s) c"),
+                    rearrange(labels, "b s -> (b s)"),
+                )
         log_metric("validate / epoch / accuracy", validate_accuracy.compute(), epoch)
 
     # evaluate model
