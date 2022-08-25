@@ -1,5 +1,4 @@
 import argparse
-import os
 
 import mlflow
 import torch
@@ -12,6 +11,15 @@ from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
+
+
+def is_rank_0():
+    return not torch.distributed.is_initialized() or torch.distributed.get_rank() == 0
+
+
+def log_metric(key: str, value: float, step: int = None):
+    if is_rank_0():
+        mlflow.log_metric(key, value, step)
 
 
 def create_argparser():
@@ -44,13 +52,14 @@ def create_argparser():
 
 
 def train(args):
-    # init mlflow
-    mlflow.set_experiment(args.experiment_name)
-    mlflow.log_params(args.__dict__)
-
     # init torch distributed
     if args.ddp:
         torch.distributed.init_process_group(backend="nccl")
+
+    # init mlflow
+    if is_rank_0():
+        mlflow.set_experiment(args.experiment_name)
+        mlflow.log_params(args.__dict__)
 
     # init datasets and data loaders
     ds_kwargs = {
@@ -115,12 +124,12 @@ def train(args):
             optimizer.step()
 
             with torch.no_grad():
-                mlflow.log_metric("train / batch / loss", loss_metric(loss))
-                mlflow.log_metric("train / batch / accuracy", train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)")))
+                log_metric("train / batch / loss", loss_metric(loss))
+                log_metric("train / batch / accuracy", train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)")))
 
         scheduler.step()
-        mlflow.log_metric("train / epoch / loss", loss_metric.compute(), epoch)
-        mlflow.log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
+        log_metric("train / epoch / loss", loss_metric.compute(), epoch)
+        log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
 
         # validate
         model.eval()
@@ -129,22 +138,23 @@ def train(args):
             with torch.no_grad():
                 audio, labels = audio.cuda(), labels.cuda()
                 validate_accuracy(rearrange(model(audio), "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
-        mlflow.log_metric("validate / epoch / accuracy", validate_accuracy.compute(), epoch)
+        log_metric("validate / epoch / accuracy", validate_accuracy.compute(), epoch)
 
     # evaluate model
-    model.eval()
-    evaluate(
-        SongDataset(["train"], **ds_kwargs, frames_per_item=0),
-        model,
-        "train_ds_evaluation",
-        args.frames_per_item,
-    )
-    evaluate(
-        SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
-        model,
-        "validate_ds_evaluation",
-        args.frames_per_item,
-    )
+    if is_rank_0():
+        model.eval()
+        evaluate(
+            SongDataset(["train"], **ds_kwargs, frames_per_item=0),
+            model,
+            "train_ds_evaluation",
+            args.frames_per_item,
+        )
+        evaluate(
+            SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
+            model,
+            "validate_ds_evaluation",
+            args.frames_per_item,
+        )
 
 
 if __name__ == "__main__":
