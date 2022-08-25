@@ -199,8 +199,8 @@ class Transformer(pl.LightningModule):
         )
 
         self.train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
-        self.log("loss", loss, on_epoch=True)
-        self.log("train_accuracy", self.train_accuracy, on_epoch=True, on_step=True)
+        self.log("loss", loss, on_epoch=True, sync_dist=True)
+        self.log("train_accuracy", self.train_accuracy, on_epoch=True, sync_dist=True)
 
         return loss
 
@@ -208,7 +208,7 @@ class Transformer(pl.LightningModule):
         audio, labels = batch
         logits = self(audio)
         self.validate_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
-        self.log("validate_accuracy", self.validate_accuracy)
+        self.log("validate_accuracy", self.validate_accuracy, sync_dist=True)
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters())
@@ -217,6 +217,6 @@ class Transformer(pl.LightningModule):
 if __name__ == "__main__":
     from torchinfo import summary
 
-    transformer = BTC(144, 128, 4, 8, 25, 0.2)
+    transformer = Transformer(144, 128, 4, 8, 25, "btc", 0.2)
     print(transformer(torch.rand(5, 100, 144)))
     summary(transformer, input_data=torch.rand(2, 108, 144))

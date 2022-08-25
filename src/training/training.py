@@ -1,4 +1,5 @@
 import argparse
+import os
 
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -80,6 +81,9 @@ def train(args):
     trainer = pl.Trainer(
         max_epochs=args.n_epochs,
         accelerator="gpu",
+        strategy="ddp",
+        devices=1,
+        num_nodes=int(os.environ.get("WORLD_SIZE", "1")),
         logger=logger,
         log_every_n_steps=1,
     )
