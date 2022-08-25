@@ -126,8 +126,8 @@ def train(args):
             optimizer.step()
 
             with torch.no_grad():
-                log_metric("train / batch / loss", loss_metric(loss))
-                log_metric("train / batch / accuracy", train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)")))
+                loss_metric(loss)
+                train_accuracy(rearrange(logits, "b s c-> (b s) c"), rearrange(labels, "b s -> (b s)"))
 
         scheduler.step()
         log_metric("train / epoch / loss", loss_metric.compute(), epoch)
