@@ -3,6 +3,7 @@ FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
 RUN apt update
 RUN apt upgrade -y
 RUN apt install -y build-essential
+RUN apt install -y libsndfile1
 
 WORKDIR /workspace
 COPY requirements.txt requirements.txt
