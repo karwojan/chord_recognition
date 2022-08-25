@@ -54,7 +54,6 @@ class SongDataset(Dataset):
             if os.path.exists(cached_path):
                 song = np.load(cached_path)
                 audio = song["audio"]
-                n_frames = audio.shape[0]
             else:
                 # load audio file (supress librosa warnings)
                 with warnings.catch_warnings():
@@ -70,10 +69,9 @@ class SongDataset(Dataset):
                     self.frame_size,
                     self.hop_size,
                 )
-                n_frames = audio.shape[0]
 
                 # assign annotations (labels) to frames
-                labels = np.zeros(shape=(n_frames,), dtype=int)
+                labels = np.zeros(shape=audio.shape[:1], dtype=int)
                 for chord in parse_annotation_file(song_metadata.filepath):
                     labels[
                         _time_to_frame_index(chord.start): _time_to_frame_index(
@@ -84,7 +82,7 @@ class SongDataset(Dataset):
                 # store in cache
                 np.savez(cached_path, audio=audio, labels=labels)
 
-            return song_metadata.Index, n_frames, np.mean(audio), np.mean(audio**2)
+            return song_metadata.Index, audio.shape, np.mean(audio), np.mean(audio**2)
 
         # load index (songs metadata)
         self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -97,7 +95,7 @@ class SongDataset(Dataset):
             )
 
         # load songs
-        id_per_song, n_frames_per_song, mean_per_song, mean_2_per_song = zip(
+        id_per_song, shape_per_song, mean_per_song, mean_2_per_song = zip(
             *tqdm(
                 ThreadPoolExecutor().map(_load_song, self.songs_metadata.itertuples()),
                 total=self.songs_metadata.shape[0],
@@ -106,17 +104,18 @@ class SongDataset(Dataset):
 
         # prepare list of items - multiple mappings to same song, proportionally to song length
         self.items = []
-        for song_id, n_frames in zip(id_per_song, n_frames_per_song):
-            n_items = n_frames // self.frames_per_item if self.frames_per_item > 0 else 1
+        for song_id, song_shape in zip(id_per_song, shape_per_song):
+            n_items = song_shape[0] // self.frames_per_item if self.frames_per_item > 0 else 1
             self.items += [song_id] * n_items
 
-        # store mean and std of whole dataset
+        # store mean, std and dimensionality of dataset
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
+        self.dim = shape_per_song[0][1]
 
-        print(
-            f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_size / self.sample_rate))})."
-        )
+        # print info about loaded songs
+        dataset_duration = sum(shape[0] for shape in shape_per_song) * self.hop_size / self.sample_rate
+        print(f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(dataset_duration))}).")
 
     def __len__(self):
         return len(self.items)
@@ -168,7 +167,7 @@ if __name__ == "__main__":
         audio_preprocessing=CQTPreprocessing(),
         standardize_audio=True,
         pitch_shift_augment=True,
-        subsets=["isophonics", "rs200"],
+        subsets=["isophonics"],
     )
     print(ds.mean, ds.std)
     print("len(ds):", len(ds))
