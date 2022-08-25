@@ -21,6 +21,15 @@ def create_argparser():
     parser.add_argument("--frames_per_item", type=int, required=True)
     parser.add_argument("--pitch_shift_augment", action="store_true")
 
+    # model
+    parser.add_argument("--model_dim", type=int, required=True)
+    parser.add_argument("--n_heads", type=int, required=True)
+    parser.add_argument("--n_blocks", type=int, required=True)
+    parser.add_argument(
+        "--block_type", type=str, choices=["btc", "transformer"], required=True
+    )
+    parser.add_argument("--dropout_p", type=float, required=True)
+
     # training
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
@@ -55,7 +64,15 @@ def train(args):
     )
 
     # prepare model
-    model = Transformer(144, 128, 4, 8, train_ds.n_classes, block_type="btc", dropout_p=0.2)
+    model = Transformer(
+        train_ds.dim,
+        args.model_dim,
+        args.n_heads,
+        args.n_blocks,
+        train_ds.n_classes,
+        block_type=args.block_type,
+        dropout_p=args.dropout_p,
+    )
 
     # train model
     logger = pl.loggers.MLFlowLogger(experiment_name="btc_custom_implementation")
@@ -75,14 +92,14 @@ def train(args):
         model,
         "train_ds_evaluation",
         args.frames_per_item,
-        logger
+        logger,
     )
     evaluate(
         SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
         model,
         "validate_ds_evaluation",
         args.frames_per_item,
-        logger
+        logger,
     )
 
 
