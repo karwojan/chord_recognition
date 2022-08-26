@@ -9,7 +9,7 @@ from einops import rearrange
 from torchmetrics import Accuracy, MeanMetric
 
 from src.training.dataset import SongDataset
-from src.training.preprocessing import CQTPreprocessing
+from src.training.preprocessing import CQTPreprocessing, JustSplitPreprocessing
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
 
@@ -32,6 +32,7 @@ def create_argparser():
     parser.add_argument("--hop_size", type=int, required=True)
     parser.add_argument("--frames_per_item", type=int, required=True)
     parser.add_argument("--pitch_shift_augment", action="store_true")
+    parser.add_argument("--preprocessing", type=str, required=True, choices=["cqt", "raw"])
 
     # model
     parser.add_argument("--model_dim", type=int, required=True)
@@ -41,6 +42,7 @@ def create_argparser():
         "--block_type", type=str, choices=["btc", "transformer"], required=True
     )
     parser.add_argument("--dropout_p", type=float, required=True)
+    parser.add_argument("--extra_features_dim", type=int)
 
     # training
     parser.add_argument("--experiment_name", type=str, required=True)
@@ -68,10 +70,13 @@ def train(args):
         "sample_rate": args.sample_rate,
         "frame_size": args.frame_size,
         "hop_size": args.hop_size,
-        "audio_preprocessing": CQTPreprocessing(),
         "labels_vocabulary": "maj_min",
         "subsets": ["isophonics", "robbie_williams", "uspop"],
     }
+    if args.preprocessing == "cqt":
+        ds_kwargs["audio_preprocessing"] = CQTPreprocessing()
+    elif args.preprocessing == "raw":
+        ds_kwargs["audio_preprocessing"] = JustSplitPreprocessing()
     train_ds = SongDataset(
         ["train"],
         **ds_kwargs,
@@ -103,6 +108,7 @@ def train(args):
         train_ds.n_classes,
         block_type=args.block_type,
         dropout_p=args.dropout_p,
+        extra_features_dim=args.extra_features_dim
     ).cuda()
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)

@@ -140,6 +140,7 @@ class Transformer(nn.Module):
         n_classes: int,
         block_type: str,
         dropout_p: float = 0.0,
+        extra_features_dim: int = None,
     ):
         super().__init__()
         # store parameters
@@ -150,6 +151,7 @@ class Transformer(nn.Module):
         self.n_classes = n_classes
         self.block_type = block_type
         self.dropout_p = dropout_p
+        self.extra_features_dim = extra_features_dim
 
         # prepare position encoding
         self.positional_encoding = torch.empty((0, 0))
@@ -162,7 +164,15 @@ class Transformer(nn.Module):
         else:
             raise ValueError(block_type)
         self.dropout = nn.Dropout(dropout_p)
-        self.embedding = nn.Linear(input_dim, dim)
+        if self.extra_features_dim is None:
+            self.embedding: nn.Module = nn.Linear(input_dim, dim)
+        else:
+            self.embedding = nn.Sequential(
+                nn.Linear(input_dim, self.extra_features_dim),
+                nn.LayerNorm(self.extra_features_dim),
+                nn.GELU(),
+                nn.Linear(self.extra_features_dim, dim)
+            )
         self.blocks = nn.Sequential(
             *[block(dim, n_heads, dropout_p) for i in range(n_blocks)]
         )
@@ -194,6 +204,6 @@ class Transformer(nn.Module):
 if __name__ == "__main__":
     from torchinfo import summary
 
-    transformer = Transformer(144, 128, 4, 8, 25, "btc", 0.2)
+    transformer = Transformer(144, 174, 6, 8, 25, "transformer", 0.2, 256)
     print(transformer(torch.rand(5, 100, 144)))
     summary(transformer, input_data=torch.rand(2, 108, 144))
