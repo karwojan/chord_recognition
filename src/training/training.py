@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 from einops import rearrange
 from torchmetrics import Accuracy, MeanMetric
+from torchinfo import summary
 
 from src.training.dataset import SongDataset
 from src.training.preprocessing import CQTPreprocessing, JustSplitPreprocessing
@@ -116,6 +117,9 @@ def train(args):
     scheduler = torch.optim.lr_scheduler.LinearLR(
         optimizer, start_factor=0.1, total_iters=5
     )
+
+    # print model info
+    summary(model, input_data=next(iter(train_dl))[0])
 
     # prepare metrics
     train_accuracy = Accuracy().cuda()
