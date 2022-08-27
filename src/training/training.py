@@ -33,7 +33,9 @@ def create_argparser():
     parser.add_argument("--hop_size", type=int, required=True)
     parser.add_argument("--frames_per_item", type=int, required=True)
     parser.add_argument("--pitch_shift_augment", action="store_true")
-    parser.add_argument("--preprocessing", type=str, required=True, choices=["cqt", "raw"])
+    parser.add_argument(
+        "--preprocessing", type=str, required=True, choices=["cqt", "raw"]
+    )
 
     # model
     parser.add_argument("--model_dim", type=int, required=True)
@@ -66,7 +68,13 @@ def train(args):
         mlflow.set_experiment(args.experiment_name)
         mlflow.start_run(run_name=args.run_name)
         mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
-        mlflow.log_params(args.__dict__)
+        mlflow.log_params(
+            {
+                key: value
+                for key, value in args.__dict__.items()
+                if key not in {"experiment_name", "run_name"}
+            }
+        )
 
     # init datasets and data loaders
     ds_kwargs = {
@@ -111,7 +119,7 @@ def train(args):
         train_ds.n_classes,
         block_type=args.block_type,
         dropout_p=args.dropout_p,
-        extra_features_dim=args.extra_features_dim
+        extra_features_dim=args.extra_features_dim,
     ).cuda()
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
