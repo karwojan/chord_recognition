@@ -51,7 +51,7 @@ class JustSplitPreprocessing(Preprocessing):
     def preprocess(self, audio: np.ndarray, sample_rate: int, frame_size: int, hop_size: int) -> np.ndarray:
         # find number of whole frames in audio
         n_frames = len(audio) // hop_size
-        while ((n_frames - 1) * hop_size + frame_size) > audio:
+        while ((n_frames - 1) * hop_size + frame_size) > len(audio):
             n_frames = n_frames - 1
 
         # split into frames
