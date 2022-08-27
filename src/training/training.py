@@ -43,10 +43,11 @@ def create_argparser():
         "--block_type", type=str, choices=["btc", "transformer"], required=True
     )
     parser.add_argument("--dropout_p", type=float, required=True)
-    parser.add_argument("--extra_features_dim", type=int)
+    parser.add_argument("--extra_features_dim", type=int, required=False)
 
     # training
     parser.add_argument("--experiment_name", type=str, required=True)
+    parser.add_argument("--run_name", type=str, required=False)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
@@ -63,6 +64,7 @@ def train(args):
     # init mlflow
     if is_rank_0():
         mlflow.set_experiment(args.experiment_name)
+        mlflow.start_run(run_name=args.run_name)
         mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
         mlflow.log_params(args.__dict__)
 
