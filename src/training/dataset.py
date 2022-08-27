@@ -43,6 +43,8 @@ class SongDataset(Dataset):
         self.subsets = subsets
         self.n_classes = 1 + max(len(vocabularies[labels_vocabulary]), 1) * 12
         self.cache_path = "./data/cache"
+        if not os.path.isdir(self.cache_path):
+            os.mkdir(self.cache_path)
 
         def _time_to_frame_index(t):
             t = int(t * sample_rate)
@@ -59,7 +61,7 @@ class SongDataset(Dataset):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     audio = librosa.load(
-                        path=song_metadata.audio_filepath, sr=self.sample_rate
+                        path=song_metadata.audio_filepath, sr=self.sample_rate, mono=True, res_type="kaiser_fast"
                     )[0]
 
                 # preprocess - split into frames
@@ -96,11 +98,12 @@ class SongDataset(Dataset):
 
         # load songs
         id_per_song, shape_per_song, mean_per_song, mean_2_per_song = zip(
-            *tqdm(
-                ThreadPoolExecutor().map(_load_song, self.songs_metadata.itertuples()),
-                total=self.songs_metadata.shape[0],
-            )
-        )
+             *tqdm(
+                 ThreadPoolExecutor(max_workers=5).map(_load_song, self.songs_metadata.itertuples()),
+                 total=self.songs_metadata.shape[0],
+                 smoothing=0.0
+             )
+         )
 
         # prepare list of items - multiple mappings to same song, proportionally to song length
         self.items = []
