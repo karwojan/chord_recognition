@@ -17,3 +17,4 @@ tabulate==0.8.10
 mlflow==1.28.0
 einops==0.4.1
 torchinfo==1.7.0
+pyrubberband==0.3.0

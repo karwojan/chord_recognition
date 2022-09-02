@@ -2,7 +2,7 @@ FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y build-essential git ffmpeg libsndfile1
+RUN apt install -y build-essential git ffmpeg libsndfile1 rubberband-cli
 
 WORKDIR /workspace
 

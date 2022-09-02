@@ -8,6 +8,7 @@ from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
+import pyrubberband
 
 from src.training.preprocessing import Preprocessing
 from src.annotation_parser import parse_annotation_file
@@ -64,24 +65,35 @@ class SongDataset(Dataset):
                         path=song_metadata.audio_filepath, sr=self.sample_rate, mono=True, res_type="kaiser_fast"
                     )[0]
 
+                # load annotation file
+                chords = parse_annotation_file(song_metadata.filepath)
+
+                # optional pitch shift augmentation
+                if self.pitch_shift_augment:
+                    shifts = range(-5, 7)
+                    audio = [pyrubberband.pitch_shift(audio, self.sample_rate, shift) for shift in shifts]
+                    chords = [[chord.shift_chord(shift) for chord in chords] for shift in shifts]
+                else:
+                    audio = [audio]
+                    chords = [chords]
+
                 # preprocess - split into frames
-                audio = self.audio_preprocessing.preprocess(
-                    audio,
-                    self.sample_rate,
-                    self.frame_size,
-                    self.hop_size,
-                )
+                audio = [self.audio_preprocessing.preprocess(a, self.sample_rate, self.frame_size, self.hop_size) for a in audio]
 
                 # assign annotations (labels) to frames
-                labels = np.zeros(shape=audio.shape[:1], dtype=int)
-                for chord in parse_annotation_file(song_metadata.filepath):
-                    labels[
-                        _time_to_frame_index(chord.start): _time_to_frame_index(
-                            chord.stop
-                        )
-                    ] = chord.to_label_occurence(labels_vocabulary).label
+                labels = []
+                for a, c in zip(audio, chords):
+                    labels.append(np.zeros(shape=a.shape[:1], dtype=int))
+                    for chord in c:
+                        labels[-1][
+                            _time_to_frame_index(chord.start): _time_to_frame_index(
+                                chord.stop
+                            )
+                        ] = chord.to_label_occurence(labels_vocabulary).label
 
                 # store in cache
+                audio = np.stack(audio, axis=0)
+                labels = np.stack(labels, axis=0)
                 np.savez(cached_path, audio=audio, labels=labels)
 
             return song_metadata.Index, audio.shape, np.mean(audio), np.mean(audio**2)
@@ -129,6 +141,11 @@ class SongDataset(Dataset):
         audio = song["audio"]
         labels = song["labels"]
 
+        # select random shift
+        shift = np.random.randint(audio.shape[0])
+        audio = audio[shift]
+        labels = labels[shift]
+
         # select random item from this file if item size is defined
         if self.frames_per_item > 0:
             start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
@@ -139,17 +156,6 @@ class SongDataset(Dataset):
         if self.standardize_audio:
             audio = (audio - self.mean) / self.std
 
-        # optionally augment pitch
-        if self.pitch_shift_augment:
-            shift = np.random.randint(10) - 5
-            audio = self.audio_preprocessing.pitch_shift_augment(audio, shift)
-            labels = np.array([
-                Chord.from_label(label, self.labels_vocabulary)
-                .shift(shift)
-                .to_label(self.labels_vocabulary)
-                for label in labels
-            ])
-
         return audio, labels
 
     def get_song_metadata(self, index):
@@ -158,7 +164,7 @@ class SongDataset(Dataset):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    from src.training.preprocessing import CQTPreprocessing
+    from src.training.preprocessing import CQTPreprocessing, JustSplitPreprocessing
     # from src.training.dataset import SongDataset
 
     ds = SongDataset(
@@ -167,7 +173,7 @@ if __name__ == "__main__":
         frame_size=4410,
         hop_size=4410,
         frames_per_item=100,
-        audio_preprocessing=CQTPreprocessing(),
+        audio_preprocessing=JustSplitPreprocessing(),
         standardize_audio=True,
         pitch_shift_augment=True,
         subsets=["isophonics"],

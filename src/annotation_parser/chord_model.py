@@ -76,6 +76,9 @@ class ChordOccurence:
     stop: float
     chord: Chord
 
+    def shift_chord(self, shift: int) -> ChordOccurence:
+        return replace(self, chord=self.chord.shift(shift))
+
     def to_label_occurence(self, vocabulary_name: str) -> LabelOccurence:
         return LabelOccurence(
             self.start, self.stop, self.chord.to_label(vocabulary_name)
