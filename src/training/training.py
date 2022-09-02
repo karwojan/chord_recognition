@@ -1,4 +1,5 @@
 import argparse
+from dataclasses import replace
 
 import os
 import mlflow
@@ -9,8 +10,7 @@ from einops import rearrange
 from torchmetrics import Accuracy, MeanMetric
 from torchinfo import summary
 
-from src.training.dataset import SongDataset
-from src.training.preprocessing import CQTPreprocessing, JustSplitPreprocessing
+from src.training.dataset import SongDataset, SongDatasetConfig
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
 
@@ -28,14 +28,7 @@ def create_argparser():
     parser = argparse.ArgumentParser()
 
     # dataset
-    parser.add_argument("--sample_rate", type=int, required=True)
-    parser.add_argument("--frame_size", type=int, required=True)
-    parser.add_argument("--hop_size", type=int, required=True)
-    parser.add_argument("--frames_per_item", type=int, required=True)
-    parser.add_argument("--pitch_shift_augment", action="store_true")
-    parser.add_argument(
-        "--preprocessing", type=str, required=True, choices=["cqt", "raw"]
-    )
+    SongDatasetConfig.add_to_argparser(parser)
 
     # model
     parser.add_argument("--model_dim", type=int, required=True)
@@ -77,23 +70,8 @@ def train(args):
         )
 
     # init datasets and data loaders
-    ds_kwargs = {
-        "sample_rate": args.sample_rate,
-        "frame_size": args.frame_size,
-        "hop_size": args.hop_size,
-        "labels_vocabulary": "maj_min",
-        "subsets": ["isophonics", "robbie_williams", "uspop"],
-    }
-    if args.preprocessing == "cqt":
-        ds_kwargs["audio_preprocessing"] = CQTPreprocessing()
-    elif args.preprocessing == "raw":
-        ds_kwargs["audio_preprocessing"] = JustSplitPreprocessing()
-    train_ds = SongDataset(
-        ["train"],
-        **ds_kwargs,
-        frames_per_item=args.frames_per_item,
-        pitch_shift_augment=args.pitch_shift_augment
-    )
+    song_dataset_config = SongDatasetConfig.create_from_args(args)
+    train_ds = SongDataset(["train"], song_dataset_config)
     train_dl = DataLoader(
         train_ds,
         batch_size=args.batch_size,
@@ -101,7 +79,7 @@ def train(args):
         sampler=DistributedSampler(train_ds) if args.ddp else None,
     )
     validate_ds = SongDataset(
-        ["validate"], **ds_kwargs, frames_per_item=args.frames_per_item
+        ["validate"], replace(song_dataset_config, pitch_shift_augment=False)
     )
     validate_dl = DataLoader(
         validate_ds,
@@ -183,14 +161,17 @@ def train(args):
     # evaluate model
     if is_rank_0():
         model.eval()
+        song_dataset_config_eval = replace(
+            song_dataset_config, frames_per_item=0, pitch_shift_augment=False
+        )
         evaluate(
-            SongDataset(["train"], **ds_kwargs, frames_per_item=0),
+            SongDataset(["train"], song_dataset_config_eval),
             model,
             "train_ds_evaluation",
             args.frames_per_item,
         )
         evaluate(
-            SongDataset(["validate"], **ds_kwargs, frames_per_item=0),
+            SongDataset(["validate"], song_dataset_config_eval),
             model,
             "validate_ds_evaluation",
             args.frames_per_item,
