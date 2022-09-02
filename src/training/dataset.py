@@ -165,8 +165,8 @@ class SongDataset(Dataset):
     def __getitem__(self, index):
         # load whole preprocessed audio file
         song = np.load(os.path.join(self.cache_path, f"{self.items[index]}.npz"))
-        audio = song["audio"]
-        labels = song["labels"]
+        audio = song["audio"].astype(np.float32)
+        labels = song["labels"].astype(np.int64)
 
         # select random shift
         shift = np.random.randint(audio.shape[0])
@@ -215,5 +215,6 @@ if __name__ == "__main__":
         item = ds[i]
         print(ds.get_song_metadata(i))
         print(item[0].shape, item[1].shape)
+        print(item[0].dtype, item[1].dtype)
         plt.imshow(item[0].T)
     plt.show()
