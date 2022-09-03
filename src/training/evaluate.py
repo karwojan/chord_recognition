@@ -30,7 +30,7 @@ def evaluate(
     output_dir_prefix: str,
     frames_per_item: int,
 ):
-    assert dataset.frames_per_item <= 0, "dataset must return whole songs"
+    assert dataset.config.frames_per_item <= 0, "dataset must return whole songs"
     model.eval()
 
     recall_precision_kwargs = {
@@ -76,9 +76,9 @@ def evaluate(
 
             # convert predictions to label occurences and merge repeated
             start_times = np.arange(len(predictions)) * (
-                dataset.hop_size / dataset.sample_rate
+                dataset.config.hop_size / dataset.config.sample_rate
             )
-            stop_times = start_times + (dataset.frame_size / dataset.sample_rate)
+            stop_times = start_times + (dataset.config.frame_size / dataset.config.sample_rate)
             pred_label_occurences: List[LabelOccurence] = []
             for start, stop, label in zip(start_times, stop_times, predictions):
                 if (
@@ -98,7 +98,7 @@ def evaluate(
                         print_labfile(
                             [
                                 label_occurence.to_chord_occurence(
-                                    dataset.labels_vocabulary
+                                    dataset.config.labels_vocabulary
                                 )
                                 for label_occurence in pred_label_occurences
                             ]
@@ -110,7 +110,7 @@ def evaluate(
                     "csr": csr(
                         [
                             chord_occurence.to_label_occurence(
-                                dataset.labels_vocabulary
+                                dataset.config.labels_vocabulary
                             )
                             for chord_occurence in parse_annotation_file(
                                 song_metadata.filepath
