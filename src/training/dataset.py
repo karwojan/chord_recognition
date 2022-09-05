@@ -12,13 +12,17 @@ from dataclasses import dataclass
 from tqdm import tqdm
 import pyrubberband
 
-from src.training.preprocessing import Preprocessing, JustSplitPreprocessing, CQTPreprocessing
+from src.training.preprocessing import (
+    Preprocessing,
+    JustSplitPreprocessing,
+    CQTPreprocessing,
+)
 from src.annotation_parser import parse_annotation_file
 from src.annotation_parser.chord_model import Chord, vocabularies
 
 
 @dataclass
-class SongDatasetConfig():
+class SongDatasetConfig:
     sample_rate: int
     frame_size: int
     hop_size: int
@@ -38,7 +42,12 @@ class SongDatasetConfig():
         parser.add_argument("--audio_preprocessing", type=str, required=True, choices=["cqt", "raw"])
         parser.add_argument("--standardize_audio", action="store_true")
         parser.add_argument("--pitch_shift_augment", action="store_true")
-        parser.add_argument("--labels_vocabulary", type=str, required=True, choices=["maj_min", "root_only"])
+        parser.add_argument(
+            "--labels_vocabulary",
+            type=str,
+            required=True,
+            choices=["maj_min", "root_only"],
+        )
         parser.add_argument("--subsets", type=str, required=False, nargs="+")
 
     @staticmethod
@@ -58,7 +67,7 @@ class SongDatasetConfig():
             standardize_audio=args.standardize_audio,
             pitch_shift_augment=args.pitch_shift_augment,
             labels_vocabulary=args.labels_vocabulary,
-            subsets=args.subsets
+            subsets=args.subsets,
         )
 
 
@@ -79,10 +88,11 @@ class SongDataset(Dataset):
             return int(round(t // config.hop_size + t % config.hop_size / config.frame_size))
 
         def _load_song(song_metadata):
-            cached_path = os.path.join(self.cache_path, f"{song_metadata.Index}.npz")
+            print(f"Loading {song_metadata.song}", flush=True)
+            cached_data_no_shift_path = os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz")
 
-            if os.path.exists(cached_path):
-                song = np.load(cached_path)
+            if os.path.exists(cached_data_no_shift_path):
+                song = np.load(cached_data_no_shift_path)
                 audio = song["audio"]
             else:
                 # load audio file (supress librosa warnings)
@@ -97,33 +107,37 @@ class SongDataset(Dataset):
 
                 # optional pitch shift augmentation
                 if config.pitch_shift_augment:
-                    shifts = range(-5, 7)
-                    audio = [pyrubberband.pitch_shift(audio, config.sample_rate, shift) for shift in shifts]
-                    chords = [[chord.shift_chord(shift) for chord in chords] for shift in shifts]
+                    shifts = [0] + list(range(-5, 0)) + list(range(1, 7))
+                    audio_list = [pyrubberband.pitch_shift(audio, config.sample_rate, shift) for shift in shifts]
+                    chords_list = [[chord.shift_chord(shift) for chord in chords] for shift in shifts]
                 else:
-                    audio = [audio]
-                    chords = [chords]
+                    audio_list = [audio]
+                    chords_list = [chords]
 
-                # preprocess - split into frames
-                audio = [config.audio_preprocessing.preprocess(a, config.sample_rate, config.frame_size, config.hop_size) for a in audio]
+                # preprocess audio - split into frames
+                audio_list = [
+                    config.audio_preprocessing.preprocess(audio, config.sample_rate, config.frame_size, config.hop_size)
+                    for audio in audio_list
+                ]
 
-                # assign annotations (labels) to frames
-                labels = []
-                for a, c in zip(audio, chords):
-                    labels.append(np.zeros(shape=a.shape[:1], dtype=int))
-                    for chord in c:
-                        labels[-1][
-                            _time_to_frame_index(chord.start): _time_to_frame_index(
-                                chord.stop
-                            )
+                for i, (audio, chords) in enumerate(zip(audio_list, chords_list)):
+                    # assign annotations (labels) to frames
+                    labels = np.zeros(shape=audio.shape[:1], dtype=int)
+                    for chord in chords:
+                        labels[
+                            _time_to_frame_index(chord.start): _time_to_frame_index(chord.stop)
                         ] = chord.to_label_occurence(config.labels_vocabulary).label
 
-                # store in cache
-                audio = np.stack(audio, axis=0)
-                labels = np.stack(labels, axis=0)
-                np.savez(cached_path, audio=audio, labels=labels)
+                    # store in cache
+                    np.savez(
+                        os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz"),
+                        audio=audio.astype(np.float32),
+                        labels=labels.astype(np.int32),
+                    )
 
-            return song_metadata.Index, audio.shape, np.mean(audio), np.mean(audio**2)
+                audio = audio_list[0]
+
+            return song_metadata.Index, audio.shape, np.mean(audio), np.mean(audio ** 2)
 
         # load index (songs metadata)
         self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -137,41 +151,39 @@ class SongDataset(Dataset):
 
         # load songs
         id_per_song, shape_per_song, mean_per_song, mean_2_per_song = zip(
-             *tqdm(
-                 ThreadPoolExecutor(max_workers=5).map(_load_song, self.songs_metadata.itertuples()),
-                 total=self.songs_metadata.shape[0],
-                 smoothing=0.0
-             )
-         )
+            *tqdm(
+                ThreadPoolExecutor(max_workers=5).map(_load_song, self.songs_metadata.itertuples()),
+                total=self.songs_metadata.shape[0],
+                smoothing=0.0,
+            )
+        )
 
         # prepare list of items - multiple mappings to same song, proportionally to song length
         self.items = []
         for song_id, song_shape in zip(id_per_song, shape_per_song):
-            n_items = song_shape[1] // config.frames_per_item if config.frames_per_item > 0 else 1
+            n_items = song_shape[0] // config.frames_per_item if config.frames_per_item > 0 else 1
             self.items += [song_id] * n_items
 
         # store mean, std and dimensionality of dataset
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
-        self.dim = shape_per_song[0][2]
+        self.dim = shape_per_song[0][1]
 
         # print info about loaded songs
-        dataset_duration = sum(shape[1] for shape in shape_per_song) * config.hop_size / config.sample_rate
+        dataset_duration = sum(shape[0] for shape in shape_per_song) * config.hop_size / config.sample_rate
         print(f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(dataset_duration))}).")
 
     def __len__(self):
         return len(self.items)
 
     def __getitem__(self, index):
+        # select random shift
+        shift = np.random.randint(12) if self.config.pitch_shift_augment else 0
+
         # load whole preprocessed audio file
-        song = np.load(os.path.join(self.cache_path, f"{self.items[index]}.npz"))
+        song = np.load(os.path.join(self.cache_path, f"{self.items[index]}_{shift}.npz"))
         audio = song["audio"].astype(np.float32)
         labels = song["labels"].astype(np.int64)
-
-        # select random shift
-        shift = np.random.randint(audio.shape[0])
-        audio = audio[shift]
-        labels = labels[shift]
 
         # select random item from this file if item size is defined
         if self.config.frames_per_item > 0:
@@ -191,6 +203,7 @@ class SongDataset(Dataset):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+
     # from src.training.dataset import SongDataset
 
     ds = SongDataset(
