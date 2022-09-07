@@ -1,15 +1,24 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics import Accuracy
 from einops import rearrange, repeat
 
 
-def positional_encoding(sequence_length: int, dim: int) -> torch.Tensor:
-    pos = torch.arange(0, sequence_length)
-    wavelengths = 10000 ** (torch.linspace(0, dim, int(dim / 2)) / dim)
-    args = rearrange(pos, "s -> s 1") / rearrange(wavelengths, "d -> 1 d")
-    return torch.cat([torch.sin(args), torch.cos(args)], dim=1)
+class PositionalEmbedding(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.positional_embedding = torch.empty((0, 0))
+
+    def _generate_positional_embedding(self, sequence_length: int, dim: int):
+        pos = torch.arange(0, sequence_length)
+        wavelengths = 10000 ** (torch.linspace(0, dim, int(dim / 2)) / dim)
+        args = rearrange(pos, "s -> s 1") / rearrange(wavelengths, "d -> 1 d")
+        self.positional_embedding = torch.cat([torch.sin(args), torch.cos(args)], dim=1)
+
+    def forward(self, x):
+        if self.positional_embedding.shape[0] < x.shape[1]:
+            self._generate_positional_embedding(x.shape[1], x.shape[2])
+        return x + self.positional_embedding.to(x.device)
 
 
 class MultiheadSelfAttention(nn.Module):
@@ -153,9 +162,6 @@ class Transformer(nn.Module):
         self.dropout_p = dropout_p
         self.extra_features_dim = extra_features_dim
 
-        # prepare position encoding
-        self.positional_encoding = torch.empty((0, 0))
-
         # prepare layers
         if block_type == "transformer":
             block = TransformerBlock
@@ -165,37 +171,33 @@ class Transformer(nn.Module):
             raise ValueError(block_type)
         self.dropout = nn.Dropout(dropout_p)
         if self.extra_features_dim is None:
-            self.embedding: nn.Module = nn.Linear(input_dim, dim)
+            self.embedding: nn.Module = nn.Sequential(
+                nn.Linear(input_dim, dim),
+                PositionalEmbedding()
+            )
         else:
             self.embedding = nn.Sequential(
                 nn.Linear(input_dim, self.extra_features_dim),
                 nn.LayerNorm(self.extra_features_dim),
                 nn.GELU(),
-                nn.Linear(self.extra_features_dim, dim)
+                nn.Linear(self.extra_features_dim, dim),
+                PositionalEmbedding()
             )
         self.blocks = nn.Sequential(
-            *[block(dim, n_heads, dropout_p) for i in range(n_blocks)]
+            *[block(dim, n_heads, dropout_p) for i in range(n_blocks)],
+            nn.LayerNorm(dim)
         )
-        self.classification_head = nn.Linear(dim, n_classes)
-        self.norm = nn.LayerNorm(dim)
-
-        # prepare metrics
-        self.train_accuracy = Accuracy()
-        self.validate_accuracy = Accuracy()
+        self.classification_head = nn.Linear(dim, n_classes) if n_classes is not None else nn.Identity()
 
     def forward(self, x):
-        # generate position encoding if necessary
-        if self.positional_encoding.shape[0] < x.shape[1]:
-            self.positional_encoding = positional_encoding(x.shape[1], self.dim)
-
         # dropout input
         x = self.dropout(x)
 
         # embedd input and add position encoding
-        x = self.embedding(x) + self.positional_encoding.to(x.device)
+        x = self.embedding(x)
 
         # transformer blocks
-        x = self.norm(self.blocks(x))
+        x = self.blocks(x)
 
         # classification head
         return self.classification_head(x)
