@@ -4,13 +4,14 @@ import warnings
 import pandas as pd
 import numpy as np
 import librosa
+import pyrubberband
 from typing import List, Optional
 from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from tqdm import tqdm
-import pyrubberband
+from retry.api import retry_call
 
 from src.training.preprocessing import (
     Preprocessing,
@@ -98,8 +99,15 @@ class SongDataset(Dataset):
                 # load audio file (supress librosa warnings)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    audio = librosa.load(
-                        path=song_metadata.audio_filepath, sr=config.sample_rate, mono=True, res_type="kaiser_fast"
+                    audio = retry_call(
+                        librosa.load,
+                        fkwargs={
+                            "path": song_metadata.audio_filepath,
+                            "sr": config.sample_rate,
+                            "mono": True,
+                            "res_type": "kaiser_fast"
+                        },
+                        tries=2
                     )[0]
 
                 # load annotation file
