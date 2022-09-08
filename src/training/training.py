@@ -39,6 +39,7 @@ def create_argparser():
     )
     parser.add_argument("--dropout_p", type=float, required=True)
     parser.add_argument("--extra_features_dim", type=int, required=False)
+    parser.add_argument("--pretrained_encoder_path", type=str, required=False)
 
     # training
     parser.add_argument("--experiment_name", type=str, required=True)
@@ -99,6 +100,10 @@ def train(args):
         dropout_p=args.dropout_p,
         extra_features_dim=args.extra_features_dim,
     ).cuda()
+    if args.pretrained_encoder_path is not None:
+        encoder_state_dict = torch.load(args.pretrained_encoder_path)
+        model.embedding.load_state_dict(encoder_state_dict["encoder_embedding"])
+        model.blocks.load_state_dict(encoder_state_dict["encoder_blocks"])
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
