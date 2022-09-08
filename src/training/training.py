@@ -34,12 +34,11 @@ def create_argparser():
     parser.add_argument("--model_dim", type=int, required=True)
     parser.add_argument("--n_heads", type=int, required=True)
     parser.add_argument("--n_blocks", type=int, required=True)
-    parser.add_argument(
-        "--block_type", type=str, choices=["btc", "transformer"], required=True
-    )
+    parser.add_argument("--block_type", type=str, choices=["btc", "transformer"], required=True)
     parser.add_argument("--dropout_p", type=float, required=True)
     parser.add_argument("--extra_features_dim", type=int, required=False)
     parser.add_argument("--pretrained_encoder_path", type=str, required=False)
+    parser.add_argument("--pretrained_encoder_run_name", type=str, required=False)
 
     # training
     parser.add_argument("--experiment_name", type=str, required=True)
@@ -63,11 +62,7 @@ def train(args):
         mlflow.start_run(run_name=args.run_name)
         mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
         mlflow.log_params(
-            {
-                key: value
-                for key, value in args.__dict__.items()
-                if key not in {"experiment_name", "run_name"}
-            }
+            {key: value for key, value in args.__dict__.items() if key not in {"experiment_name", "run_name"}}
         )
 
     # init datasets and data loaders
@@ -79,9 +74,7 @@ def train(args):
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
     )
-    validate_ds = SongDataset(
-        ["validate"], replace(song_dataset_config, pitch_shift_augment=False)
-    )
+    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False))
     validate_dl = DataLoader(
         validate_ds,
         batch_size=args.batch_size,
@@ -100,16 +93,27 @@ def train(args):
         dropout_p=args.dropout_p,
         extra_features_dim=args.extra_features_dim,
     ).cuda()
+    if args.pretrained_encoder_run_name is not None:
+        run_id = (
+            mlflow.search_runs(
+                experiment_names=[args.experiment_name],
+                filter_string=f'tags.mlflow.runName = "{args.pretrained_encoder_run_name}"',
+            )
+            .iloc[0]
+            .run_id
+        )
+        args.pretrained_encoder_path = mlflow.artifacts.download_artifacts(
+            run_id=run_id, artifact_path="training/encoder_checkpoint.pt"
+        )
     if args.pretrained_encoder_path is not None:
+        print(f"Loading pretrained encoder from {args.pretrained_encoder_path}")
         encoder_state_dict = torch.load(args.pretrained_encoder_path)
         model.embedding.load_state_dict(encoder_state_dict["encoder_embedding"])
         model.blocks.load_state_dict(encoder_state_dict["encoder_blocks"])
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
-    scheduler = torch.optim.lr_scheduler.LinearLR(
-        optimizer, start_factor=0.1, total_iters=5
-    )
+    scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=5)
 
     # print model info
     summary(model, input_data=next(iter(train_dl))[0])
@@ -166,9 +170,7 @@ def train(args):
     # evaluate model
     if is_rank_0():
         model.eval()
-        song_dataset_config_eval = replace(
-            song_dataset_config, frames_per_item=0, pitch_shift_augment=False
-        )
+        song_dataset_config_eval = replace(song_dataset_config, frames_per_item=0, pitch_shift_augment=False)
         evaluate(
             SongDataset(["train"], song_dataset_config_eval),
             model,

@@ -21,5 +21,3 @@ RUN pip install -r post_requirements.txt
 # copy source code
 COPY .git .git
 COPY src src
-
-ENV MLFLOW_TRACKING_URI="http://mlflow.ds-cluster.intra.pixel.com.pl:80"
