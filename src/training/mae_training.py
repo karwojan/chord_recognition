@@ -132,7 +132,9 @@ def train(args):
 
             # shuffle and cut - mask operation
             shuffle_indices = torch.randperm(sequence_length)
-            tokens = tokens[:, shuffle_indices][:, :-masked_sequence_length]
+            not_masked_indices = shuffle_indices[:-masked_sequence_length]
+            masked_indices = shuffle_indices[-masked_sequence_length:]
+            tokens = tokens[:, not_masked_indices]
 
             # encoder blocks
             tokens = encoder_blocks(tokens)
@@ -145,7 +147,7 @@ def train(args):
             pred_audio = decoder(tokens)
 
             # MSE loss
-            loss = torch.nn.functional.mse_loss(pred_audio, audio)
+            loss = torch.nn.functional.mse_loss(pred_audio[:, masked_indices], audio[:, masked_indices])
 
             optimizer.zero_grad()
             loss.backward()
@@ -179,7 +181,7 @@ def train(args):
                 # (notice that this is random part of dataset in distributed training)
                 audio, pred_audio = audio.cpu().detach(), pred_audio.cpu().detach()
                 masked_audio = audio.clone().detach()
-                masked_audio[:, shuffle_indices[-masked_sequence_length:]] = 0
+                masked_audio[:, masked_indices] = 0
                 for i in range(3):
                     if args.audio_preprocessing == "cqt":
                         plt.subplot(1, 3, 1)
