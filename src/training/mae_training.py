@@ -148,15 +148,11 @@ def train(args):
 
             # MSE loss
             loss = torch.nn.functional.mse_loss(pred_audio[:, masked_indices], audio[:, masked_indices])
+            loss_metric(loss.detach())
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
-            with torch.no_grad():
-                loss_metric(loss)
-                if is_rank_0():
-                    mlflow.log_metric("train / batch / loss", loss)
 
         scheduler.step()
         if is_rank_0():
