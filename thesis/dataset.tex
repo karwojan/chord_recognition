@@ -47,18 +47,43 @@ przyczyną tego, że nie przygotowano więcej niż kilka publicznie dostępnych
 muzycznych, które mogą zostać wykorzystane do treningu modeli uczenia maszynowego.
 
 
-\section{Publiczne zbiory z oznaczeniami akordów}
+% do początku do uzyskania pierwszego indeksu (skrypt 01)
+\subsection{Publiczne zbiory z oznaczeniami akordów}
 
 % zbiory są takie, co to inni wykorzystywali
 W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpoznawania akordów za
 pomocą sieci neuronowych - większość wykorzystywanych przez badaczy zbiorów danych udało się
-odnaleźć i wykorzystać. Zostały one opisane poniżej. Trzeba jeszcze zaznaczyć, że wszystkie te
-zbiory są udostępniane za darmo, ale jedynie jako same pliki tekstowe z oznaczeniami akordów. Pliki
-z nagranimi muzycznymi, ze względu na prawa autorskie, nie są udostępniane. Pozyskanie odpowiednich
-nagrań stanowi osobny problem, opisany w dalszej części rozdziału.
+odnaleźć i wykorzystać. Zostały one szczegółowo opisane poniżej. Każdy zbiór oznaczeń został
+pobrany, odpowiednio oczyszczony (wybrane zostały tylko niezbędne pliki) i zapisany w repozytorium
+projektu. Po przeanalizowanu struktury zbiorów stworzony został pierwszy skrypt przygotowujący dane
+- ,,src/dataset\_scripts/01-generate\_index\_of\_chordlab.py'' - który, w postaci pliku \emph{csv},
+generuje jeden wspólny indeks dla wszystkich zbiorów, tak że mogą one być już traktowane jako jeden
+zbiór danych. Fragment tego indeksu został przedstawionyw w \ref{tab:indeks_01}.
 
-\subsection{Zbiór Isophonics}
+\begin{table}
+    \caption{Fragment indeksu zbioru danych po pierwszym etapie jego tworzenia}
+    \label{tab:indeks_01}
+    \begin{tabular}{rllllr}
+    \hline
+    & filepath & song & artist & subset & album \\
+    \hline
+     0 & ./data/chordlab/rs200/1999\_dt.clt                      & 1999                      & Prince                      & rs200 & nan \\ 
+     1 & ./data/chordlab/rs200/a\_change\_is\_gonna\_come\_dt.clt    & A Change Is Gonna Come    & Sam Cooke                   & rs200 & nan \\
+     5 & ./data/chordlab/rs200/all\_along\_the\_watchtower\_dt.clt  & All Along the Watchtower  & The Jimi Hendrix Experience & rs200 & nan \\
+     6 & ./data/chordlab/rs200/all\_apologies\_dt.clt             & All Apologies             & Nirvana                     & rs200 & nan \\
+     7 & ./data/chordlab/rs200/all\_i\_have\_to\_do\_is\_dream\_dt.clt & All I Have to Do Is Dream & The Everly Brothers         & rs200 & nan \\
+    \hline
+    \end{tabular}
+\end{table}
 
+Trzeba jeszcze zaznaczyć, że wszystkie te zbiory są udostępniane za darmo, ale jedynie jako same
+pliki tekstowe z oznaczeniami akordów. Pliki z nagranimi muzycznymi, ze względu na prawa autorskie,
+nie są udostępniane. Pozyskanie odpowiednich nagrań stanowi osobny problem, opisany w dalszej części
+rozdziału.
+
+\subsubsection{Zbiór Isophonics}
+
+% ogólny opis, jakie i ile utworów, format zapisu
 \emph{Isophonics} to właściwie nazwa serwisu internetowego\footnote{www.isophonics.net/about},
 prowadzonego przez zespół naukowy \emph{Centre for Digital Music} z londyńskiego Uniwersytety
 Królowej Marii. Jest to duża i popularna na cały świat jednostka naukowa specjalizująca się w
@@ -72,13 +97,88 @@ również jest opisany w \cite{harte_towards_nodate} i jest wykorzystywany prakt
 również w przypadku innych zbiorów danych. Warto wspomnieć jeszcze, że jest to pierwszy referencyjny
 zbiór wykorzystywany w konkursie MIREX, w zadaniu automatycznego rozpoznawania akordów.
 
-\subsection{Zbiór McGill Billboard}
+% pobieranie i indeksowanie
+Zbiór \emph{Isohponics} jest dostępny do pobrania ze strony projektu w postaci skompresowanych
+archiwów \emph{tar} (osobny plik dla każdego z czterech artystów). Każde z tych archiwów ma taką
+samą strukturę i zawiera nie tylko oznaczenia akordów, dostępne w różnych formatach, ale również
+inne informacje o utworach, jak zmiany tonacji czy segmentacje strukturalne. Spośród wszystkich tych
+plików wykorzystane zostały jedynie oznaczenia akordów w postaci plików \emph{lab} - pozostałe pliki
+zostały usunięte. Pliki z oznaczeniami akordów uporządkowane są w takiej stukturze katalogów, gdzie
+nazwy katalogów na kolejnych poziomach zagłębienia odpowiadają kolejno nazwie artysty, nazwie albumu
+(dla The Beatles poprzedzonej dodatkowo liczbą porządkową) i numerowi wraz z nazwą konkretnego
+utworu. Zbiór ten nie posiada żadnego dodatkowego indeksu, przy tworzeniu własnego indeksu zostały
+więc wykorzystane nazwy katalogów.
 
+% poprawki i zapisanie w projekcie
+Jedyne zmiany, jakie zostały wprowadzone w oznaczeniach akordów po pobraniu ich z Internetu, poza
+usunięciem niewykorzystywanych plików, dotyczą artystki Carole King. Polegały one na dostosowaniu
+kilku skrótów typów akordów, które występowały jedynie tutaj a były niezgodne z przyjętą w
+\cite{harte_towards_nodate} konwencją.  Wszystkie oznaczenia zbioru \emph{isohponics}, po
+przeprowadzeniu opisanych powyżej operacji, zostały zapisane w repozytorium projektu, w katalogu
+,,data/chordlab/isophonics''.
+
+
+\subsubsection{Zbiór McGill Billboard}
+
+% ogólny opis, jakie i ile utworów, format zapisu
 Zbiór \emph{McGill Billboard}\cite{burgoyne_expert_2011} został stworzony przez grupę \emph{DDMAL
 (Distributed Digital Music Archives \& Libraries Lab)}\footnote{https://ddmal.music.mcgill.ca/} z
 kandadyjskiego \emph{McGill University}. Jak nazwa wskazuje, zajmują się oni różnymi projektami
-związanymi z preztwarzaniem muzyki, w tym tworzą i utrzymują ten prawdopodobnie największy dostępny
-zbiór danych z oznaczeniami akordów.
+związanymi z przetwarzaniem muzyki, w tym tworzą i utrzymują ten prawdopodobnie największy, dostępny
+publicznie zbiór danych z różnymi typami oznaczeń utworów, takimi jak akordy, struktura, instrumenty
+i tempo. Lista utworów wybranych do tego zbioru została zbudowana z 1300 utworów, losowo
+próbkowanych z rankingów serwisu \emph{Billboard}\footnote{www.billboard.com}. W praktyce, ponieważ
+niektórych utworów nie udało się twórcom znaleźć, zbiór ten zawiera 890 utworów muzyki popularnej,
+przy czym zdarzają się takie, które się powtarzają. Oznaczenia akordów są wyrównane w czasie zgodnie
+z częstotliwością występowania taktów. Format tych oznaczeń bazuje ściśle na
+\cite{harte_towards_nodate} (tak jak \emph{isophonics}), jedyna różnica polega na wprowadzeniu kilku
+dodatkowych skrótów typów akordów.  Podobnie jak w przypadku innych zbiorów z oznaczeniami akordów,
+twórcy tego zbioru nie mogli udostępnić nagrań muzycznych. Jednakże w tym przypadku udostępnione
+zostały dwa zestawy cech dla wszystkich akordów: \emph{non-negative-least-squares chroma vectors}
+oraz \emph{Echo Nest features}, które mogą zostać wykorzystane jako wejście do modeli ML, nie były
+jednak użyte w ramach niniejszej pracy.
+
+% pobieranie i indeksowanie
+Zbiór \emph{McGill Billboard} dostępny jest do
+pobrania\footnote{https://ddmal.music.mcgill.ca/research/The\_McGill\_Billboard\_Project\_(Chord\_Analysis\_Dataset)/}
+w postaci skompresowanych (na kilka sposobów) archiwów \emph{tar}. Dostępne są pliki ze wspomnianymi
+powyżej dwoma zestawami dźwiękowych cech utworów, dostępny jest zestaw wszystkich oznaczeń we
+własnym formacie twórców zbioru, oraz zestaw oznaczeń samych akordów, w postaci plików \emph{lab}.
+Do niniejszej wykorzystany został jedynie ten ostatni zestaw, zawierający pliki \emph{lab}. Pobrane
+archiwum zawiera główny katalog ,,McGill-Billboard'', w którym znajduje się 890 katalogów nazwanych
+liczbowymi identyfikatorami utworów ze zbioru. Każdy taki katalog zawiera jeden plik ,,full.lab'' z
+oznaczeniami akordów. Twórcy zbioru dostarczają również indeks w postaci pliku \emph{csv}, wiążący
+identyfikatory utworów z tytułem, artystą (album nie jest podany) i innymi informacjami związanymi z
+rankingiem, z którego pochodzi utwór. Indeks ten jest niestety bardzo wybrakowany i dla wielu
+utworów brakuje wpisu o tytule lub artyście. Po wybraniu tych przypadków, dla których znany jest
+tytuł i artysta zostało jedynie 596 utworów. Tabela ta została wykorzystana do przygotowanie
+własnego indeksu.
+
+% poprawki i zapisanie w projekcie
+Pobrane oznaczenia akordów nie wymagały właściwie żadnych poprawek. Cały katalog
+,,McGill-Billboard'' został przeniesiony do repozytorium projetu, do katalogu
+,,data/chordlab/mcgill\_billboard''.
+
+\subsubsection{Zbiór Robbie Williams}
+
+Zbiór \emph{Robbie Williams}\cite{giorgi_automatic_2013} składa się z oznaczeń akordów oraz tonacji
+dla pierwszych pięciu albumów Robbiego Williamsa. Został przygotowany TODO
+
+\subsubsection{Zbiór RS200}
+
+% ogólny opis, jakie i ile utworów, format zapisu
+Zbiór \emph{RS200}\cite{de_clercq_corpus_2011} został stworzony przez dwóch badaczy z amerykańskiej
+uczelni muzycznej \emph{Eastman School of Music} w Rochester. Powstał on na bazie listy \emph{500
+Greatest Songs of All Time} z magazynu Rolling Stone. Początkowo zawierał jedynie 100 utworów i w
+takiej formie zostały wykorzystany w oryginalnej publikacji, gdzie autorzy analizowali częstość
+występowania różnych akordów i ich progresji. Utwory te zostały wybrane tak, aby pochodziły z wielu
+różnych dekad. Z czasem zbiór został rozszerzony do 200 utworów i w takiej formie jest dostępny do
+dzisiaj. Każdy z dwóch twórców, niezależnie od drugiego, przygotował swoje oznaczenia dla wszystkich
+200 utworów. Oznaczenia te zawierają nie tylko akordy, ale również transkrypcję melodii, informacje
+o tempie i tekstach utworów. Format zapisu oznaczeń akordów został opracowanych przez twórców tego
+zbioru danych i różni się zdecydowanie od sposobu oznaczeń stosowanego w pozostałych zbiorach.
+
+
 
 % pamiętać, żeby opisać wszystkie kroki, SKRYPTY i zerknąć na COMMITY
 
