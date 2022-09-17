@@ -12,7 +12,7 @@ from einops import rearrange, repeat
 from torchmetrics import MeanMetric
 from torchinfo import summary
 
-from src.training.dataset import SongDataset, SongDatasetConfig
+from src.training.dataset import SongDataset, SongDatasetConfig, song_dataset_collate_fn
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
 
@@ -66,6 +66,7 @@ def train(args):
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
+        collate_fn=song_dataset_collate_fn
     )
 
     # prepare models and optimizer

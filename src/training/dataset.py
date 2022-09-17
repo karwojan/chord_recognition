@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import librosa
 import pyrubberband
+import torch
 from typing import List, Optional
 from datetime import timedelta
 from torch.utils.data import Dataset
@@ -22,12 +23,20 @@ from src.annotation_parser import parse_annotation_file
 from src.annotation_parser.chord_model import Chord, vocabularies
 
 
+def song_dataset_collate_fn(items):
+    return (
+        torch.concat([torch.from_numpy(item[0]) for item in items], dim=0),
+        torch.concat([torch.from_numpy(item[1]) for item in items], dim=0),
+    )
+
+
 @dataclass
 class SongDatasetConfig:
     sample_rate: int
     frame_size: int
     hop_size: int
     frames_per_item: int
+    item_multiplier: int
     audio_preprocessing: Preprocessing
     standardize_audio: bool
     pitch_shift_augment: bool
@@ -40,6 +49,7 @@ class SongDatasetConfig:
         parser.add_argument("--frame_size", type=int, required=True)
         parser.add_argument("--hop_size", type=int, required=True)
         parser.add_argument("--frames_per_item", type=int, required=True)
+        parser.add_argument("--item_multiplier", type=int, required=True)
         parser.add_argument("--audio_preprocessing", type=str, required=True, choices=["cqt", "raw"])
         parser.add_argument("--standardize_audio", action="store_true")
         parser.add_argument("--pitch_shift_augment", action="store_true")
@@ -64,6 +74,7 @@ class SongDatasetConfig:
             frame_size=args.frame_size,
             hop_size=args.hop_size,
             frames_per_item=args.frames_per_item,
+            item_multiplier=args.item_multiplier,
             audio_preprocessing=audio_preprocessing,
             standardize_audio=args.standardize_audio,
             pitch_shift_augment=args.pitch_shift_augment,
@@ -105,9 +116,9 @@ class SongDataset(Dataset):
                             "path": song_metadata.audio_filepath,
                             "sr": config.sample_rate,
                             "mono": True,
-                            "res_type": "kaiser_fast"
+                            "res_type": "kaiser_fast",
                         },
-                        tries=2
+                        tries=2,
                     )[0]
 
                 # load annotation file
@@ -145,7 +156,7 @@ class SongDataset(Dataset):
 
                 audio = audio_list[0]
 
-            return song_metadata.Index, audio.shape, np.mean(audio), np.mean(audio ** 2)
+            return audio.shape, np.mean(audio), np.mean(audio**2)
 
         # load index (songs metadata)
         self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -158,7 +169,7 @@ class SongDataset(Dataset):
             )
 
         # load songs
-        id_per_song, shape_per_song, mean_per_song, mean_2_per_song = zip(
+        shape_per_song, mean_per_song, mean_2_per_song = zip(
             *tqdm(
                 ThreadPoolExecutor(max_workers=5).map(_load_song, self.songs_metadata.itertuples()),
                 total=self.songs_metadata.shape[0],
@@ -166,38 +177,39 @@ class SongDataset(Dataset):
             )
         )
 
-        # prepare list of items - multiple mappings to same song, proportionally to song length
-        self.items = []
-        for song_id, song_shape in zip(id_per_song, shape_per_song):
-            n_items = song_shape[0] // config.frames_per_item if config.frames_per_item > 0 else 1
-            self.items += [song_id] * n_items
-
         # store mean, std and dimensionality of dataset
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
         self.dim = shape_per_song[0][1]
 
         # print info about loaded songs
-        dataset_duration = sum(shape[0] for shape in shape_per_song) * config.hop_size / config.sample_rate
-        print(f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(dataset_duration))}).")
+        dataset_duration = np.sum(shape_per_song, axis=0)[0] * config.hop_size / config.sample_rate
+        print(f"Loaded {len(self.songs_metadata)} songs ({timedelta(seconds=int(dataset_duration))}).")
+        print(f"Maximum length (in items): {int(np.max(shape_per_song, axis=0)[0]) // config.frames_per_item}")
+        print(f"Mean length (in items): {int(np.mean(shape_per_song, axis=0)[0]) // config.frames_per_item}")
 
     def __len__(self):
-        return len(self.items)
+        return len(self.songs_metadata)
 
     def __getitem__(self, index):
         # select random shift
         shift = np.random.randint(12) if self.config.pitch_shift_augment else 0
 
         # load whole preprocessed audio file
-        song = np.load(os.path.join(self.cache_path, f"{self.items[index]}_{shift}.npz"))
+        song = np.load(os.path.join(self.cache_path, f"{self.songs_metadata.iloc[index].name}_{shift}.npz"))
         audio = song["audio"].astype(np.float32)
         labels = song["labels"].astype(np.int64)
 
-        # select random item from this file if item size is defined
+        # select 'item_multiplier' random items if item size is defined
         if self.config.frames_per_item > 0:
-            start_frame_index = np.random.randint(audio.shape[0] - self.config.frames_per_item)
-            audio = audio[start_frame_index: start_frame_index + self.config.frames_per_item]
-            labels = labels[start_frame_index: start_frame_index + self.config.frames_per_item]
+            indices = np.array([
+                np.arange(start, start + self.config.frames_per_item)
+                for start in np.random.randint(
+                    audio.shape[0] - self.config.frames_per_item, size=(self.config.item_multiplier,)
+                )
+            ])
+            audio = audio[indices]
+            labels = labels[indices]
 
         # optionally standardize frames values
         if self.config.standardize_audio:
@@ -206,7 +218,7 @@ class SongDataset(Dataset):
         return audio, labels
 
     def get_song_metadata(self, index):
-        return self.songs_metadata.loc[self.items[index]]
+        return self.songs_metadata.iloc[index]
 
 
 if __name__ == "__main__":
@@ -215,15 +227,16 @@ if __name__ == "__main__":
     # from src.training.dataset import SongDataset
 
     ds = SongDataset(
-        purposes=["validate"],
+        purposes=["train"],
         config=SongDatasetConfig(
             sample_rate=22050,
             frame_size=2048,
             hop_size=2048,
             frames_per_item=108,
+            item_multiplier=5,
             audio_preprocessing=JustSplitPreprocessing(),
             standardize_audio=True,
-            pitch_shift_augment=True,
+            pitch_shift_augment=False,
             labels_vocabulary="maj_min",
             subsets=["isophonics"],
         ),
@@ -237,5 +250,5 @@ if __name__ == "__main__":
         print(ds.get_song_metadata(i))
         print(item[0].shape, item[1].shape)
         print(item[0].dtype, item[1].dtype)
-        plt.imshow(item[0].T)
+        plt.imshow(item[0][0].T)
     plt.show()

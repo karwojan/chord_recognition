@@ -10,7 +10,7 @@ from einops import rearrange
 from torchmetrics import Accuracy, MeanMetric
 from torchinfo import summary
 
-from src.training.dataset import SongDataset, SongDatasetConfig
+from src.training.dataset import SongDataset, SongDatasetConfig, song_dataset_collate_fn
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
 
@@ -73,6 +73,7 @@ def train(args):
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
+        collate_fn=song_dataset_collate_fn
     )
     validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False))
     validate_dl = DataLoader(
@@ -80,6 +81,7 @@ def train(args):
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(validate_ds) if args.ddp else None,
+        collate_fn=song_dataset_collate_fn
     )
 
     # prepare model and optimizer
