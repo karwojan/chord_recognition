@@ -36,6 +36,7 @@ def create_argparser():
     parser.add_argument("--decoder_n_blocks", type=int, required=True)
     # training
     parser.add_argument("--masking_ratio", type=float, required=True)
+    parser.add_argument("--chunks_per_item", type=int, required=True)
     parser.add_argument("--experiment_name", type=str, required=True)
     parser.add_argument("--run_name", type=str, required=False)
     parser.add_argument("--n_epochs", type=int, required=True)
@@ -132,7 +133,10 @@ def train(args):
             tokens = encoder_embedding(audio)
 
             # shuffle and cut - mask operation
-            shuffle_indices = torch.randperm(sequence_length)
+            indices = torch.arange(sequence_length)
+            chunked_indices = rearrange(indices, "(ch s) -> ch s", ch=args.chunks_per_item)
+            shuffle_chunked_indices = chunked_indices[torch.randperm(len(chunked_indices))]
+            shuffle_indices = rearrange(shuffle_chunked_indices, "ch s -> (ch s)")
             not_masked_indices = shuffle_indices[:-masked_sequence_length]
             masked_indices = shuffle_indices[-masked_sequence_length:]
             tokens = tokens[:, not_masked_indices]
