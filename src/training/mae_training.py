@@ -42,6 +42,7 @@ def create_argparser():
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
+    parser.add_argument("--save_state_freq", type=int, default=10)
     parser.add_argument("--ddp", action="store_true")
     return parser
 
@@ -162,6 +163,8 @@ def train(args):
         scheduler.step()
         if is_rank_0():
             mlflow.log_metric("train / epoch / loss", loss_metric.compute(), epoch)
+
+        if is_rank_0() and (epoch % args.save_state_freq == 0 or epoch == (args.n_epochs - 1)):
             with tempfile.TemporaryDirectory() as tmp_dir:
                 # save encoder state dict
                 if args.ddp:

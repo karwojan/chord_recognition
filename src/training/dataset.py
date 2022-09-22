@@ -185,8 +185,9 @@ class SongDataset(Dataset):
         # print info about loaded songs
         dataset_duration = np.sum(shape_per_song, axis=0)[0] * config.hop_size / config.sample_rate
         print(f"Loaded {len(self.songs_metadata)} songs ({timedelta(seconds=int(dataset_duration))}).")
-        print(f"Maximum length (in items): {int(np.max(shape_per_song, axis=0)[0]) // config.frames_per_item}")
-        print(f"Mean length (in items): {int(np.mean(shape_per_song, axis=0)[0]) // config.frames_per_item}")
+        if config.frames_per_item > 0:
+            print(f"Maximum length (in items): {int(np.max(shape_per_song, axis=0)[0]) // config.frames_per_item}")
+            print(f"Mean length (in items): {int(np.mean(shape_per_song, axis=0)[0]) // config.frames_per_item}")
 
     def __len__(self):
         return len(self.songs_metadata)
