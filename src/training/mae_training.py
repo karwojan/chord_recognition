@@ -152,8 +152,12 @@ def train(args):
             # decoder
             pred_audio = decoder(tokens)
 
-            # MSE loss
-            loss = torch.nn.functional.mse_loss(pred_audio[:, masked_indices], audio[:, masked_indices])
+            # contrastive loss
+            pred = repeat(pred_audio[:, masked_indices], "b s c -> b s2 s c", s2=masked_sequence_length)
+            target = repeat(audio[:, masked_indices], "b s c -> b s s2 c", s2=masked_sequence_length)
+            exp_sim = torch.exp(torch.cosine_similarity(pred, target, dim=-1))
+            per_token_loss = -torch.log(torch.diagonal(exp_sim, dim1=1, dim2=2)/torch.sum(exp_sim, dim=1))
+            loss = torch.mean(per_token_loss)
             loss_metric(loss.detach())
 
             optimizer.zero_grad()
