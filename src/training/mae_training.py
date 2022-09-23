@@ -15,10 +15,7 @@ from torchinfo import summary
 from src.training.dataset import SongDataset, SongDatasetConfig, song_dataset_collate_fn
 from src.training.model import Transformer
 from src.training.evaluate import evaluate
-
-
-def is_rank_0():
-    return not torch.distributed.is_initialized() or torch.distributed.get_rank() == 0
+from src.training.training import is_rank_0, log_metric, load_pretrained_encoder_weights
 
 
 def create_argparser():
@@ -30,6 +27,8 @@ def create_argparser():
     parser.add_argument("--encoder_n_heads", type=int, required=True)
     parser.add_argument("--encoder_n_blocks", type=int, required=True)
     parser.add_argument("--encoder_extra_features_dim", type=int, required=False)
+    parser.add_argument("--pretrained_encoder_path", type=str, required=False)
+    parser.add_argument("--pretrained_encoder_run_name", type=str, required=False)
     # decoder model
     parser.add_argument("--decoder_dim", type=int, required=True)
     parser.add_argument("--decoder_n_heads", type=int, required=True)
@@ -84,6 +83,7 @@ def train(args):
     ).cuda()
     encoder_embedding = encoder.embedding
     encoder_blocks = encoder.blocks
+    load_pretrained_encoder_weights(args, encoder_embedding, encoder_blocks)
     decoder = Transformer(
         input_dim=args.encoder_dim,
         dim=args.decoder_dim,
@@ -165,8 +165,7 @@ def train(args):
             optimizer.step()
 
         scheduler.step()
-        if is_rank_0():
-            mlflow.log_metric("train / epoch / loss", loss_metric.compute(), epoch)
+        log_metric("train / epoch / loss", loss_metric.compute(), epoch)
 
         if is_rank_0() and (epoch % args.save_state_freq == 0 or epoch == (args.n_epochs - 1)):
             with tempfile.TemporaryDirectory() as tmp_dir:

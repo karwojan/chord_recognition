@@ -24,6 +24,26 @@ def log_metric(key: str, value: float, step: int = None):
         mlflow.log_metric(key, value, step)
 
 
+def load_pretrained_encoder_weights(args, encoder_embedding, encoder_blocks):
+    if args.pretrained_encoder_run_name is not None:
+        run_id = (
+            mlflow.search_runs(
+                experiment_names=[args.experiment_name],
+                filter_string=f'tags.mlflow.runName = "{args.pretrained_encoder_run_name}"',
+            )
+            .iloc[0]
+            .run_id
+        )
+        args.pretrained_encoder_path = mlflow.artifacts.download_artifacts(
+            run_id=run_id, artifact_path="training/encoder_checkpoint.pt"
+        )
+    if args.pretrained_encoder_path is not None:
+        print(f"Loading pretrained encoder from {args.pretrained_encoder_path}")
+        encoder_state_dict = torch.load(args.pretrained_encoder_path)
+        encoder_embedding.load_state_dict(encoder_state_dict["encoder_embedding"])
+        encoder_blocks.load_state_dict(encoder_state_dict["encoder_blocks"])
+
+
 def create_argparser():
     parser = argparse.ArgumentParser()
 
@@ -95,23 +115,7 @@ def train(args):
         dropout_p=args.dropout_p,
         extra_features_dim=args.extra_features_dim,
     ).cuda()
-    if args.pretrained_encoder_run_name is not None:
-        run_id = (
-            mlflow.search_runs(
-                experiment_names=[args.experiment_name],
-                filter_string=f'tags.mlflow.runName = "{args.pretrained_encoder_run_name}"',
-            )
-            .iloc[0]
-            .run_id
-        )
-        args.pretrained_encoder_path = mlflow.artifacts.download_artifacts(
-            run_id=run_id, artifact_path="training/encoder_checkpoint.pt"
-        )
-    if args.pretrained_encoder_path is not None:
-        print(f"Loading pretrained encoder from {args.pretrained_encoder_path}")
-        encoder_state_dict = torch.load(args.pretrained_encoder_path)
-        model.embedding.load_state_dict(encoder_state_dict["encoder_embedding"])
-        model.blocks.load_state_dict(encoder_state_dict["encoder_blocks"])
+    load_pretrained_encoder_weights(args, model.embedding, model.blocks)
     if args.ddp:
         model = torch.nn.parallel.DistributedDataParallel(model)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
