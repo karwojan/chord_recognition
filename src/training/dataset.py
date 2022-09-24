@@ -37,6 +37,7 @@ class SongDatasetConfig:
     hop_size: int
     frames_per_item: int
     item_multiplier: int
+    song_multiplier: int
     audio_preprocessing: Preprocessing
     standardize_audio: bool
     pitch_shift_augment: bool
@@ -50,6 +51,7 @@ class SongDatasetConfig:
         parser.add_argument("--hop_size", type=int, required=True)
         parser.add_argument("--frames_per_item", type=int, required=True)
         parser.add_argument("--item_multiplier", type=int, required=True)
+        parser.add_argument("--song_multiplier", type=int, required=True)
         parser.add_argument("--audio_preprocessing", type=str, required=True, choices=["cqt", "raw"])
         parser.add_argument("--standardize_audio", action="store_true")
         parser.add_argument("--pitch_shift_augment", action="store_true")
@@ -75,6 +77,7 @@ class SongDatasetConfig:
             hop_size=args.hop_size,
             frames_per_item=args.frames_per_item,
             item_multiplier=args.item_multiplier,
+            song_multiplier=args.song_multiplier,
             audio_preprocessing=audio_preprocessing,
             standardize_audio=args.standardize_audio,
             pitch_shift_augment=args.pitch_shift_augment,
@@ -190,14 +193,17 @@ class SongDataset(Dataset):
             print(f"Mean length (in items): {int(np.mean(shape_per_song, axis=0)[0]) // config.frames_per_item}")
 
     def __len__(self):
-        return len(self.songs_metadata)
+        return len(self.songs_metadata) * self.config.song_multiplier
 
     def __getitem__(self, index):
         # select random shift
         shift = np.random.randint(12) if self.config.pitch_shift_augment else 0
 
         # load whole preprocessed audio file
-        song = np.load(os.path.join(self.cache_path, f"{self.songs_metadata.iloc[index].name}_{shift}.npz"))
+        song = np.load(os.path.join(
+            self.cache_path,
+            f"{self.songs_metadata.iloc[index % len(self.songs_metadata)].name}_{shift}.npz"
+        ))
         audio = song["audio"].astype(np.float32)
         labels = song["labels"].astype(np.int64)
 
@@ -219,7 +225,7 @@ class SongDataset(Dataset):
         return audio, labels
 
     def get_song_metadata(self, index):
-        return self.songs_metadata.iloc[index]
+        return self.songs_metadata.iloc[index % len(self.songs_metadata)]
 
 
 if __name__ == "__main__":
@@ -235,6 +241,7 @@ if __name__ == "__main__":
             hop_size=2048,
             frames_per_item=108,
             item_multiplier=5,
+            song_multiplier=2,
             audio_preprocessing=JustSplitPreprocessing(),
             standardize_audio=True,
             pitch_shift_augment=False,

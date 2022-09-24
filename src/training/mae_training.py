@@ -1,6 +1,7 @@
 import argparse
 import tempfile
 import os
+from dataclasses import replace
 
 import mlflow
 import matplotlib.pyplot as plt
@@ -41,9 +42,43 @@ def create_argparser():
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
-    parser.add_argument("--save_state_freq", type=int, default=10)
     parser.add_argument("--ddp", action="store_true")
     return parser
+
+
+def mae_pred(audio: torch.Tensor, encoder_embedding, encoder_blocks, decoder, blank, args):
+    # get shapes
+    batch_size, sequence_length = audio.shape[:2]
+    masked_sequence_length = int(args.masking_ratio * sequence_length)
+    # encoder embedding
+    tokens = encoder_embedding(audio)
+    # shuffle and cut - mask operation
+    indices = torch.arange(sequence_length)
+    chunked_indices = rearrange(indices, "(ch s) -> ch s", ch=args.chunks_per_item)
+    shuffle_chunked_indices = chunked_indices[torch.randperm(len(chunked_indices))]
+    shuffle_indices = rearrange(shuffle_chunked_indices, "ch s -> (ch s)")
+    not_masked_indices = shuffle_indices[:-masked_sequence_length]
+    masked_indices = shuffle_indices[-masked_sequence_length:]
+    tokens = tokens[:, not_masked_indices]
+    # encoder blocks
+    tokens = encoder_blocks(tokens)
+    # concat and unshuffle
+    tokens = torch.cat([tokens, repeat(blank, "c -> b s c", b=batch_size, s=masked_sequence_length)], dim=1)
+    tokens = tokens[:, torch.argsort(shuffle_indices)]
+    # decoder
+    return decoder(tokens), masked_indices, not_masked_indices
+
+
+def contrastive_loss(audio: torch.Tensor, pred_audio: torch.Tensor, masked_indices):
+    pred = repeat(pred_audio[:, masked_indices], "b s c -> b s2 s c", s2=len(masked_indices))
+    target = repeat(audio[:, masked_indices], "b s c -> b s s2 c", s2=len(masked_indices))
+    exp_sim = torch.exp(torch.cosine_similarity(pred, target, dim=-1))
+    per_token_loss = -torch.log(torch.diagonal(exp_sim, dim1=1, dim2=2)/torch.sum(exp_sim, dim=1))
+    return torch.mean(per_token_loss)
+
+
+def mse_loss(audio: torch.Tensor, pred_audio: torch.Tensor, masked_indices):
+    return torch.nn.functional.mse_loss(pred_audio[:, masked_indices], audio[:, masked_indices])
 
 
 def train(args):
@@ -61,12 +96,23 @@ def train(args):
         )
 
     # init datasets and data loaders
-    train_ds = SongDataset(["train"], SongDatasetConfig.create_from_args(args))
+    song_dataset_config = SongDatasetConfig.create_from_args(args)
+    train_ds = SongDataset(["train"], song_dataset_config)
     train_dl = DataLoader(
         train_ds,
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
+        collate_fn=song_dataset_collate_fn
+    )
+    validate_ds = SongDataset(
+        ["validate"], replace(song_dataset_config, pitch_shift_augment=False, song_multiplier=1)
+    )
+    validate_dl = DataLoader(
+        validate_ds,
+        batch_size=args.batch_size,
+        num_workers=5,
+        sampler=DistributedSampler(validate_ds) if args.ddp else None,
         collate_fn=song_dataset_collate_fn
     )
 
@@ -119,6 +165,7 @@ def train(args):
     for epoch in tqdm(range(args.n_epochs), unit="epoch"):
         if args.ddp:
             train_dl.sampler.set_epoch(epoch)
+            validate_dl.sampler.set_epoch(epoch)
 
         # train
         encoder_embedding.train()
@@ -127,47 +174,43 @@ def train(args):
         loss_metric.reset()
         for audio, _ in tqdm(train_dl, total=len(train_dl), unit="batch"):
             audio = audio.cuda()
-            batch_size, sequence_length = audio.shape[:2]
-            masked_sequence_length = int(args.masking_ratio * sequence_length)
-
-            # encoder embedding
-            tokens = encoder_embedding(audio)
-
-            # shuffle and cut - mask operation
-            indices = torch.arange(sequence_length)
-            chunked_indices = rearrange(indices, "(ch s) -> ch s", ch=args.chunks_per_item)
-            shuffle_chunked_indices = chunked_indices[torch.randperm(len(chunked_indices))]
-            shuffle_indices = rearrange(shuffle_chunked_indices, "ch s -> (ch s)")
-            not_masked_indices = shuffle_indices[:-masked_sequence_length]
-            masked_indices = shuffle_indices[-masked_sequence_length:]
-            tokens = tokens[:, not_masked_indices]
-
-            # encoder blocks
-            tokens = encoder_blocks(tokens)
-
-            # concat and unshuffle
-            tokens = torch.cat([tokens, repeat(blank, "c -> b s c", b=batch_size, s=masked_sequence_length)], dim=1)
-            tokens = tokens[:, torch.argsort(shuffle_indices)]
-
-            # decoder
-            pred_audio = decoder(tokens)
-
-            # contrastive loss
-            pred = repeat(pred_audio[:, masked_indices], "b s c -> b s2 s c", s2=masked_sequence_length)
-            target = repeat(audio[:, masked_indices], "b s c -> b s s2 c", s2=masked_sequence_length)
-            exp_sim = torch.exp(torch.cosine_similarity(pred, target, dim=-1))
-            per_token_loss = -torch.log(torch.diagonal(exp_sim, dim1=1, dim2=2)/torch.sum(exp_sim, dim=1))
-            loss = torch.mean(per_token_loss)
+            pred_audio, masked_indices, not_masked_indices = mae_pred(
+                audio=audio,
+                encoder_embedding=encoder_embedding,
+                encoder_blocks=encoder_blocks,
+                decoder=decoder,
+                blank=blank,
+                args=args
+            )
+            loss = contrastive_loss(audio, pred_audio, masked_indices)
             loss_metric(loss.detach())
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
         scheduler.step()
         log_metric("train / epoch / loss", loss_metric.compute(), epoch)
 
-        if is_rank_0() and (epoch % args.save_state_freq == 0 or epoch == (args.n_epochs - 1)):
+        # validate
+        encoder_embedding.eval()
+        encoder_blocks.eval()
+        decoder.eval()
+        loss_metric.reset()
+        for audio, _ in tqdm(validate_dl, total=len(validate_dl), unit="batch"):
+            audio = audio.cuda()
+            with torch.no_grad():
+                pred_audio, masked_indices, not_masked_indices = mae_pred(
+                    audio=audio,
+                    encoder_embedding=encoder_embedding,
+                    encoder_blocks=encoder_blocks,
+                    decoder=decoder,
+                    blank=blank,
+                    args=args
+                )
+                loss = contrastive_loss(audio, pred_audio, masked_indices)
+            loss_metric(loss.detach())
+        log_metric("validate / epoch / loss", loss_metric.compute(), epoch)
+
+        if is_rank_0():
             with tempfile.TemporaryDirectory() as tmp_dir:
                 # save encoder state dict
                 if args.ddp:
@@ -184,12 +227,25 @@ def train(args):
                     os.path.join(tmp_dir, "encoder_checkpoint.pt"),
                 )
 
-                # save N predictions from last batch
-                # (notice that this is random part of dataset in distributed training)
-                audio, pred_audio = audio.cpu().detach(), pred_audio.cpu().detach()
-                masked_audio = audio.clone().detach()
+                # save some random predictions from train and validation datasets
+                N = 3
+                audio = torch.stack(
+                    [torch.from_numpy(train_ds[int(i)][0][0]) for i in torch.randint(0, len(train_ds), (N,))]
+                    + [torch.from_numpy(validate_ds[int(i)][0][0]) for i in torch.randint(0, len(validate_ds), (N,))],
+                    dim=0
+                ).cuda()
+                with torch.no_grad():
+                    pred_audio, masked_indices, not_masked_indices = mae_pred(
+                        audio=audio,
+                        encoder_embedding=encoder_embedding,
+                        encoder_blocks=encoder_blocks,
+                        decoder=decoder,
+                        blank=blank,
+                        args=args
+                    )
+                audio, pred_audio, masked_audio = audio.cpu(), pred_audio.cpu(), audio.cpu().clone()
                 masked_audio[:, masked_indices] = 0
-                for i in range(3):
+                for i in range(len(audio)):
                     if args.audio_preprocessing == "cqt":
                         plt.subplot(1, 3, 1)
                         plt.axis("off")

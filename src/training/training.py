@@ -93,15 +93,17 @@ def train(args):
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
-        collate_fn=song_dataset_collate_fn
+        collate_fn=song_dataset_collate_fn,
     )
-    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False))
+    validate_ds = SongDataset(
+        ["validate"], replace(song_dataset_config, pitch_shift_augment=False, song_multiplier=1)
+    )
     validate_dl = DataLoader(
         validate_ds,
         batch_size=args.batch_size,
         num_workers=5,
         sampler=DistributedSampler(validate_ds) if args.ddp else None,
-        collate_fn=song_dataset_collate_fn
+        collate_fn=song_dataset_collate_fn,
     )
 
     # prepare model and optimizer
