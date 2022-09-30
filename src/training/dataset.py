@@ -44,6 +44,22 @@ class SongDatasetConfig:
     labels_vocabulary: str
     subsets: Optional[List[str]]
 
+    def generate_cache_description(self) -> str:
+        desc = "cache"
+        desc += "_sr" + str(self.sample_rate)
+        desc += "_fs" + str(self.frame_size)
+        desc += "_hs" + str(self.hop_size)
+        if isinstance(self.audio_preprocessing, CQTPreprocessing):
+            desc += "_cqt"
+        elif isinstance(self.audio_preprocessing, JustSplitPreprocessing):
+            desc += "_raw"
+        if self.standardize_audio:
+            desc += "_norm"
+        if self.pitch_shift_augment:
+            desc += "_augm"
+        desc += "_" + self.labels_vocabulary
+        return desc
+
     @staticmethod
     def add_to_argparser(parser: argparse.ArgumentParser):
         parser.add_argument("--sample_rate", type=int, required=True)
@@ -94,9 +110,8 @@ class SongDataset(Dataset):
         self.purposes = purposes
         self.config = config
         self.n_classes = 1 + max(len(vocabularies[config.labels_vocabulary]), 1) * 12
-        self.cache_path = "./data/cache"
-        if not os.path.isdir(self.cache_path):
-            os.mkdir(self.cache_path)
+        self.cache_path = f"./data/cache/{config.generate_cache_description()}/"
+        os.makedirs(self.cache_path, exist_ok=True)
 
         def _time_to_frame_index(t):
             t = int(t * config.sample_rate)
