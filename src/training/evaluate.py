@@ -48,7 +48,8 @@ def evaluate(
         all_n_frames = []
         all_predictions = []
         all_labels = []
-        for item_index, (audio, labels) in tqdm(enumerate(dataset), total=len(dataset)):
+        for item_index in tqdm(range(len(dataset)), total=len(dataset), unit="item"):
+            audio, labels = dataset[item_index]
             audio, labels = torch.tensor(audio).cuda(), torch.tensor(labels).cuda()
             song_metadata = dataset.get_song_metadata(item_index)
 
