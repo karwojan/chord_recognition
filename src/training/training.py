@@ -4,6 +4,7 @@ from dataclasses import replace
 import os
 import mlflow
 import torch
+import numpy as np
 from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 from einops import rearrange
@@ -42,6 +43,10 @@ def load_pretrained_encoder_weights(args, encoder_embedding, encoder_blocks):
         encoder_state_dict = torch.load(args.pretrained_encoder_path)
         encoder_embedding.load_state_dict(encoder_state_dict["encoder_embedding"])
         encoder_blocks.load_state_dict(encoder_state_dict["encoder_blocks"])
+
+
+def worker_init_fn(worker_id):
+    np.random.seed(torch.utils.data.get_worker_info().seed % np.iinfo(np.int32).max)
 
 
 def create_argparser():
@@ -94,6 +99,7 @@ def train(args):
         num_workers=5,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
         collate_fn=song_dataset_collate_fn,
+        worker_init_fn=worker_init_fn,
     )
     validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False, song_multiplier=1))
     validate_dl = DataLoader(
@@ -102,6 +108,7 @@ def train(args):
         num_workers=5,
         sampler=DistributedSampler(validate_ds) if args.ddp else None,
         collate_fn=song_dataset_collate_fn,
+        worker_init_fn=worker_init_fn
     )
 
     # prepare model and optimizer
