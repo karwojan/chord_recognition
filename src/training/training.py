@@ -101,7 +101,7 @@ def train(args):
         collate_fn=song_dataset_collate_fn,
         worker_init_fn=worker_init_fn,
     )
-    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False, song_multiplier=1))
+    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False))
     validate_dl = DataLoader(
         validate_ds,
         batch_size=args.batch_size,
