@@ -1,0 +1,60 @@
+Robocze notatki z treningów
+
+sup-small-btc
+------------------------
+Pierwszy trening to odwzorowanie oryginalnego BTC. Model jest praktycznie identyczny,
+dane, preprocessing i augmentacje również. Oczywiście metoda przechodzenia po danych może
+być nieznacznie inna, ale osiągnięte wyniki są bardzo zbliżone do tych w artykule
+(WCSR=0.816 na walidacyjnym). Na razie nie została zrobiona crosswalidacja ze względu na
+brak czasu - nie jest to kluczowe dla tej pracy.
+
+
+sup-small-transformer(-no-dropout), sup-medium-transformer(-no-dropout),
+sup-small-transformer-all-data(-no-dropout)
+------------------------
+Następnie jest seria treningów, w których zastąpiono architekturę BTC zwykłym, czystym
+transformerem, aby zbadać działanie bloku BTC i przygotować referencję dla treningów
+nienadzorowanych. Wykonane zostały właściwie trzy eksperymenty, każdy w wersji z dropoutem
+i bez: pierwszy model ma rozmiar zbliżony do BTC (mały), drugi model jest zdecydowanie
+większy, trzeci jest taki jak pierwszy, ale na rozszerzonym (pełnym) zbiorze danych.
+
+W pierwszym okazało się, że bez dropout jest nieznacznie lepszy wynik (0.80 vs 0.79), ale
+widać że może zacząć się przetrenowywać. Oczywiście znacznie szybciej spada loss i rośnie
+dokładność na zbiorze treningowym. W drugim, większym modelu powtarza się ten sam schemat
+(0.80 bez dropout vs 0.77) z tym, że wydaje się że nawet z dropoutem zaczyna się
+przetrenowywać. W trzecim eksperymencie (mały model, dużo danych), wyniki są ogólnie
+gorsze, bo jest więcej danych, czy się przetrenowywują nie wiadomo, ale dalej bez dropoutu
+jest nieznacznie lepiej (0.74 vs 0.73). W konsekwencji stwierdzono, że finetuning po
+treningu nienadzorowanym będzie bez dropoutu.
+
+
+mae-small-transformer(1/2/3/4)_(pretraining/finetuning)
+------------------------
+Dalej zaczynają się pierwsze treningi nienadzorowane. Stanowią one pierwsze podejście do
+wykazania zysku z pretreningu nienadzorowanego i różnią się między sobą drobnymi
+odchyleniami kluczowych dla MAE hiperparametrów, aby uzyskać jakiś punkt wyjścia dla
+dalszych eksperymentów. Model (encoder) i hiperparametry finetuningu są takie, jak w
+pierwszym z trzech referencyjnych treningów - różnią się jedynie liczbą epok i
+wczytywaniem pretrenowanych wag. 
+
+Pierwszy (referencyjny) wygląda po lossie, że zaczyna się przetrenowywać. Po obrazkach
+wydaje się, że czegoś tam zaczyna się uczyć, ale nic specjalnego, równie dobrze może
+niektórych miejsc uczyć się na pamięć. W drugim loss jest znacznie niższy niż w
+pozostałych ze względu na mniejszą proporcję wycinania. Również po krzywej widać, że
+powoli dla treningu zaczyna być lepiej niż dla walidacji. Obrazki dość trudno ocenić, bo
+dużo w nich nie brakuje, ale też wydaje się, że nic specjalnego. Trzeci ma większe chunki
+i zdecydowanie się przetrenowuje. Po obrazkach wygląda jak by się czegoś uczył, ale
+jeszcze daleko do oczekiwanego efektu. Przy ostatnim treningu z większym dekoderem również
+wygląda, że zaczyna się przetrenowywać, po obrazkach nic nie wiadomo. Jeżeli chodzi o
+finetuning to jest zysk w znacznie szybszym spadku lossa i wzroście dokładności. Również
+widać zysk w WCSR na walidacji dla wszystkich poza tym z dużymi chankami (zdecydowanie
+przetrenowanym). Zysk w WCSR może być jednak spowodowany przetrenowaniem w referencyjnym
+treningu bez dropoutu.
+
+Wygląda więc na to, że jeżeli się nie przetrenuje w pretreningu to jest zysk!
+
+
+mae-medium-transformer(1/2)_(pretraining/finetuning)
+------------------------
+W kolejnych dwóch eksperymentach sprawdzone zostały więkse modele ale oba przetrenowały
+się w finetuningu i nie dały żadnego zysku w finetuningu.
