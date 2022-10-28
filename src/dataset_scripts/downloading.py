@@ -10,7 +10,7 @@ def download_video(video_id: str, output_path: str) -> str:
     paths = glob(os.path.join(output_path, f"{video_id}_*"))
     if len(paths) == 0:
         try:
-            return (
+            path = (
                 YouTube(f"http://youtube.com/watch?v={video_id}")
                 .streams.filter(only_audio=True)
                 .order_by("abr")
@@ -18,6 +18,7 @@ def download_video(video_id: str, output_path: str) -> str:
                 .first()
                 .download(output_path, filename_prefix=f"{video_id}_")
             )
+            return os.path.relpath(path, os.path.curdir)
         except Exception as e:
             print(f"Video {video_id} is unavailable:", e)
             return None
