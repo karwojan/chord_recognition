@@ -97,7 +97,7 @@ def train(args):
 
     # init datasets and data loaders
     song_dataset_config = SongDatasetConfig.create_from_args(args)
-    train_ds = SongDataset(["train"], song_dataset_config)
+    train_ds = SongDataset(["pretrain"], song_dataset_config)
     train_dl = DataLoader(
         train_ds,
         batch_size=args.batch_size,

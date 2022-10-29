@@ -140,7 +140,9 @@ class SongDataset(Dataset):
                     )[0]
 
                 # load annotation file
-                chords = parse_annotation_file(song_metadata.filepath)
+                if not pd.isna(song_metadata.filepath):
+                    chords = parse_annotation_file(song_metadata.filepath)
+                else chords = []
 
                 # optional pitch shift augmentation
                 if config.pitch_shift_augment:
