@@ -110,7 +110,7 @@ class SongDataset(Dataset):
         self.purposes = purposes
         self.config = config
         self.n_classes = 1 + max(len(vocabularies[config.labels_vocabulary]), 1) * 12
-        self.cache_path = f"./data/cache/{config.generate_cache_description()}/"
+        self.cache_path = f"./data/audio/cache/{config.generate_cache_description()}/"
         os.makedirs(self.cache_path, exist_ok=True)
 
         def _time_to_frame_index(t):
