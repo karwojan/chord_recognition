@@ -7,10 +7,8 @@ RUN apt install -y build-essential git ffmpeg libsndfile1 rubberband-cli
 WORKDIR /workspace
 
 # copy data
-COPY data/audio data/audio
 COPY data/chordlab data/chordlab
 COPY data/index.csv data/index.csv
-COPY data/index_big.csv data/index_big.csv
 
 # copy and install requirements
 COPY requirements.txt requirements.txt
