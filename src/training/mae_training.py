@@ -184,7 +184,7 @@ def train(args):
                 blank=blank,
                 args=args
             )
-            loss = contrastive_loss(audio, pred_audio, masked_indices)
+            loss = mse_loss(audio, pred_audio, masked_indices)
             loss_metric(loss.detach())
             optimizer.zero_grad()
             loss.backward()
@@ -208,7 +208,7 @@ def train(args):
                     blank=blank,
                     args=args
                 )
-                loss = contrastive_loss(audio, pred_audio, masked_indices)
+                loss = mse_loss(audio, pred_audio, masked_indices)
             loss_metric(loss.detach())
         log_metric("validate / epoch / loss", loss_metric.compute(), epoch)
 
