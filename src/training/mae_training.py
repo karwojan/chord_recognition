@@ -107,7 +107,7 @@ def train(args):
         worker_init_fn=worker_init_fn
     )
     validate_ds = SongDataset(
-        ["validate"], replace(song_dataset_config, pitch_shift_augment=False)
+        ["validate"], replace(song_dataset_config, pitch_shift_augment=False, fraction=None)
     )
     validate_dl = DataLoader(
         validate_ds,

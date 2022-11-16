@@ -43,6 +43,7 @@ class SongDatasetConfig:
     pitch_shift_augment: bool
     labels_vocabulary: str
     subsets: Optional[List[str]]
+    fraction: Optional[float]
 
     def generate_cache_description(self) -> str:
         desc = "cache"
@@ -80,6 +81,7 @@ class SongDatasetConfig:
             choices=["maj_min", "root_only"],
         )
         parser.add_argument("--subsets", type=str, required=False, nargs="+")
+        parser.add_argument("--dataset_fraction", type=float, required=False)
 
     @staticmethod
     def create_from_args(args):
@@ -101,6 +103,7 @@ class SongDatasetConfig:
             pitch_shift_augment=args.pitch_shift_augment,
             labels_vocabulary=args.labels_vocabulary,
             subsets=args.subsets,
+            fraction=args.dataset_fraction,
         )
 
 
@@ -207,6 +210,10 @@ class SongDataset(Dataset):
         if config.subsets is not None:
             self.songs_metadata = self.songs_metadata.query(
                 " or ".join([f"subset == '{subset}'" for subset in config.subsets])
+            )
+        if config.fraction is not None:
+            self.songs_metadata = self.songs_metadata.sample(
+                frac=config.fraction, random_state=47
             )
 
         # load songs

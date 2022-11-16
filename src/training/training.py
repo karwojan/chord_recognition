@@ -101,7 +101,7 @@ def train(args):
         collate_fn=song_dataset_collate_fn,
         worker_init_fn=worker_init_fn,
     )
-    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False))
+    validate_ds = SongDataset(["validate"], replace(song_dataset_config, pitch_shift_augment=False, fraction=None))
     validate_dl = DataLoader(
         validate_ds,
         batch_size=args.batch_size,
@@ -184,7 +184,7 @@ def train(args):
     if is_rank_0():
         model.eval()
         song_dataset_config_eval = replace(
-            song_dataset_config, frames_per_item=0, pitch_shift_augment=False, song_multiplier=1
+            song_dataset_config, frames_per_item=0, pitch_shift_augment=False, song_multiplier=1, fraction=None
         )
         evaluate(
             SongDataset(["train"], song_dataset_config_eval),
