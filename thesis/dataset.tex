@@ -161,8 +161,26 @@ Pobrane oznaczenia akordów nie wymagały właściwie żadnych poprawek. Cały k
 
 \subsubsection{Zbiór Robbie Williams}
 
+% ogólny opis, jakie i ile utworów, format zapisu
 Zbiór \emph{Robbie Williams}\cite{giorgi_automatic_2013} składa się z oznaczeń akordów oraz tonacji
-dla pierwszych pięciu albumów Robbiego Williamsa. Został przygotowany TODO
+dla pierwszych pięciu albumów Robbiego Williamsa. Został przygotowany przez włoskich naukowców z
+Politechniki w Mediolanie na potrzeby uczenia systemu automatycznego rozpoznawania akordów.
+Oznaczenia są zgodne z \cite{harte_towards_nodate}. W sumie dokładne oznaczenia akordów i tonacji
+przygotowano dla 65 utworów.
+
+% pobieranie i indeksowanie
+Zbiór ten dostępny jest do pobrania ze strony
+\footnote{https://www.researchgate.net/publication/260399240_Chord_and_Harmony_annotations_of_the_first_five_albums_by_Robbie_Williams}
+w postaci archiwum zip. Znajduje się w nim katalog \emph{RobbieWilliamsAnnotations}, który zawiera
+dwa główne podkatalogi: \emph{chords} i \emph{keys}. W każdym z tych podkatalogów znajduje się po pięć
+podkatalogów (po jednym na album). W każdym katalogu z albumem znajdują się pliki \emph{txt} z
+oznaczeniami akordów w formacie \emph{lab}. Zbiór ten nie posiada żadnych dodatkowych metadanych,
+własny indeks wygenerowany został na podstawie znormalizowanych nazw katalogów.
+
+% poprawki i zapisanie w projekcie
+Pobrane oznaczenia znowu nie wymagały żadnych poprawek. Zawartość katalog
+,,RobbieWilliamsAnnotations/chords/'' została przeniesiona do repozytorium projektu, do katalogu
+,,data/chordlab/robbie\_williams''.
 
 \subsubsection{Zbiór RS200}
 
@@ -177,7 +195,20 @@ dzisiaj. Każdy z dwóch twórców, niezależnie od drugiego, przygotował swoje
 200 utworów. Oznaczenia te zawierają nie tylko akordy, ale również transkrypcję melodii, informacje
 o tempie i tekstach utworów. Format zapisu oznaczeń akordów został opracowanych przez twórców tego
 zbioru danych i różni się zdecydowanie od sposobu oznaczeń stosowanego w pozostałych zbiorach.
+Bardziej szczegółowo został opisany w dalszej części rozdziału, ale ogólnie opiera się on na
+rekurencyjnej składni, pozwalającej łatwo reprezentować pewne schematy i powtórzenia w strukturze
+utworów. Same oznaczenia akordów są również ustalone przez tych autorów i bazują na liczbach
+rzymskich, które prezentują informacje względem klucza tonacji całego utworu. Mamy więc tutaj do
+czynienia z podejściem zupełnie innym, od przyjętego dla pozostałych zbiorów danych.
 
+% pobieranie i indeksowanie
+Zbiór ten dostępny jest do pobrania ze strony
+\footnote{http://rockcorpus.midside.com/harmonic_analyses.html}. Właściwie autorzy oferują trzy
+formaty, z których ostatni jest już rozwinięty do postaci zbliżonej do plików \emph{lab}. Główna
+różnica to wspomniany powyżej sposób oznaczania konkretnych akordów. Po pobraniu i rozpakowaniu archiwum
+\emph{zip} znaleźć można pojedynczy katalog ,,rs200_harmony_clt'', który zawiera pliki z
+rozszerzeniem \emph{clt}, po dwa dla każdego utworu, jeden z suffiksem ,,dt' a drugi ,,tdc'' (od
+nazwisk autorów). 
 
 
 % pamiętać, żeby opisać wszystkie kroki, SKRYPTY i zerknąć na COMMITY
