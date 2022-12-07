@@ -4,9 +4,9 @@ from datetime import datetime
 import numpy as np
 from tqdm import tqdm
 from dataclasses import replace
-import mlflow
 import tempfile
 import json
+import mlflow
 import matplotlib
 import matplotlib.pyplot as plt
 from typing import List
@@ -14,27 +14,32 @@ from sklearn.metrics import (
     accuracy_score,
     recall_score,
     precision_score,
-    ConfusionMatrixDisplay
+    ConfusionMatrixDisplay,
 )
 
 from src.training.dataset import SongDataset
-from src.training.btc import BTC
+from src.training.model import Transformer
 from src.annotation_parser import parse_annotation_file
 from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, csr
 from src.annotation_parser.labfile_printer import print_labfile
 
 
-def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_item: int):
-    assert dataset.frames_per_item <= 0, "dataset must return whole songs"
-    btc.eval()
+def evaluate(
+    dataset: SongDataset,
+    model: Transformer,
+    output_dir_prefix: str,
+    frames_per_item: int,
+):
+    assert dataset.config.frames_per_item <= 0, "dataset must return whole songs"
+    model.eval()
 
     recall_precision_kwargs = {
-            "average": None,
-            "labels": np.arange(dataset.n_classes),
-            "zero_division": 0
+        "average": None,
+        "labels": np.arange(dataset.n_classes),
+        "zero_division": 0,
     }
 
-    plt.rcParams.update({'font.size': 5})  # for confusion matrix
+    plt.rcParams.update({"font.size": 5})  # for confusion matrix
 
     output_dir = f"{output_dir_prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
@@ -43,7 +48,8 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
         all_n_frames = []
         all_predictions = []
         all_labels = []
-        for item_index, (audio, labels) in tqdm(enumerate(dataset), total=len(dataset)):
+        for item_index in tqdm(range(len(dataset)), total=len(dataset), unit="item"):
+            audio, labels = dataset[item_index]
             audio, labels = torch.tensor(audio).cuda(), torch.tensor(labels).cuda()
             song_metadata = dataset.get_song_metadata(item_index)
 
@@ -56,7 +62,7 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
                 # extract frames of single item
                 item_audio = audio[i: i + frames_per_item]
                 # predict labels
-                prediction = torch.argmax(btc(item_audio.unsqueeze(0)), dim=2)[0]
+                prediction = torch.argmax(model(item_audio.unsqueeze(0)), dim=2)[0]
                 # fill all predictions with new predictions
                 if i > 0:
                     predictions[
@@ -71,13 +77,18 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
 
             # convert predictions to label occurences and merge repeated
             start_times = np.arange(len(predictions)) * (
-                dataset.hop_size / dataset.sample_rate
+                dataset.config.hop_size / dataset.config.sample_rate
             )
-            stop_times = start_times + (dataset.frame_size / dataset.sample_rate)
+            stop_times = start_times + (dataset.config.frame_size / dataset.config.sample_rate)
             pred_label_occurences: List[LabelOccurence] = []
             for start, stop, label in zip(start_times, stop_times, predictions):
-                if len(pred_label_occurences) > 0 and pred_label_occurences[-1].label == label:
-                    pred_label_occurences[-1] = replace(pred_label_occurences[-1], stop=stop)
+                if (
+                    len(pred_label_occurences) > 0
+                    and pred_label_occurences[-1].label == label
+                ):
+                    pred_label_occurences[-1] = replace(
+                        pred_label_occurences[-1], stop=stop
+                    )
                 else:
                     pred_label_occurences.append(LabelOccurence(start, stop, label))
 
@@ -88,7 +99,7 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
                         print_labfile(
                             [
                                 label_occurence.to_chord_occurence(
-                                    dataset.labels_vocabulary
+                                    dataset.config.labels_vocabulary
                                 )
                                 for label_occurence in pred_label_occurences
                             ]
@@ -99,7 +110,9 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
                 metrics = {
                     "csr": csr(
                         [
-                            chord_occurence.to_label_occurence(dataset.labels_vocabulary)
+                            chord_occurence.to_label_occurence(
+                                dataset.config.labels_vocabulary
+                            )
                             for chord_occurence in parse_annotation_file(
                                 song_metadata.filepath
                             )
@@ -107,14 +120,20 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
                         pred_label_occurences,
                     ),
                     "accuracy": accuracy_score(labels, predictions),
-                    "recall": list(recall_score(labels, predictions, **recall_precision_kwargs)),
-                    "precision": list(precision_score(labels, predictions, **recall_precision_kwargs))
+                    "recall": list(
+                        recall_score(labels, predictions, **recall_precision_kwargs)
+                    ),
+                    "precision": list(
+                        precision_score(labels, predictions, **recall_precision_kwargs)
+                    ),
                 }
                 with open(os.path.join(tmp_dir, "metrics.json"), "w") as f:
                     json.dump(metrics, f)
 
                 # plot confusion matrix
-                ConfusionMatrixDisplay.from_predictions(labels, predictions, labels=recall_precision_kwargs["labels"])
+                ConfusionMatrixDisplay.from_predictions(
+                    labels, predictions, labels=recall_precision_kwargs["labels"]
+                )
                 plt.savefig(os.path.join(tmp_dir, "confusion_matrix.png"), dpi=200)
                 plt.close()
 
@@ -134,12 +153,20 @@ def evaluate(dataset: SongDataset, btc: BTC, output_dir_prefix: str, frames_per_
         global_metrics = {
             "wcsr": np.average(all_csrs, weights=all_n_frames),
             "accuracy": accuracy_score(labels, predictions),
-            "recall": list(recall_score(labels, predictions, **recall_precision_kwargs)),
-            "precision": list(precision_score(labels, predictions, **recall_precision_kwargs)),
-            "worst_to_best_song_ids": [str(dataset.get_song_metadata(i).name) for i in np.argsort(all_csrs)]
+            "recall": list(
+                recall_score(labels, predictions, **recall_precision_kwargs)
+            ),
+            "precision": list(
+                precision_score(labels, predictions, **recall_precision_kwargs)
+            ),
+            "worst_to_best_song_ids": [
+                str(dataset.get_song_metadata(i).name) for i in np.argsort(all_csrs)
+            ],
         }
         with open(os.path.join(tmp_dir, "global_metrics.json"), "w") as f:
             json.dump(global_metrics, f)
-        ConfusionMatrixDisplay.from_predictions(labels, predictions, labels=recall_precision_kwargs["labels"])
+        ConfusionMatrixDisplay.from_predictions(
+            labels, predictions, labels=recall_precision_kwargs["labels"]
+        )
         plt.savefig(os.path.join(tmp_dir, "global_confusion_matrix.png"), dpi=200)
         mlflow.log_artifacts(tmp_dir, output_dir)

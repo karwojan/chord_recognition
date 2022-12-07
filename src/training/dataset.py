@@ -1,174 +1,313 @@
 import os
+import argparse
 import warnings
 import pandas as pd
 import numpy as np
 import librosa
-from typing import List
+import pyrubberband
+import torch
+from typing import List, Optional
 from datetime import timedelta
 from torch.utils.data import Dataset
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from tqdm import tqdm
+from retry.api import retry_call
 
-from src.training.preprocessing import Preprocessing
+from src.training.preprocessing import (
+    Preprocessing,
+    JustSplitPreprocessing,
+    CQTPreprocessing,
+)
 from src.annotation_parser import parse_annotation_file
 from src.annotation_parser.chord_model import Chord, vocabularies
 
 
+def song_dataset_collate_fn(items):
+    return (
+        torch.concat([torch.from_numpy(item[0]) for item in items], dim=0),
+        torch.concat([torch.from_numpy(item[1]) for item in items], dim=0),
+    )
+
+
+@dataclass
+class SongDatasetConfig:
+    sample_rate: int
+    frame_size: int
+    hop_size: int
+    frames_per_item: int
+    item_multiplier: int
+    song_multiplier: int
+    audio_preprocessing: Preprocessing
+    standardize_audio: bool
+    pitch_shift_augment: bool
+    labels_vocabulary: str
+    subsets: Optional[List[str]]
+    fraction: Optional[float]
+
+    def generate_cache_description(self) -> str:
+        desc = "cache"
+        desc += "_sr" + str(self.sample_rate)
+        desc += "_fs" + str(self.frame_size)
+        desc += "_hs" + str(self.hop_size)
+        if isinstance(self.audio_preprocessing, CQTPreprocessing):
+            desc += "_cqt"
+        elif isinstance(self.audio_preprocessing, JustSplitPreprocessing):
+            desc += "_raw"
+        if self.standardize_audio:
+            desc += "_norm"
+        if self.pitch_shift_augment:
+            desc += "_augm"
+        desc += "_" + self.labels_vocabulary
+        return desc
+
+    @staticmethod
+    def add_to_argparser(parser: argparse.ArgumentParser):
+        parser.add_argument("--sample_rate", type=int, required=True)
+        parser.add_argument("--frame_size", type=int, required=True)
+        parser.add_argument("--hop_size", type=int, required=True)
+        parser.add_argument("--frames_per_item", type=int, required=True)
+        parser.add_argument("--item_multiplier", type=int, required=True)
+        parser.add_argument("--song_multiplier", type=int, required=True)
+        parser.add_argument(
+            "--audio_preprocessing", type=str, required=True, choices=["cqt", "raw"]
+        )
+        parser.add_argument("--standardize_audio", action="store_true")
+        parser.add_argument("--pitch_shift_augment", action="store_true")
+        parser.add_argument(
+            "--labels_vocabulary",
+            type=str,
+            required=True,
+            choices=["maj_min", "root_only"],
+        )
+        parser.add_argument("--subsets", type=str, required=False, nargs="+")
+        parser.add_argument("--dataset_fraction", type=float, required=False)
+
+    @staticmethod
+    def create_from_args(args):
+        if args.audio_preprocessing == "raw":
+            audio_preprocessing = JustSplitPreprocessing()
+        elif args.audio_preprocessing == "cqt":
+            audio_preprocessing = CQTPreprocessing()
+        else:
+            raise ValueError(args.audio_preprocessing)
+        return SongDatasetConfig(
+            sample_rate=args.sample_rate,
+            frame_size=args.frame_size,
+            hop_size=args.hop_size,
+            frames_per_item=args.frames_per_item,
+            item_multiplier=args.item_multiplier,
+            song_multiplier=args.song_multiplier,
+            audio_preprocessing=audio_preprocessing,
+            standardize_audio=args.standardize_audio,
+            pitch_shift_augment=args.pitch_shift_augment,
+            labels_vocabulary=args.labels_vocabulary,
+            subsets=args.subsets,
+            fraction=args.dataset_fraction,
+        )
+
+
 class SongDataset(Dataset):
-    def __init__(
-        self,
-        purposes: List[str],
-        sample_rate: int,
-        frame_size: int,
-        hop_size: int,
-        frames_per_item: int,
-        audio_preprocessing: Preprocessing,
-        standardize_audio: bool = True,
-        pitch_shift_augment: bool = False,
-        labels_vocabulary: str = "root_only",
-        subsets: List[str] = None,
-    ):
+    def __init__(self, purposes: List[str], config: SongDatasetConfig):
         super().__init__()
 
         # store parameters
         self.purposes = purposes
-        self.sample_rate = sample_rate
-        self.frame_size = frame_size
-        self.hop_size = hop_size
-        self.frames_per_item = frames_per_item
-        self.audio_preprocessing = audio_preprocessing
-        self.standardize_audio = standardize_audio
-        self.pitch_shift_augment = pitch_shift_augment
-        self.labels_vocabulary = labels_vocabulary
-        self.subsets = subsets
-        self.n_classes = 1 + max(len(vocabularies[labels_vocabulary]), 1) * 12
-        self.cache_path = "./data/cache"
+        self.config = config
+        self.n_classes = 1 + max(len(vocabularies[config.labels_vocabulary]), 1) * 12
+        self.cache_path = f"./data/audio/cache/{config.generate_cache_description()}/"
+        os.makedirs(self.cache_path, exist_ok=True)
 
         def _time_to_frame_index(t):
-            t = int(t * sample_rate)
-            return int(round(t // hop_size + t % hop_size / frame_size))
+            t = int(t * config.sample_rate)
+            return int(
+                round(t // config.hop_size + t % config.hop_size / config.frame_size)
+            )
 
         def _load_song(song_metadata):
-            cached_path = os.path.join(self.cache_path, f"{song_metadata.Index}.npz")
+            print(f"Loading {song_metadata.song}", flush=True)
 
-            if os.path.exists(cached_path):
-                song = np.load(cached_path)
-                audio = song["audio"]
-                n_frames = audio.shape[0]
+            # check if song is already cached (with all augmentations if conifgured)
+            if all(
+                os.path.exists(
+                    os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz")
+                )
+                for i in range(0, 12 if config.pitch_shift_augment else 1)
+            ):
+                audio = np.load(
+                    os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz")
+                )["audio"]
             else:
                 # load audio file (supress librosa warnings)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    audio = librosa.load(
-                        path=song_metadata.audio_filepath, sr=self.sample_rate
+                    audio = retry_call(
+                        librosa.load,
+                        fkwargs={
+                            "path": song_metadata.audio_filepath,
+                            "sr": config.sample_rate,
+                            "mono": True,
+                            "res_type": "kaiser_fast",
+                        },
+                        tries=2,
                     )[0]
 
-                # preprocess - split into frames
-                audio = self.audio_preprocessing.preprocess(
-                    audio,
-                    self.sample_rate,
-                    self.frame_size,
-                    self.hop_size,
-                )
-                n_frames = audio.shape[0]
+                # load annotation file
+                if not pd.isna(song_metadata.filepath):
+                    chords = parse_annotation_file(song_metadata.filepath)
+                else:
+                    chords = []
 
-                # assign annotations (labels) to frames
-                labels = np.zeros(shape=(n_frames,), dtype=int)
-                for chord in parse_annotation_file(song_metadata.filepath):
-                    labels[
-                        _time_to_frame_index(chord.start): _time_to_frame_index(
-                            chord.stop
-                        )
-                    ] = chord.to_label_occurence(labels_vocabulary).label
+                # optional pitch shift augmentation
+                if config.pitch_shift_augment:
+                    shifts = [0] + list(range(-5, 0)) + list(range(1, 7))
+                    audio_list = [
+                        pyrubberband.pitch_shift(audio, config.sample_rate, shift)
+                        for shift in shifts
+                    ]
+                    chords_list = [
+                        [chord.shift_chord(shift) for chord in chords]
+                        for shift in shifts
+                    ]
+                else:
+                    audio_list = [audio]
+                    chords_list = [chords]
 
-                # store in cache
-                np.savez(cached_path, audio=audio, labels=labels)
+                # preprocess audio - split into frames
+                audio_list = [
+                    config.audio_preprocessing.preprocess(
+                        audio, config.sample_rate, config.frame_size, config.hop_size
+                    )
+                    for audio in audio_list
+                ]
 
-            return song_metadata.Index, n_frames, np.mean(audio), np.mean(audio**2)
+                for i, (audio, chords) in enumerate(zip(audio_list, chords_list)):
+                    # assign annotations (labels) to frames
+                    labels = np.zeros(shape=audio.shape[:1], dtype=int)
+                    for chord in chords:
+                        labels[
+                            _time_to_frame_index(chord.start): _time_to_frame_index(
+                                chord.stop
+                            )
+                        ] = chord.to_label_occurence(config.labels_vocabulary).label
+
+                    # store in cache
+                    np.savez(
+                        os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz"),
+                        audio=audio.astype(np.float32),
+                        labels=labels.astype(np.int32),
+                    )
+
+                audio = audio_list[0]
+
+            return audio.shape, np.mean(audio), np.mean(audio**2)
 
         # load index (songs metadata)
         self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
         self.songs_metadata = self.songs_metadata.query(
             " or ".join([f"purpose == '{purpose}'" for purpose in purposes])
         )
-        if subsets is not None:
+        if config.subsets is not None:
             self.songs_metadata = self.songs_metadata.query(
-                " or ".join([f"subset == '{subset}'" for subset in subsets])
+                " or ".join([f"subset == '{subset}'" for subset in config.subsets])
+            )
+        if config.fraction is not None:
+            self.songs_metadata = self.songs_metadata.sample(
+                frac=config.fraction, random_state=47
             )
 
         # load songs
-        id_per_song, n_frames_per_song, mean_per_song, mean_2_per_song = zip(
+        shape_per_song, mean_per_song, mean_2_per_song = zip(
             *tqdm(
-                ThreadPoolExecutor().map(_load_song, self.songs_metadata.itertuples()),
+                ThreadPoolExecutor(max_workers=5).map(
+                    _load_song, self.songs_metadata.itertuples()
+                ),
                 total=self.songs_metadata.shape[0],
+                smoothing=0.0,
             )
         )
 
-        # prepare list of items - multiple mappings to same song, proportionally to song length
-        self.items = []
-        for song_id, n_frames in zip(id_per_song, n_frames_per_song):
-            n_items = n_frames // self.frames_per_item if self.frames_per_item > 0 else 1
-            self.items += [song_id] * n_items
-
-        # store mean and std of whole dataset
+        # store mean, std and dimensionality of dataset
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
+        self.dim = shape_per_song[0][1]
 
-        print(
-            f"Loaded {len(id_per_song)} songs ({timedelta(seconds=int(sum(n_frames_per_song) * self.frame_size / self.sample_rate))})."
+        # print info about loaded songs
+        dataset_duration = (
+            np.sum(shape_per_song, axis=0)[0] * config.hop_size / config.sample_rate
         )
+        print(
+            f"Loaded {len(self.songs_metadata)} songs ({timedelta(seconds=int(dataset_duration))})."
+        )
+        if config.frames_per_item > 0:
+            print(
+                f"Maximum length (in items): {int(np.max(shape_per_song, axis=0)[0]) // config.frames_per_item}"
+            )
+            print(
+                f"Mean length (in items): {int(np.mean(shape_per_song, axis=0)[0]) // config.frames_per_item}"
+            )
 
     def __len__(self):
-        return len(self.items)
+        return len(self.songs_metadata) * self.config.song_multiplier
 
     def __getitem__(self, index):
-        # load whole preprocessed audio file
-        song = np.load(os.path.join(self.cache_path, f"{self.items[index]}.npz"))
-        audio = song["audio"]
-        labels = song["labels"]
+        # select random shift
+        shift = np.random.randint(12) if self.config.pitch_shift_augment else 0
 
-        # select random item from this file if item size is defined
-        if self.frames_per_item > 0:
-            start_frame_index = np.random.randint(audio.shape[0] - self.frames_per_item)
-            audio = audio[start_frame_index: start_frame_index + self.frames_per_item]
-            labels = labels[start_frame_index: start_frame_index + self.frames_per_item]
+        # load whole preprocessed audio file
+        song = np.load(
+            os.path.join(
+                self.cache_path,
+                f"{self.songs_metadata.iloc[index % len(self.songs_metadata)].name}_{shift}.npz",
+            )
+        )
+        audio = song["audio"].astype(np.float32)
+        labels = song["labels"].astype(np.int64)
+
+        # select 'item_multiplier' random items if item size is defined
+        if self.config.frames_per_item > 0:
+            indices = np.array(
+                [
+                    np.arange(start, start + self.config.frames_per_item)
+                    for start in np.random.randint(
+                        audio.shape[0] - self.config.frames_per_item,
+                        size=(self.config.item_multiplier,),
+                    )
+                ]
+            )
+            audio = audio[indices]
+            labels = labels[indices]
 
         # optionally standardize frames values
-        if self.standardize_audio:
+        if self.config.standardize_audio:
             audio = (audio - self.mean) / self.std
-
-        # optionally augment pitch
-        if self.pitch_shift_augment:
-            shift = np.random.randint(10) - 5
-            audio = self.audio_preprocessing.pitch_shift_augment(audio, shift)
-            labels = np.array([
-                Chord.from_label(label, self.labels_vocabulary)
-                .shift(shift)
-                .to_label(self.labels_vocabulary)
-                for label in labels
-            ])
 
         return audio, labels
 
     def get_song_metadata(self, index):
-        return self.songs_metadata.loc[self.items[index]]
+        return self.songs_metadata.iloc[index % len(self.songs_metadata)]
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    from src.training.preprocessing import CQTPreprocessing
+
     # from src.training.dataset import SongDataset
 
     ds = SongDataset(
-        ["validate"],
-        sample_rate=44100,
-        frame_size=4410,
-        hop_size=4410,
-        frames_per_item=100,
-        audio_preprocessing=CQTPreprocessing(),
-        standardize_audio=True,
-        pitch_shift_augment=True,
-        subsets=["isophonics", "rs200"],
+        purposes=["train"],
+        config=SongDatasetConfig(
+            sample_rate=22050,
+            frame_size=2048,
+            hop_size=2048,
+            frames_per_item=108,
+            item_multiplier=5,
+            song_multiplier=2,
+            audio_preprocessing=JustSplitPreprocessing(),
+            standardize_audio=True,
+            pitch_shift_augment=False,
+            labels_vocabulary="maj_min",
+            subsets=["isophonics"],
+        ),
     )
     print(ds.mean, ds.std)
     print("len(ds):", len(ds))
@@ -178,5 +317,6 @@ if __name__ == "__main__":
         item = ds[i]
         print(ds.get_song_metadata(i))
         print(item[0].shape, item[1].shape)
-        plt.imshow(item[0].T)
+        print(item[0].dtype, item[1].dtype)
+        plt.imshow(item[0][0].T)
     plt.show()
