@@ -1,3 +1,5 @@
+% pamiętać, żeby opisać wszystkie kroki, wszystkie SKRYPTY (koncepcję i algorytmy spisać szczegółowo,
+% szczegóły techniczne, jak co zwraca, co przyjmuje dana funkcja pominąć), zerknąć na COMMITY !!!
 \chapter{Zbiór danych}
 
 \section{Wstęp}
@@ -23,7 +25,7 @@ W ramach niniejszej pracy, ze względu na ograniczoną ilość danych oznaczonyc
 właśnie powyższe podejście. Do przeprowadzenia eksperymentów potrzebne były dwa zbiory: pierwszy to
 ,,niewielki'' zbiór danych oznaczonych a drugi to ,,zdecydowanie większy'' zbiór danych bez
 oznaczeń. W tym rodzdziale opisany został proces pozyskiwania obu zbiorów danych z ogólnie
-dostępnych źródeł. Zawarto tutaj opis wszystkich kroków wykonanych w celu przygotowanie danych do
+dostępnych źródeł. Zawarto tutaj opis wszystkich kroków wykonanych w celu przygotowania danych do
 treningu sieci, poczynając od wyszukiwania oznaczeń utworów muzycznych i przygotowanie parsera dla
 plików z tymi oznaczeniami, poprzez automatyczne wyszukiwania i pobieranie odpowiednich plików z
 nagraniami muzycznymi, aż po wstępne przetwarzanie danych do formatu odpowiedniego dla sieci
@@ -47,7 +49,7 @@ przyczyną tego, że nie przygotowano więcej niż kilka publicznie dostępnych
 muzycznych, które mogą zostać wykorzystane do treningu modeli uczenia maszynowego.
 
 
-% do początku do uzyskania pierwszego indeksu (skrypt 01)
+% od początku do uzyskania wszystkich oznaczeń ('data/chordlab') oraz pierwszego indeksu (skrypt 01)
 \subsection{Publiczne zbiory z oznaczeniami akordów}
 
 % zbiory są takie, co to inni wykorzystywali
@@ -55,9 +57,9 @@ W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpozn
 pomocą sieci neuronowych - większość wykorzystywanych przez badaczy zbiorów danych udało się
 odnaleźć i wykorzystać. Zostały one szczegółowo opisane poniżej. Każdy zbiór oznaczeń został
 pobrany, odpowiednio oczyszczony (wybrane zostały tylko niezbędne pliki) i zapisany w repozytorium
-projektu. Po przeanalizowanu struktury zbiorów stworzony został pierwszy skrypt przygotowujący dane
+projektu (w katalogu ,,data/chordlab''. Po przeanalizowanu struktury zbiorów stworzony został pierwszy skrypt przygotowujący dane
 - ,,src/dataset\_scripts/01-generate\_index\_of\_chordlab.py'' - który, w postaci pliku \emph{csv},
-generuje jeden wspólny indeks dla wszystkich zbiorów, tak że mogą one być już traktowane jako jeden
+generuje jeden wspólny indeks (,,data/index.csv'') dla wszystkich zbiorów, tak że mogą one być już traktowane jako jeden
 zbiór danych. Fragment tego indeksu został przedstawionyw w \ref{tab:indeks_01}.
 
 \begin{table}
@@ -121,7 +123,7 @@ przeprowadzeniu opisanych powyżej operacji, zostały zapisane w repozytorium pr
 \subsubsection{Zbiór McGill Billboard}
 
 % ogólny opis, jakie i ile utworów, format zapisu
-Zbiór \emph{McGill Billboard}\cite{burgoyne_expert_2011} został stworzony przez grupę \emph{DDMAL
+Zbiór \emph{McGill Billboard} \cite{burgoyne_expert_2011} został stworzony przez grupę \emph{DDMAL
 (Distributed Digital Music Archives \& Libraries Lab)}\footnote{https://ddmal.music.mcgill.ca/} z
 kandadyjskiego \emph{McGill University}. Jak nazwa wskazuje, zajmują się oni różnymi projektami
 związanymi z przetwarzaniem muzyki, w tym tworzą i utrzymują ten prawdopodobnie największy, dostępny
@@ -162,7 +164,7 @@ Pobrane oznaczenia akordów nie wymagały właściwie żadnych poprawek. Cały k
 \subsubsection{Zbiór Robbie Williams}
 
 % ogólny opis, jakie i ile utworów, format zapisu
-Zbiór \emph{Robbie Williams}\cite{giorgi_automatic_2013} składa się z oznaczeń akordów oraz tonacji
+Zbiór \emph{Robbie Williams} \cite{giorgi_automatic_2013} składa się z oznaczeń akordów oraz tonacji
 dla pierwszych pięciu albumów Robbiego Williamsa. Został przygotowany przez włoskich naukowców z
 Politechniki w Mediolanie na potrzeby uczenia systemu automatycznego rozpoznawania akordów.
 Oznaczenia są zgodne z \cite{harte_towards_nodate}. W sumie dokładne oznaczenia akordów i tonacji
@@ -185,9 +187,9 @@ Pobrane oznaczenia znowu nie wymagały żadnych poprawek. Zawartość katalog
 \subsubsection{Zbiór RS200}
 
 % ogólny opis, jakie i ile utworów, format zapisu
-Zbiór \emph{RS200}\cite{de_clercq_corpus_2011} został stworzony przez dwóch badaczy z amerykańskiej
+Zbiór \emph{RS200} \cite{de_clercq_corpus_2011} został stworzony przez dwóch badaczy z amerykańskiej
 uczelni muzycznej \emph{Eastman School of Music} w Rochester. Powstał on na bazie listy \emph{500
-Greatest Songs of All Time} z magazynu Rolling Stone. Początkowo zawierał jedynie 100 utworów i w
+Greatest Songs of All Time} z magazynu \emph{Rolling Stone}. Początkowo zawierał jedynie 100 utworów i w
 takiej formie zostały wykorzystany w oryginalnej publikacji, gdzie autorzy analizowali częstość
 występowania różnych akordów i ich progresji. Utwory te zostały wybrane tak, aby pochodziły z wielu
 różnych dekad. Z czasem zbiór został rozszerzony do 200 utworów i w takiej formie jest dostępny do
@@ -208,14 +210,206 @@ formaty, z których ostatni jest już rozwinięty do postaci zbliżonej do plik�
 różnica to wspomniany powyżej sposób oznaczania konkretnych akordów. Po pobraniu i rozpakowaniu archiwum
 \emph{zip} znaleźć można pojedynczy katalog ,,rs200_harmony_clt'', który zawiera pliki z
 rozszerzeniem \emph{clt}, po dwa dla każdego utworu, jeden z suffiksem ,,dt' a drugi ,,tdc'' (od
-nazwisk autorów). 
+nazwisk autorów). Ze względu na to, że oznaczenia jednego z autorów były znacznie bardziej
+uporządkowane i prostsze a kwestia różnić w oznaczeniach dwóch różnych osób nie jest szczególnie
+związana z tematem niniejszej pracy, wybrane zostały jedynie oznaczenia z sufikem ,,dt''. Jeżeli
+chodzi o indeksowanie plików z oznaczeniami, to autorzy dostarczają plik \emph{txt} z opisem
+wszystkich plików z oznaczeniami, w tym z tytułem utworu, rokiem wydania i nazwiskiem artysty. Plik
+ten, po wprowadzeniu kilku niezbędnych poprawek (literówki i pomyłki w nazwach, odniesienia do
+nieistniejących plików), został wykorzystany do generowania głównego indeksu utworów.
+
+% poprawki i zapisanie w projekcie
+Wybrane pliki z suffiksem ,,dt'' nie wymagały już więcej poprawek. Zostały wzsystkie, przeniesione
+do katalogu ,,data/chordlab/rs200''.
+
+\subsubsection{Zbiór RWC POP}
+
+% ogólny opis, jakie i ile utworów, format zapis
+Zbiór RWC POP \cite{goto_rwc_nodate} stanowi część większego zbioru o nazwie RWC (Real World
+Computing) Music Database\footnote{https://staff.aist.go.jp/m.goto/RWC-MDB/}, stworzonego przez Real
+World Computing Partnership (RWCP) w Japonii. Jest to oczyszczony z praw autorskich, dostępny za
+darmo (trzeba pokryć jedynie koszty kopiowania i dostawy) wielkoskalowy zbiór 315 utworów
+muzycznych, podzielonych na 5 zestawów o różnym zastosowaniu, jak rozpoznawanie gatunku czy
+instrumentu muzycznego. Jednym z tych zestawów jest właśnie Popular Music Database zawierający 100
+utworów muzyki popularnej - 20 w stylu popularnej muzyki zachodniej z lat 80-tych (w języku
+angielskim) i 80 w stylu popularnej muzyki japońskiej, z lat 90-tych (w języku japońskim). Właściwie
+zbiór ten, poza potencjalną możliwością uzyskania darmowego i legalnego dostępu do nagrań
+dźwiękowych, nie jest przydatny dla zadania rozpoznawania akordów, ponieważ nie zawiera oznaczeń
+akordów. Te zostały jednak przygotowane dla wszystkich 100 utworów przez studentów uniwersytetu w
+Nowym Jorku z Music and Audio Research Lab. Format tych oznaczeń jest ponownie zgodny z
+\cite{harte_towards_nodate}. W praktyce, w ramach niniejszej pracy wykorzystane zostały tylke te
+oznaczenia. Dla uproszczenia i zautomatyzowania całego procesu przygotowania danych nagrania
+muzyczne próbowano pozyskać tą samą metodą jak w przypadku pozostałych zbiorów danych.
+
+% pobieranie i indeksowanie
+Oznaczenia akordów do zbioru RWC POP są dostępne za darmo do pobrania w Internecie jako repozytorium
+git w serwisie GitHub\footnote{https://github.com/tmc323/Chord-Annotations}. Bezpośrednio w
+repozytorium znajduje się katalog ,,RWC_Pop_Chords'', który zawiera pliki z oznaczeniami
+akordów w dwóch formatach: \emph{svl} oraz \emph{lab}.
+
+\subsubsection{Zbiór Uspop}
+todo
 
 
-% pamiętać, żeby opisać wszystkie kroki, SKRYPTY i zerknąć na COMMITY
 
 
-\section{Pozyskanie plików z nagraniami muzycznymi}
 
+% annotation parser i implementacja CSR
+\subsection{Parsowanie plików z oznaczeniami akordów}
+todo
+
+
+
+
+% skrypt evaluation, downloading, 02 i 03 - znalezienie najlepiej pasujących nagrań muzycznych
+\subsection{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
+
+% to jest problem generalnie
+Znalezienie odpowiednich plików z nagraniami muzycznymi stanowiło jeden z głównych problemów,
+rozwiązywanych w ramach niniejszej pracy. Jest to problem z którym mierzyli się również twórcy
+poprzednich rozwiązań, ponieważ tak jak wspomniano wcześniej, nieliczne zbiory danych oznaczeń
+akordów dostarczane są zazwyczaj bez utworów muzycznych, ze względu na prawa autorskie muzyków
+(wyjątkiem jest oczyszczony z praw autorskich zbiór RWC POP).
+
+% nie można tak po prostu łatwo ich wyszukać - opis i ocena ręcznej procedury
+\subsubsection{Analiza koncepcji ręcznego wyszukiwanie nagrań}
+Pierwszym i prawdopodobnie prowadzącym do najmniejszej liczby pomyłek sposobem pozyskania utworów
+muzycznych jest szukanie ,,ręczne''. Polegało by ono na znalezieniu odpowiednich artystów, albumów i
+konkretnych nagrań w serwisach muzycznych i innych ogólnie dostępnych źródłach, lub też w razie
+potrzeby zakupienie odpowiednich nagrań. Każdy zbiór oznaczeń należałoby rozpatrzeć osobno i w miarę
+możliwości spróbować pozyskać oryginalne, wykorzystane podczas tworzenia oznaczeń nagrania. W
+przypadku zbioru RWC POP nagrania są możliwe do pozyskania za symboliczną opłatą. W przypadku
+zbiorów Isohponics, Robbie Williams i uspop wiadomo (w miarę) dokładnie o które nagrania chodzi
+ponieważ dla każdego utworu znana jest nazwa albumu. Można próbować dostać się do tych konkretnych
+albumów, weryfikując wyrywkowo, czy oznaczenia pasują do nagrań - możliwe jest jednak, że trafi się
+na jakieś poprawione wydania, gdzie wszystkie utwory będą np. przesunięte w czasie. Można wtedy
+próbować je ,,naprawić'' za pomocą odpowiedniego programu komputerowego. Co do pozostałych zbiorów,
+to nie jest znany album i w tym przypadku zdecydowanie już nie można łatwo stwierdzić, które spośród
+wielu możliwych nagrań będzie pasowało do oznaczeń. Trzeba by więc samodzielnie odsłuchać fragment
+każdej znalezionej wersji nagrania i znaleźć tą odpowiednią, w najgorszym przypadku odrzucając
+wszystkie i pozostając z samymi oznaczeniami akordów. Tak więc metoda ta, chociaż najdokładniejsza,
+jest niezwykle czasochłonna i trudno skalowalna w przypadku znalezienia większej liczby oznaczeń.
+Co więcej i tak nie daje ona pewności, że nie trafią się nagrania niepasujące, chyba że ostatecznie
+każde wybrane nagrania zostanie przesłuchane i porównane z oznaczeniami akordów. Na końcu warto
+wspomnieć, że cały opis powyższej procedury ,,ręcznej'', choć przemyślany, jest jedynie teoretyczny
+(nie był zrealizowany od początku do końca) i nie wiadomo, jakie problemy okazałyby się mało
+znaczące, a jakie nie zostały wzięte pod uwagę.
+
+% motywacja i decyzja o procedurze automatycznej
+\subsubsection{Motywacja i decyzja o automatycznym wyszukiwaniu nagrań}
+W ramach niniejszej pracy zdecydowano się na automatyczną procedurę wyszukiwania odpowiednich
+utworów muzycznych w serwisie YouTube Music\footnote{music.youtube.com}. Takie podejście prowadzi
+prawdopodobnie do pozyskania większej ilości niepasujących nagrań i co ważniejsze, w ogóle do
+pozyskania mniejszej ilości nagrań. Jest to jednak podejście zdecydowanie szybsze i znacznie
+bardziej inżynierskie. Automatyzacja procesu wyszukiwania odpowiednich nagrań sama w sobie stanowi
+ciekawy problem, ktorego możliwe rozwiązania wydają się być cenne, ze względu na swoją szybkość,
+powtarzalność i skalowalność. Z tych powodów zdecydowano się, że ostatecznie zbiór danych
+oznaczonych będzie prawdopodobnie trochę mniejszy i bardziej zanieczyszczony, niż w przypadku
+ręcznego wyszukiwania odpowiednich utworów. Poświęcono natomiast czas na przygotowanie
+nieskomplikowango algorytmu, opierającego się na kilku prostych założeniach, pozwalającego
+automatycznie wyszukiwać odpowiednie nagrania w serwisie YouTube Music. Algorytm ten można opisać w
+kilku prostych krokach.  Składają się na nie jednak trzy bardziej złożone operację: wyszukiwanie
+utworu w serwisie YouTube Music, pobieranie konkretnego nagrania na dysk lokalny oraz ewaluacja tego
+nagrania - oceny na ile jest ono zgodne z dostępnymi oznaczeniami akordów. Wszystkie trzy operacje
+są szczegółowo opisane poniżej.
+
+% opis wyszukiwania utworów i liba ytmusicapi
+\subsubsection{Wyszukiwanie utworów w serwisie YouTube Music}
+Wyszukiwanie utworów w serwisie YouTube Music zostało wykonane za pomocą nieoficjalnego klienta
+pythonowego do tego serwisu - \emph{ytmusicapi}\footnote{https://github.com/sigma67/ytmusicapi}.
+Daje on mniej więcej takie same możliwości jak korzystanie z oficjalnego, graficznego klienta
+przeglądarkowego. Można jednak wszystkie operacje łatwo zautomatyzować. Jest to przykład tak zwanego
+\emph{web scrappingu}, który w tym przypadku jest niezbędny, jako że oficjalne API do tego serwisu
+nie istnieje, a dostępne w ograniczonym zakresie (ograniczona liczba zapytań) API do całego serwisu
+YouTube nie daje wystarczających możliwości przeszukiwania dostępnych tam nagrań muzycznych.
+Korzystanie z klienta \emph{ytmusicapi} jest niezwykle proste. Trzeba jedynie stworzyć
+instancję obiektu \emph{YTMusic} (jest to dostęp analogiczny jak dla niezalogawnego użytkownika w
+przeglądarce) i wywołać metodę \emph{search} przyjmującą tekstowe zapytanie (takie jak wpisywane w
+pole wyszukiwania w kliencie graficznym) i filtr, ograniczający wyniki do danego typu treści, np.
+tylko do nagrań muzycznych, lub tylko do filmów. W zwróconych wynikach dostępne są informacje o
+indentyfikatorze zasobu (\emph{video\_id}), tytule utworu, artyście (lub artystach) i albumie
+(opcjonalnie).
+
+% opis pobierania utworów - skryptu i liba pytube
+\subsubsection{Pobieranie nagrań z serwisu YouTube na dysk lokalny}
+Pobieranie nagrań na dysk lokalny również jest zrealizowane za pomocą nieoficjalnego, pythonowego
+klienta, tym razem już do całego serwisu YouTube -
+\emph{pytube}\footnote{https://github.com/pytube/pytube}. Służy on właściwie nie tyle do
+przeszukiwania serwisu YouTube co do pobieranie z niego całych filmów lub samych ścieżek dźwiękowych
+w dostępnych formatach i jakościach. Aby z niego skorzystać trzeba stworzyć instancję klasy
+\emph{YouTube} podając jako argument adres URL konkretnego filmu, przy czym wystarczy oczywiście
+znać jedynie jego \emph{video\_id} (,,http://youtube.com/watch?v=\emph{video\_id}''). Następnie
+można filtrować dostępne formaty i ostatecznie pobrać wybrany strumień na dysk. Przygotowana została
+funkcja pomocnicza (,,src/dataset\_scripts/downloading.py''), która dla danego \emph{video\_id},
+jeżeli nagranie nie zostało już pobrane (nie istnieje plik we wskazanym katalogu), wybiera pośród
+dostępnych strumieni z samym dźwiękiem ten w najlepszej jakości i zapisuje go jako plik dźwiękowy do
+wskazego katalogu. Pobieranie to może się z różnych powodów nie powieść (błąd sieci, YouTube odrzuca
+podejrzane żądanie, etc.).
+
+% opis idei ewaluacji nagrań i liba madmom
+\subsubsection{Ewaluacja nagrań - ocena dopasowania do oznaczeń akordów}
+Ewaluacja nagrań jest najbardziej skomplikowaną i jednocześnie najważniejszą częścią całego procesu
+wyszukiwania nagrań. Aby automatycznie ocenić czy nagranie pasuje do oznaczeń trzeba automatycznie
+rozpoznać jakie akordy w nim występują. Z kolei przygotowanie algorytmu rozpoznającego akordy
+stanowi jeden z podstawowych celów niniejszej pracy. Oczywiście nie można się więc na tym etapie
+posłużyć własnym rozwiązaniem. Istnieje natomiast dużo gotowych, wysokopoziomowych bibliotek, które
+realizują to zadanie, z większą bądź mniejszą dokładnością. Wysoka dokładność takiego algorytmu nie
+ma na tym etapie dużego znaczenia, chodzi jedynie aby poglądowo ocenić, czy dane nagranie pasuje do
+oznaczeń, czy może jest to zupełnie inny utwór, czy jedynie inna, wolniejsza lub trochę przesunięta
+w czasie wersja oryginalnego nagrania. Zdecydowano się na użycie biblioteki
+\emph{madmom}\footnote{https://github.com/CPJKU/madmom}, której autorem jest sam Korzeniowski.
+Biblioteka ta, podobnie jak dwie poprzednie i w ogóle zdecydowana większość bibliotek języka Python,
+jest bardzo prosta w użyciu. Trzeba wybrać odpowiedni algorytm, stworzyć jego instancję i wywołać
+przekazując ścieżkę do pliku. Pod spodem wykorzystywana jest biblioteka \emph{ffmpeg} do odczytania
+praktycznie dowolnego formatu, za pomocą wytrenowanego wcześniej modelu rozpoznawane są występujące
+akordy (standardowe 25 klas) i zwracane są czasy ich występowania i symbole w formacie
+wykorzystywanym w plikach \emph{lab} (zgodnym z \cite{harte_towards_nodate}). Ze względu na
+niewielkie wymagania dotyczące jakości klasyfikacji i większe wymagania dotyczące szybkości
+działania, zdecydowano się użyć prostszego z dwóch dostępnych algorytmów, czyli \emph{Deep Chroma
+Extractor} \cite{korzeniowski_feature_2016}.
+
+% dokładny opis procedury ewaluacji (skryptu ewaluacyjnego)
+Cała procedura ewaluacji nie kończy się na wywołaniu biblioteki i rozpoznaniu występujących akordów.
+Trzeba wybrać odpowiednie metryki pozwalające łatwo porównać między sobą kilka dostępnych nagrań dla
+danego zestawu oznaczeń akordów. Po pierwsze wykorzystana została podstawowa miara WCSR. Po drugie
+dla każdego nagrania liczone jest przesunięcie czasowe pomiędzy początkiem pierwszego oczekiwanego
+(z pliku z oznaczeniami) i pierwszego rozpoznanego (za pomocą biblioteki madmom) akordu
+(\emph{start\_diff}), oraz przesunięcie czasowe pomiędzy końcem ostatniego oczekiwanego i ostatniego
+rozpoznanego akordu (\emph{stop\_diff}). Oczywiście poprzez wystąpienie akordu rozumie się
+wystąpienie akordu dowolnej klasy poza \emph{no chord}. Realizujące wszystkie te operacje funkcja
+pomocnicza znajduje się w pliku ,,src/dataset\_scripts/evaluation.py''. W przypadku gdy żaden akord
+nie występuje w oznaczeniach lub nie został rozpoznany funkcja ta nie zwraca żadnych wartości.
+
+% interpretacja metryk
+Metryka WCSR pozwala ocenić na ile znalezione akordy są zgodne z oczekiwanymi. Metryki prezentujące
+przesunięcie czasowe dodatkowo pozwalają wykryć sytuację, kiedy znalezione nagranie zaczyna się w
+innym momencie albo ma zupełnie różną długość. W obu tych sytuacjach wciąż możliwa jest względnie
+wysoka wartość miary CSR, która nie pozwala łatwo wyeliminować nagrań, ktore z powodu różnej
+długości z całą pewnością nie pasują do oznaczeń.
+
+\subsubsection{Algorytm automatycznego wyszukiwania pasujących nagrań muzycznych}
+
+Poniższe kroki są wykonywane dla każdej pozycji z indeksu (,,data/index.csv'') opisującego cały
+dostępny zbiór oznaczeń. Przechodzenie przez cały indeks dzieje się równolegle w 16 procesach, jako
+że w zastosowanym algorytmie nie ma żadnych zależności między poszczególnymi utworami. Wynikiem
+działania algorytmu są dodatkowe kolumny w pliku ,,index.csv'', prezentujące identyfikator
+najlepszego znalezionego nagrania (\emph{video\_id}) oraz wyniki ewaluacji tego nagrania:
+przesunięcie początku pierwszego akordu (\emph{start\_diff}) i zakończenia ostatniego
+(\emph{stop\_diff}) względem pliku z oznaczeniami oraz wartość miary CSR (\emph{csr}).
+
+Poniższy algorytm jest dodatkowo przygotowany w taki sposób, aby móc wykonywać go wielokrotnie dla
+tego samego indeksu w celu wyszukiwania nagrań dla nowo dodanych plików z oznaczeniami, skorzystania
+z dostępnych od niedawna nagrań lub po prostu kontynuacji przerwanego działania, które jest
+czasochłonne i może zostać przerwane z powodu różnych błędów.
+
+\begin{enumerate}
+    \item Jeżeli dany utwór ma już dopasowane nagranie (video\_id) i jest ono zewaluowane to nic nie rób
+    \item Jeżeli dany utwór ma już dopasowane \emph{video\_id} i NIE jest ono zewaluowane to zrób
+        ewaluację tego nagrania
+    \item todo
+\end{enumerate}
+
+\subsubsection{Selekcja utworów, dla których znaleziono dobre nagranie}
 
 
 % - zorganizować zbiór danych nieoznaczonych
