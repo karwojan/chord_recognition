@@ -254,7 +254,7 @@ todo
 
 
 
-% annotation parser i implementacja CSR
+% annotation parser i implementacja WCSR
 \subsection{Parsowanie plików z oznaczeniami akordów}
 todo
 
@@ -267,21 +267,21 @@ todo
 % to jest problem generalnie
 Znalezienie odpowiednich plików z nagraniami muzycznymi stanowiło jeden z głównych problemów,
 rozwiązywanych w ramach niniejszej pracy. Jest to problem z którym mierzyli się również twórcy
-poprzednich rozwiązań, ponieważ tak jak wspomniano wcześniej, nieliczne zbiory danych oznaczeń
-akordów dostarczane są zazwyczaj bez utworów muzycznych, ze względu na prawa autorskie muzyków
+poprzednich rozwiązań, ponieważ tak jak wspomniano wcześniej, nieliczne zbiory oznaczeń
+akordów dostarczane są zazwyczaj bez nagrań muzycznych, ze względu na prawa autorskie muzyków
 (wyjątkiem jest oczyszczony z praw autorskich zbiór RWC POP).
 
 % nie można tak po prostu łatwo ich wyszukać - opis i ocena ręcznej procedury
 \subsubsection{Analiza koncepcji ręcznego wyszukiwanie nagrań}
 Pierwszym i prawdopodobnie prowadzącym do najmniejszej liczby pomyłek sposobem pozyskania utworów
 muzycznych jest szukanie ,,ręczne''. Polegało by ono na znalezieniu odpowiednich artystów, albumów i
-konkretnych nagrań w serwisach muzycznych i innych ogólnie dostępnych źródłach, lub też w razie
-potrzeby zakupienie odpowiednich nagrań. Każdy zbiór oznaczeń należałoby rozpatrzeć osobno i w miarę
+konkretnych nagrań w serwisach muzycznych oraz innych ogólnie dostępnych źródłach. W razie
+potrzeby wymagało by zakupienie odpowiednich nagrań. Każdy zbiór oznaczeń należało by rozpatrzeć osobno i w miarę
 możliwości spróbować pozyskać oryginalne, wykorzystane podczas tworzenia oznaczeń nagrania. W
 przypadku zbioru RWC POP nagrania są możliwe do pozyskania za symboliczną opłatą. W przypadku
-zbiorów Isohponics, Robbie Williams i uspop wiadomo (w miarę) dokładnie o które nagrania chodzi
+zbiorów Isohponics, Robbie Williams i uspop wiadomo, w miarę dokładnie, o które nagrania chodzi,
 ponieważ dla każdego utworu znana jest nazwa albumu. Można próbować dostać się do tych konkretnych
-albumów, weryfikując wyrywkowo, czy oznaczenia pasują do nagrań - możliwe jest jednak, że trafi się
+albumów, weryfikując wyrywkowo, czy oznaczenia pasują do nagrań. Możliwe jest jednak, że trafi się
 na jakieś poprawione wydania, gdzie wszystkie utwory będą np. przesunięte w czasie. Można wtedy
 próbować je ,,naprawić'' za pomocą odpowiedniego programu komputerowego. Co do pozostałych zbiorów,
 to nie jest znany album i w tym przypadku zdecydowanie już nie można łatwo stwierdzić, które spośród
@@ -290,28 +290,30 @@ każdej znalezionej wersji nagrania i znaleźć tą odpowiednią, w najgorszym p
 wszystkie i pozostając z samymi oznaczeniami akordów. Tak więc metoda ta, chociaż najdokładniejsza,
 jest niezwykle czasochłonna i trudno skalowalna w przypadku znalezienia większej liczby oznaczeń.
 Co więcej i tak nie daje ona pewności, że nie trafią się nagrania niepasujące, chyba że ostatecznie
-każde wybrane nagrania zostanie przesłuchane i porównane z oznaczeniami akordów. Na końcu warto
-wspomnieć, że cały opis powyższej procedury ,,ręcznej'', choć przemyślany, jest jedynie teoretyczny
+każde wybrane nagrania zostanie przesłuchane i porównane z oznaczeniami akordów. Warto
+zaznaczyć, że cały opis powyższej procedury ,,ręcznej'', choć przemyślany, jest jedynie teoretyczny
 (nie był zrealizowany od początku do końca) i nie wiadomo, jakie problemy okazałyby się mało
-znaczące, a jakie nie zostały wzięte pod uwagę.
+znaczące, a jakie nie zostały wzięte pod uwagę. 
 
 % motywacja i decyzja o procedurze automatycznej
 \subsubsection{Motywacja i decyzja o automatycznym wyszukiwaniu nagrań}
 W ramach niniejszej pracy zdecydowano się na automatyczną procedurę wyszukiwania odpowiednich
 utworów muzycznych w serwisie YouTube Music\footnote{music.youtube.com}. Takie podejście prowadzi
 prawdopodobnie do pozyskania większej ilości niepasujących nagrań i co ważniejsze, w ogóle do
-pozyskania mniejszej ilości nagrań. Jest to jednak podejście zdecydowanie szybsze i znacznie
-bardziej inżynierskie. Automatyzacja procesu wyszukiwania odpowiednich nagrań sama w sobie stanowi
-ciekawy problem, ktorego możliwe rozwiązania wydają się być cenne, ze względu na swoją szybkość,
-powtarzalność i skalowalność. Z tych powodów zdecydowano się, że ostatecznie zbiór danych
-oznaczonych będzie prawdopodobnie trochę mniejszy i bardziej zanieczyszczony, niż w przypadku
-ręcznego wyszukiwania odpowiednich utworów. Poświęcono natomiast czas na przygotowanie
-nieskomplikowango algorytmu, opierającego się na kilku prostych założeniach, pozwalającego
-automatycznie wyszukiwać odpowiednie nagrania w serwisie YouTube Music. Algorytm ten można opisać w
-kilku prostych krokach.  Składają się na nie jednak trzy bardziej złożone operację: wyszukiwanie
-utworu w serwisie YouTube Music, pobieranie konkretnego nagrania na dysk lokalny oraz ewaluacja tego
-nagrania - oceny na ile jest ono zgodne z dostępnymi oznaczeniami akordów. Wszystkie trzy operacje
-są szczegółowo opisane poniżej.
+pozyskania mniejszej ilości nagrań. Jest to jednak podejście zdecydowanie szybsze. Automatyzacja
+procesu wyszukiwania odpowiednich nagrań sama w sobie stanowi ciekawy problem, ktorego możliwe
+rozwiązania wydają się być cenne, ze względu na swoją szybkość, powtarzalność i skalowalność.
+Ponadto rozwiązuje częściowo problem reprodukcji i kontynuacji badań przez inne osoby.  Przygotowane
+w ramach niniejszej pracy skrypty można by umieścić w internecie ułatwiając zadanie innym osobom
+zajmującym się tym samym tematem. Nie można natomiast rozpowszechniać w ten sposób nagrań
+muzycznych. Z tych powodów zdecydowano się, że ostatecznie zbiór danych oznaczonych będzie
+prawdopodobnie trochę mniejszy i bardziej zanieczyszczony, niż w przypadku ręcznego wyszukiwania
+odpowiednich utworów. Poświęcono natomiast czas na przygotowanie nieskomplikowango algorytmu,
+opierającego się na kilku prostych założeniach, pozwalającego automatycznie wyszukiwać odpowiednie
+nagrania w serwisie YouTube Music. Algorytm ten można opisać w kilku prostych krokach. Wśród nich
+występują jednak trzy bardziej złożone operację: wyszukiwanie utworu w serwisie YouTube Music,
+pobieranie konkretnego nagrania na dysk lokalny oraz ewaluacja tego nagrania - oceny na ile jest ono
+zgodne z dostępnymi oznaczeniami akordów. Wszystkie trzy operacje są szczegółowo opisane poniżej.
 
 % opis wyszukiwania utworów i liba ytmusicapi
 \subsubsection{Wyszukiwanie utworów w serwisie YouTube Music}
@@ -319,16 +321,16 @@ Wyszukiwanie utworów w serwisie YouTube Music zostało wykonane za pomocą nieo
 pythonowego do tego serwisu - \emph{ytmusicapi}\footnote{https://github.com/sigma67/ytmusicapi}.
 Daje on mniej więcej takie same możliwości jak korzystanie z oficjalnego, graficznego klienta
 przeglądarkowego. Można jednak wszystkie operacje łatwo zautomatyzować. Jest to przykład tak zwanego
-\emph{web scrappingu}, który w tym przypadku jest niezbędny, jako że oficjalne API do tego serwisu
+\emph{web scrappingu}, który w tym przypadku jest niezbędny, jako że oficjalne API do tego (pod)serwisu
 nie istnieje, a dostępne w ograniczonym zakresie (ograniczona liczba zapytań) API do całego serwisu
 YouTube nie daje wystarczających możliwości przeszukiwania dostępnych tam nagrań muzycznych.
 Korzystanie z klienta \emph{ytmusicapi} jest niezwykle proste. Trzeba jedynie stworzyć
 instancję obiektu \emph{YTMusic} (jest to dostęp analogiczny jak dla niezalogawnego użytkownika w
 przeglądarce) i wywołać metodę \emph{search} przyjmującą tekstowe zapytanie (takie jak wpisywane w
-pole wyszukiwania w kliencie graficznym) i filtr, ograniczający wyniki do danego typu treści, np.
+pole wyszukiwania w kliencie graficznym) oraz filtr, ograniczający wyniki do danego typu treści, np.
 tylko do nagrań muzycznych, lub tylko do filmów. W zwróconych wynikach dostępne są informacje o
 indentyfikatorze zasobu (\emph{video\_id}), tytule utworu, artyście (lub artystach) i albumie
-(opcjonalnie).
+(jeżeli dotyczy).
 
 % opis pobierania utworów - skryptu i liba pytube
 \subsubsection{Pobieranie nagrań z serwisu YouTube na dysk lokalny}
@@ -361,8 +363,8 @@ w czasie wersja oryginalnego nagrania. Zdecydowano się na użycie biblioteki
 Biblioteka ta, podobnie jak dwie poprzednie i w ogóle zdecydowana większość bibliotek języka Python,
 jest bardzo prosta w użyciu. Trzeba wybrać odpowiedni algorytm, stworzyć jego instancję i wywołać
 przekazując ścieżkę do pliku. Pod spodem wykorzystywana jest biblioteka \emph{ffmpeg} do odczytania
-praktycznie dowolnego formatu, za pomocą wytrenowanego wcześniej modelu rozpoznawane są występujące
-akordy (standardowe 25 klas) i zwracane są czasy ich występowania i symbole w formacie
+praktycznie dowolnego formatu. Za pomocą wytrenowanego wcześniej modelu rozpoznawane są występujące
+akordy (standardowe 25 klas) i zwracane są czasy ich występowania oraz symbole w formacie
 wykorzystywanym w plikach \emph{lab} (zgodnym z \cite{harte_towards_nodate}). Ze względu na
 niewielkie wymagania dotyczące jakości klasyfikacji i większe wymagania dotyczące szybkości
 działania, zdecydowano się użyć prostszego z dwóch dostępnych algorytmów, czyli \emph{Deep Chroma
@@ -371,21 +373,21 @@ Extractor} \cite{korzeniowski_feature_2016}.
 % dokładny opis procedury ewaluacji (skryptu ewaluacyjnego)
 Cała procedura ewaluacji nie kończy się na wywołaniu biblioteki i rozpoznaniu występujących akordów.
 Trzeba wybrać odpowiednie metryki pozwalające łatwo porównać między sobą kilka dostępnych nagrań dla
-danego zestawu oznaczeń akordów. Po pierwsze wykorzystana została podstawowa miara WCSR. Po drugie
+tego samego zestawu oznaczeń akordów. Po pierwsze wykorzystana została podstawowa miara WCSR. Po drugie
 dla każdego nagrania liczone jest przesunięcie czasowe pomiędzy początkiem pierwszego oczekiwanego
 (z pliku z oznaczeniami) i pierwszego rozpoznanego (za pomocą biblioteki madmom) akordu
 (\emph{start\_diff}), oraz przesunięcie czasowe pomiędzy końcem ostatniego oczekiwanego i ostatniego
 rozpoznanego akordu (\emph{stop\_diff}). Oczywiście poprzez wystąpienie akordu rozumie się
-wystąpienie akordu dowolnej klasy poza \emph{no chord}. Realizujące wszystkie te operacje funkcja
+wystąpienie akordu dowolnej klasy poza \emph{no chord}. Realizująca wszystkie te operacje funkcja
 pomocnicza znajduje się w pliku ,,src/dataset\_scripts/evaluation.py''. W przypadku gdy żaden akord
 nie występuje w oznaczeniach lub nie został rozpoznany funkcja ta nie zwraca żadnych wartości.
 
 % interpretacja metryk
 Metryka WCSR pozwala ocenić na ile znalezione akordy są zgodne z oczekiwanymi. Metryki prezentujące
 przesunięcie czasowe dodatkowo pozwalają wykryć sytuację, kiedy znalezione nagranie zaczyna się w
-innym momencie albo ma zupełnie różną długość. W obu tych sytuacjach wciąż możliwa jest względnie
-wysoka wartość miary CSR, która nie pozwala łatwo wyeliminować nagrań, ktore z powodu różnej
-długości z całą pewnością nie pasują do oznaczeń.
+innym momencie albo jest zdecydowanie za długie. W obu tych sytuacjach wciąż możliwa jest względnie
+wysoka wartość miary CSR. W konsekwencji miara ta nie pozwala łatwo wyeliminować nagrań, ktore z
+powodu różnej długości z całą pewnością nie pasują do oznaczeń.
 
 \subsubsection{Algorytm automatycznego wyszukiwania pasujących nagrań muzycznych}
 
@@ -402,11 +404,32 @@ tego samego indeksu w celu wyszukiwania nagrań dla nowo dodanych plików z ozna
 z dostępnych od niedawna nagrań lub po prostu kontynuacji przerwanego działania, które jest
 czasochłonne i może zostać przerwane z powodu różnych błędów.
 
+Kroki algorytmu są następujące:
 \begin{enumerate}
-    \item Jeżeli dany utwór ma już dopasowane nagranie (video\_id) i jest ono zewaluowane to nic nie rób
+    \item Jeżeli dany utwór ma już dopasowane nagranie (\emph{video\_id}) i jest ono zewaluowane to
+        zakończ działanie.
     \item Jeżeli dany utwór ma już dopasowane \emph{video\_id} i NIE jest ono zewaluowane to zrób
-        ewaluację tego nagrania
-    \item todo
+        ewaluację tego nagrania i zakończ działanie.
+    \item Wyszukaj nagrania w serwisie YouTube Music zapytaniem ,,tytuł artysta album (jeśli jest
+        znany)'', filtr ustawiony na nagrania muzyczne, ogranicz do 10. wyników.
+    \item Pierwszy etap selekcji - na podstawie nazw. Etap ten ma na celu zmniejszyć liczbę
+        czasochłonnych ewaluacji z etapu drugiego. 
+        \begin{enumerate}
+            \item Znormalizuj nazwy albumu, utworu i artystów dla danego utworu i we wszystkich
+                wynikach wyszukiwania poprzez zamianę wielkich liter na małe i pozostawienie tylko
+                znaków alfanumerycznych oraz znaku ,,\_''
+            \item Wybierz te wyniki wyszukiwania, dla których nazwy albumu (jeśli jest
+                dostępna), utworu i artystów zawierają w sobie odpowiednie nazwy z indeksu.
+            \item Jeżeli żadne nagranie nie pasuje na tym etapie, wszystkie przechodzą dalej.
+        \end{enumerate}
+    \item Drugi etap selekcji - na podstawie ewaluacji.
+        \begin{enumerate}
+            \item Pobierz na dysk nagrania z pozostałych po etapie pierwszym wyników wyszukiwania
+            \item Dokonaj ewaluacji każdego z pobranych nagrań i zapamiętaj wartości metryk
+            \item Usuń nagrania z dysku
+            \item Wybierz to nagranie, które ma najwyższą wartość WCSR i zapisz w indeksie jego
+                \emph{video\_id} oraz wartości metryk z ewaluacji
+        \end{enumerate}
 \end{enumerate}
 
 \subsubsection{Selekcja utworów, dla których znaleziono dobre nagranie}
