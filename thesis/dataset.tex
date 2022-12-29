@@ -13,7 +13,7 @@ uwzględnieniu natury tychże algorytmów - wynajdują one pewne reguły w oparc
 Głęboki sieci neuronowe, co do zasady potrzebują ,,dużo'' (zazwyczaj wiele milionów) przykładów
 uczących, aby móc znaleźć poprawne reguły i wzorce - aby nauczyć się odpowiedniej ekstrakcji cech. W
 celu wytrenowania sieci do konkretnego zadania (np. do klasyfikacji obrazów), potrzeba zbioru
-zawierającego dane wejściowe do modelu i oczekiwane dane wyjściowe z modelu. Takie uczeni w oparciu
+zawierającego dane wejściowe do modelu i oczekiwane dane wyjściowe z modelu. Takie uczenie w oparciu
 o przykłady oznaczone (ze znaną wartością oczekiwaną) to \emph{uczenie nadzorowane}. Często jednak
 ilość danych oznaczonych jest ograniczona, można wtedy wykorzystać dane bez oznaczeń w różnych
 algorytmach \emph{uczenia nienadzorowanego}, aby nauczyć sieć struktury tych danych, bez
@@ -41,26 +41,27 @@ nieoznaczonych nie stanowiło szczególnego problemu. Znacznie trudniejsze okaza
 zbioru danych oznaczonych. Zadanie rozpoznawania akordów muzycznych, mimo iż będące jednym z
 głównych zadań z dziedziny \emph{MIR}, jest oczywiście bardzo mało popularne w stosunku do takich
 zadań jak klasyfikacja, czy segmentacja obrazów. Jest to również po prostu znacznie mniej przydatne
-w życiu codziennym i znacznie mniej się w tę dziedzinę inwestuje. Należy również uwzględnić fakt, że
-przygotowanie oznaczeń akordów do utworów muzycznych wymaga specjalistycznej wiedzy muzycznej,
-praktyki muzycznej i dużo czasu. Oznaczenia powstałe w ten sposób nadal pozostają subiektywne i będą
-się często różnić, w zależności od osoby, która utwory oznaczała. Wszystkie wymienione powody są
-przyczyną tego, że nie przygotowano więcej niż kilka publicznie dostępnych zbiorów oznaczeń akordów
-muzycznych, które mogą zostać wykorzystane do treningu modeli uczenia maszynowego.
+w życiu codziennym i znacznie mniej się w tę dziedzinę inwestuje. Ponadto przygotowanie oznaczeń
+akordów do utworów muzycznych wymaga specjalistycznej wiedzy muzycznej, praktyki muzycznej i dużo
+czasu. Oznaczenia powstałe w ten sposób nadal pozostają subiektywne i będą się często różnić, w
+zależności od osoby, która utwory oznaczała. Wszystkie wymienione powody są przyczyną tego, że nie
+przygotowano więcej niż kilka publicznie dostępnych zbiorów oznaczeń akordów muzycznych, które mogą
+zostać wykorzystane do treningu modeli uczenia maszynowego.
 
 
 % od początku do uzyskania wszystkich oznaczeń ('data/chordlab') oraz pierwszego indeksu (skrypt 01)
-\subsection{Publiczne zbiory z oznaczeniami akordów}
+\subsection{Pozyskanie zbiorów danych z oznaczeniami akordów}
 
 % zbiory są takie, co to inni wykorzystywali
 W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpoznawania akordów za
 pomocą sieci neuronowych - większość wykorzystywanych przez badaczy zbiorów danych udało się
 odnaleźć i wykorzystać. Zostały one szczegółowo opisane poniżej. Każdy zbiór oznaczeń został
 pobrany, odpowiednio oczyszczony (wybrane zostały tylko niezbędne pliki) i zapisany w repozytorium
-projektu (w katalogu ,,data/chordlab''. Po przeanalizowanu struktury zbiorów stworzony został pierwszy skrypt przygotowujący dane
-- ,,src/dataset\_scripts/01-generate\_index\_of\_chordlab.py'' - który, w postaci pliku \emph{csv},
-generuje jeden wspólny indeks (,,data/index.csv'') dla wszystkich zbiorów, tak że mogą one być już traktowane jako jeden
-zbiór danych. Fragment tego indeksu został przedstawionyw w \ref{tab:indeks_01}.
+projektu (w katalogu ,,data/chordlab''). Po przeanalizowaniu struktury zbiorów stworzony został
+pierwszy skrypt przygotowujący dane - ,,src/dataset\_scripts/01-generate\_index\_of\_chordlab.py'' -
+który, w postaci pliku \emph{csv}, generuje jeden wspólny indeks (,,data/index.csv'') dla wszystkich
+zbiorów, tak że mogą one być już traktowane jako jeden zbiór danych. Fragment tego indeksu został
+przedstawionyw w \ref{tab:indeks_01}.
 
 \begin{table}
     \caption{Fragment indeksu zbioru danych po pierwszym etapie jego tworzenia}
@@ -115,7 +116,7 @@ więc wykorzystane nazwy katalogów.
 Jedyne zmiany, jakie zostały wprowadzone w oznaczeniach akordów po pobraniu ich z Internetu, poza
 usunięciem niewykorzystywanych plików, dotyczą artystki Carole King. Polegały one na dostosowaniu
 kilku skrótów typów akordów, które występowały jedynie tutaj a były niezgodne z przyjętą w
-\cite{harte_towards_nodate} konwencją.  Wszystkie oznaczenia zbioru \emph{isohponics}, po
+\cite{harte_towards_nodate} konwencją. Wszystkie oznaczenia zbioru \emph{isohponics}, po
 przeprowadzeniu opisanych powyżej operacji, zostały zapisane w repozytorium projektu, w katalogu
 ,,data/chordlab/isophonics''.
 
@@ -146,7 +147,7 @@ pobrania\footnote{https://ddmal.music.mcgill.ca/research/The\_McGill\_Billboard\
 w postaci skompresowanych (na kilka sposobów) archiwów \emph{tar}. Dostępne są pliki ze wspomnianymi
 powyżej dwoma zestawami dźwiękowych cech utworów, dostępny jest zestaw wszystkich oznaczeń we
 własnym formacie twórców zbioru, oraz zestaw oznaczeń samych akordów, w postaci plików \emph{lab}.
-Do niniejszej wykorzystany został jedynie ten ostatni zestaw, zawierający pliki \emph{lab}. Pobrane
+Do niniejszej pracy wykorzystany został jedynie ten ostatni zestaw, zawierający pliki \emph{lab}. Pobrane
 archiwum zawiera główny katalog ,,McGill-Billboard'', w którym znajduje się 890 katalogów nazwanych
 liczbowymi identyfikatorami utworów ze zbioru. Każdy taki katalog zawiera jeden plik ,,full.lab'' z
 oznaczeniami akordów. Twórcy zbioru dostarczają również indeks w postaci pliku \emph{csv}, wiążący
@@ -200,7 +201,7 @@ zbioru danych i różni się zdecydowanie od sposobu oznaczeń stosowanego w po
 Bardziej szczegółowo został opisany w dalszej części rozdziału, ale ogólnie opiera się on na
 rekurencyjnej składni, pozwalającej łatwo reprezentować pewne schematy i powtórzenia w strukturze
 utworów. Same oznaczenia akordów są również ustalone przez tych autorów i bazują na liczbach
-rzymskich, które prezentują informacje względem klucza tonacji całego utworu. Mamy więc tutaj do
+rzymskich, które prezentują informacje względem tonacji całego utworu. Mamy więc tutaj do
 czynienia z podejściem zupełnie innym, od przyjętego dla pozostałych zbiorów danych.
 
 % pobieranie i indeksowanie
@@ -237,28 +238,89 @@ zbiór ten, poza potencjalną możliwością uzyskania darmowego i legalnego do
 dźwiękowych, nie jest przydatny dla zadania rozpoznawania akordów, ponieważ nie zawiera oznaczeń
 akordów. Te zostały jednak przygotowane dla wszystkich 100 utworów przez studentów uniwersytetu w
 Nowym Jorku z Music and Audio Research Lab. Format tych oznaczeń jest ponownie zgodny z
-\cite{harte_towards_nodate}. W praktyce, w ramach niniejszej pracy wykorzystane zostały tylke te
-oznaczenia. Dla uproszczenia i zautomatyzowania całego procesu przygotowania danych nagrania
-muzyczne próbowano pozyskać tą samą metodą jak w przypadku pozostałych zbiorów danych.
+\cite{harte_towards_nodate}. W ramach niniejszej pracy wykorzystane zostały właśnie te oznaczenia.
+Dla uproszczenia i zautomatyzowania całego procesu przygotowania danych, nagrania muzyczne próbowano
+pozyskać tą samą metodą jak w przypadku pozostałych zbiorów danych.
 
 % pobieranie i indeksowanie
 Oznaczenia akordów do zbioru RWC POP są dostępne za darmo do pobrania w Internecie jako repozytorium
 git w serwisie GitHub\footnote{https://github.com/tmc323/Chord-Annotations}. Bezpośrednio w
-repozytorium znajduje się katalog ,,RWC_Pop_Chords'', który zawiera pliki z oznaczeniami
-akordów w dwóch formatach: \emph{svl} oraz \emph{lab}.
+repozytorium znajduje się katalog ,,RWC\_Pop\_Chords'', który zawiera pliki z oznaczeniami akordów w
+dwóch formatach: \emph{svl} oraz \emph{lab}. Wykorzystane zostały jedynie pliki \emph{lab}. Nazwy
+tych plików zawierają liczbowe identyfikatory poszczególnych nagrań. Aby przygotować indeks i
+pozyskać informacje o tytułach, nazwach albumów i nazwiskach artystów ze strony
+projektu\footnote{https://staff.aist.go.jp/m.goto/RWC-MDB/rwc-mdb-p.html} skopiowana została tabela
+ze wszystkimi tymi informacjami. Tabela ta zapisana została w pliku
+,,data/chordlab/rwc\_pop/rwc\_pop.txt'' i była wykorzystana w skrypcie generującym indeks.
 
-\subsubsection{Zbiór Uspop}
-todo
+% poprawki i zapisanie w projekcie
+Przygotowane przez nowojorskich studentów oznaczenia nie wymagały żadnych poprawek. Wszystkie pliki
+\emph{lab} zostały umieszczone w katalogu ,,data/chordlab/rwc_pop''.
 
+\subsubsection{Zbiór Uspop2002}
 
+% ogólny opis, jakie i ile utworów, format zapis
+Zbiór uspop2002 \cite{berenzweig_large-scale_2004} został przygotowany w ramach współpracy naukowców
+z \emph{LabROSA (Laboratory for the Recognition and Organization of Speech and Audio)} z
+Uniwersytetu w Kolumbii, naukowców z MIT i naukowców z \emph{HP Labs} w Cambridge. Jest to zbiór
+8752 utworów, pochodzących od 400 różnych artystów, z 706 różnych albumów. Podobnie jak w przypadku
+większości wykorzystanych zbiorów danych, oryginalne nagrania muzyczne nie są udostępniane
+bezpośrednio - dostępne są jedynie wyekstrachowane wcześniej cechy MFCC. Zbiór ten został stworzony
+na potrzeby badań nad miarami podobieństwa między utworami, autorzy nie dostarczają więc oznaczeń
+akordów. Na szczęście studenci z Nowego Jorku, poza przygotowaniem oznaczeń dla zbioru RWC POP,
+przygotowali również oznaczenia akordów dla 195 utworów z tego zbioru. Oznaczenia te mają ponownie
+format plików \emph{lab}, zgodny z \cite{harte_towards_nodate}. W ramach niniejszej pracy zbiór
+uspop2002 nie był więc wykorzystywany bezpośrednio, a jedynie jako punkt wyjścia dla twórców
+wspomnianych 195 plików z oznaczeniami, które to dopiero były wykorzystane w niniejszej pracy.
 
+% pobieranie i indeksowanie
+Dokładnie tak jak w przypadku zbioru RWC POP oznaczenia są dostępne za darmo do pobrania w
+Internecie - stanowią część tego samego reozytorium w serwisie
+GitHub\footnote{https://github.com/tmc323/Chord-Annotations}. Znajdują się w katalogu
+,,uspopLabels'', który zawiera katalogi nazwane nazwiskami artystów. Każdy z katalogów artysty
+zawiera katalogi (zazwyczaj jeden) z nazwami albumów. Dopiero w katalogach z albumami znajdują się
+pliki \emph{lab}, zawierające w nazwie tytuły konkretnych utworów. Nazwy katalogów i nazwy plików
+zostały wykorzystane podczas generowania indeksu.
+
+% poprawki i zapisanie w projekcie
+Ponownie oznaczenia nie wymagały żadnych poprawek. Całą zawartość katalogu ,,uspopLabels''
+przeniesiono do katalogu projektu ,,data/chordlab/uspop''.
+
+% duplikaty i podsumowanie
+\subsubsection{Usuwanie duplikatów i podsumowanie pozyskanych oznaczeń}
+
+Ostatnim etapem przygotowania wspólnego indeksu, opisującego wszystkie pozyskane pliki z
+oznaczeniami, jest usunięcie duplikatów. Procedura ta, stanowiąca ostatni fragment skryptu
+tworzącego indeks, jest następująca:
+
+\begin{enumerate}
+    \item Znormalizuj kolumny z nazwą utworu, artysty i albumu poprzez zamianę wszystkich wielkich
+        liter na małe oraz usunięcie białych znaków z początku i końca ciągów tekstowych
+    \item Pogrupuj wszystkie utwory po kluczu składającym się z tytułu i nazwy artysty, grupy te
+        zawierają potencjalne duplikaty utworów
+    \item Jeżeli w grupie występują razem utwory ze znanym albumem i bez albumu, to usuń wszystkie
+        utwory bez albumu
+    \item Jeżeli w grupie występuje kilka utworów z tym samym albumem, to zostaw tylko jeden
+        (losowy) spośród nich
+\end{enumerate}
+
+W sumie wszystkich plików z oznaczeniami udało się zgromadzić 1380. Po etapie usuwania duplikatów
+pozostało 1268. Tabela \ref{tab:datasets} prezentuje rozkład wszystkich dostępnych plików z
+oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
+
+\begin{table}
+    \caption{Liczebności plików z oznaczeniami dla poszczególnych zbiorów danych}
+    \label{tab:datasets}
+    \begin{tabular}{|l|c|c|c|c|c|} \hline
+        Nazwa zbioru & Isohponics & McGill Billboard & Robbie Williams & RS200 & RWC POP & Uspop2002 & SUMA \\ \hline
+        Liczba utworów (z duplikatami) & 225 (225) & 509 (596) & 65 (65) & 174 (199) & 100 (100) & 195 (195) & 1268 (1380) \\ \hline
+    \end{tabular}
+\end{table}
 
 
 % annotation parser i implementacja WCSR
 \subsection{Parsowanie plików z oznaczeniami akordów}
 todo
-
-
 
 
 % skrypt evaluation, downloading, 02 i 03 - znalezienie najlepiej pasujących nagrań muzycznych
