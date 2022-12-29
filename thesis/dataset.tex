@@ -2,7 +2,7 @@
 % szczegóły techniczne, jak co zwraca, co przyjmuje dana funkcja pominąć), zerknąć na COMMITY !!!
 \chapter{Zbiór danych}
 
-\section{Wstęp}
+\section{Wprowadzenie}
 
 % potrzeba danych!
 Pierwszym i jednocześnie najważniejszym etapem w tworzeniu rozwiązania opartego o uczenie maszynowe
@@ -173,7 +173,7 @@ przygotowano dla 65 utworów.
 
 % pobieranie i indeksowanie
 Zbiór ten dostępny jest do pobrania ze strony
-\footnote{https://www.researchgate.net/publication/260399240_Chord_and_Harmony_annotations_of_the_first_five_albums_by_Robbie_Williams}
+\footnote{https://www.researchgate.net/publication/260399240\_Chord\_and\_Harmony\_annotations\_of\_the\_first\_five\_albums\_by\_Robbie\_Williams}
 w postaci archiwum zip. Znajduje się w nim katalog \emph{RobbieWilliamsAnnotations}, który zawiera
 dwa główne podkatalogi: \emph{chords} i \emph{keys}. W każdym z tych podkatalogów znajduje się po pięć
 podkatalogów (po jednym na album). W każdym katalogu z albumem znajdują się pliki \emph{txt} z
@@ -206,10 +206,10 @@ czynienia z podejściem zupełnie innym, od przyjętego dla pozostałych zbioró
 
 % pobieranie i indeksowanie
 Zbiór ten dostępny jest do pobrania ze strony
-\footnote{http://rockcorpus.midside.com/harmonic_analyses.html}. Właściwie autorzy oferują trzy
+\footnote{http://rockcorpus.midside.com/harmonic\_analyses.html}. Właściwie autorzy oferują trzy
 formaty, z których ostatni jest już rozwinięty do postaci zbliżonej do plików \emph{lab}. Główna
 różnica to wspomniany powyżej sposób oznaczania konkretnych akordów. Po pobraniu i rozpakowaniu archiwum
-\emph{zip} znaleźć można pojedynczy katalog ,,rs200_harmony_clt'', który zawiera pliki z
+\emph{zip} znaleźć można pojedynczy katalog ,,rs200\_harmony\_clt'', który zawiera pliki z
 rozszerzeniem \emph{clt}, po dwa dla każdego utworu, jeden z suffiksem ,,dt' a drugi ,,tdc'' (od
 nazwisk autorów). Ze względu na to, że oznaczenia jednego z autorów były znacznie bardziej
 uporządkowane i prostsze a kwestia różnić w oznaczeniach dwóch różnych osób nie jest szczególnie
@@ -255,7 +255,7 @@ ze wszystkimi tymi informacjami. Tabela ta zapisana została w pliku
 
 % poprawki i zapisanie w projekcie
 Przygotowane przez nowojorskich studentów oznaczenia nie wymagały żadnych poprawek. Wszystkie pliki
-\emph{lab} zostały umieszczone w katalogu ,,data/chordlab/rwc_pop''.
+\emph{lab} zostały umieszczone w katalogu ,,data/chordlab/rwc\_pop''.
 
 \subsubsection{Zbiór Uspop2002}
 
@@ -311,7 +311,7 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 \begin{table}
     \caption{Liczebności plików z oznaczeniami dla poszczególnych zbiorów danych}
     \label{tab:datasets1}
-    \begin{tabular}{|l|c|c|c|c|c|} \hline
+    \begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
         Nazwa zbioru & Isohponics & McGill Billboard & Robbie Williams & RS200 & RWC POP & Uspop2002 & SUMA \\ \hline
         Liczba utworów (z duplikatami) & 225 (225) & 509 (596) & 65 (65) & 174 (199) & 100 (100) & 195 (195) & 1268 (1380) \\ \hline
     \end{tabular}
@@ -323,7 +323,7 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 todo
 
 
-% skrypt evaluation, downloading, 02 i 03 - znalezienie najlepiej pasujących nagrań muzycznych
+% skrypt evaluation, downloading, 02, 03 i 05 - znalezienie i pobranie najlepiej pasujących nagrań muzycznych
 \subsection{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
 
 % to jest problem generalnie
@@ -519,7 +519,7 @@ niestety znaleźć innej metody ewaulacji i ostatecznie trzeba było zdecydować
 progową, wiedząc, że opiera się ona po części na intuicji, a po części na ślepym losie.
 
 Operację odfiltrowania ,,niepasujących'' nagrań zaimplementowano w skrypcie
-,,src/dataset_scripts/03-select\_proposals\_and\_split.py''. Po wykonaniu progowania z 1268 utworów
+,,src/dataset\_scripts/03-select\_proposals\_and\_split.py''. Po wykonaniu progowania z 1268 utworów
 pozostało jedynie 995. Następnie usuwane są również te utwory, które mają dopasowane to samo
 nagranie co inny utwór. Znalazł się tylko 1 taki przypadek. Tak więc ostatecznie pozyskano nagrania
 dla 994 utworów. W ramach tego samego skryptu, wszystkie te utwory zostały podzielone na 3
@@ -528,8 +528,7 @@ zbioru oznaczeń). Podział ten został zapisany w nowej kolumnie \emph{purpose}
 ,,data/index.csv''. Wpis w tej kolumnie jest jednocześnie znacznikiem, że dla danego pliku z
 oznaczeniami znaleziono pasujące nagranie.
 
-\subsubsection{Pobieranie utworów i podsumowanie ich liczbebności}
-
+\subsubsection{Pobieranie utworów i podsumowanie ich liczebności}
 Ostatnim etapem jest ponowne pobranie wszystkich nagrań z serwisu YouTube. Operacja ta została
 wydzielona do osobnego kroku i osobnego skryptu, ponieważ nagrania te zajmują względnie dużo miejsca
 i dodatkowo nie powinny być rozpowszechniane. Dzięki temu nie muszą być więc przechowywane a mogą
@@ -548,7 +547,7 @@ nagrań, pomiędzy poszczególne zbiory danych z oznaczeniami.
 \begin{table}
     \caption{Liczebności pobranych i wykorzystywanych do eksperymentów nagrań między poszczególnymi zbiorami danych z oznaczeniami}
     \label{tab:datasets2}
-    \begin{tabular}{|l|c|c|c|c|c|} \hline
+    \begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
         Nazwa zbioru & Isohponics & McGill Billboard & Robbie Williams & RS200 & RWC POP & Uspop2002 & SUMA \\ \hline
         Liczba nagrań  & 217      & 420              & 54              & 142   & 0       & 161       & 994  \\ \hline
         Łączny czas trwania & todo& todo             & todo            & todo  & todo    & todo      & todo \\ \hline
@@ -560,7 +559,7 @@ walidacyjnym.
 
 \begin{table}
     \caption{Liczności zbiorów treningowego, testowego i walidacyjnego}
-    \label{tab:datasets2}
+    \label{tab:datasets3}
     \begin{tabular}{|l|c|c|c|c|c|} \hline
         Nazwa zbioru & Treningowy & Testowy & Walidacyjny \\ \hline
         Liczba nagrań  & 790 & 102 & 102 \\ \hline
@@ -569,7 +568,83 @@ walidacyjnym.
 \end{table}
 
 
-% - zorganizować zbiór danych nieoznaczonych
+\section{Dane nieoznaczone}
+
+\subsection{Wprowadzenie}
+
+Jak już wspomniano wcześniej, zgromadzenie zbioru danych nieoznaczonych było znacznie prostsze. Dla
+przypomnienia, chodzi tutaj jedynie o same nagrania muzyczne, bez oznaczeń akordów. W najprostszym
+rozumieniu wystarczyło by więc pobrać dowolną liczbę dowolnych nagrań muzycznych z internetu i
+zadanie będzie wykonane. Trzeba natomiast zorganizować ten proces w taki sposób, aby nagrania te
+się nie powtarzały i aby, co ważniejsze, stanowiły pewną reprezentatywną próbę dla muzyki danego
+gatunku, w tym przypadku dla popularnej muzyki zachodniej (\emph{ang. Western Music}). Trzeba więc
+uniknąć sytuacji, kiedy zbyt wiele nagrań będzie pochodziło z tego samego okresu, z tego samego
+specyficznego nurtu, lub nawet od tego samego artysty. W ramach niniejszej pracy zdecydowano się na
+bardzo proste podejście do tematu wyboru tychże utworów - były one losowo próbkowane (bez powtórzeń)
+ze wszystkich dostępnych rankingów \emph{Hot 100} magazynu \emph{Billboard}. Jest to więc metoda
+niejako skopiowana od twórców zbioru McGill Billobard. Zapewnia ona, że wybrane utwory będą z
+różnych okresów, od różnych artystów i w różnych stylach. Będą również, ze względu na swoją wysoką
+popularność, stanowiły reprezentatywną grupę muzyki popularnej zachodu. Znalezione w ten sposób
+utwory były następnie wyszukiwane w serwisie YouTube Music i w razie dostępności pobierane i
+dodawane do pliku indeksu. Wyszukanych i pobranych tą metodą zostało 10000 różnych nagrań.
+
+\subsection{Wielowątkowa implementacja wyszukiwania utworów z rankingów magazynu Billboard}
+
+Cały alogorytm automatycznego preszukiwania rankingów magazynu \emph{Billboard} oraz serwisu YouTube
+Music został zaimplementowany w skrypcie ,,src/dataset\_scripts/04-collect\_big\_dataset.py''. Jest
+to implementacja umożliwiająca przeszukiwanie w wielu wątkach jednocześnie (w ramach pracy
+wykorzystanych zostało 5 wątków), ze względu na to, że krytycznymi pod wzlędem czasu operacjami są
+zapytania do Internetu, a cała procedura jest czasochłonna. Algorytm ten składa się z dwóch
+zasadniczych części: pierwsza związana jest z przeszukiwaniem rankingów \emph{Hot 100} a druga z
+wyszukiwaniem kandydujących utworów w serwisie YouTube Music.
+
+Pierwsza z dwóch części algorytmu została zaimplementowana w postaci pythonowego generatora o nazwie
+\emph{billboard\_hot100\_item\_generator}. Generator ten zaczyna od stworzenia listy dat wszystkich
+niedziel od 9 kwietnia 1958 roku, z kiedy to dostępny jest najstarszy, cotygodniowy ranking
+\emph{Hot 100} magazynu \emph{Billboard}. Ranking ten prezentuje najpopularniejsze w danym tygodniu
+utwory z różnych gatunków muzycznych, mierzone według aktywności serwisów streamingowych. Każda data
+z powstałej listy odpowiada zatem jednemu rankingowi, ze wszystkich dostępnych, od najstarszego aż
+do teraz. Zwracając kolejne wyniki, generator iteruje przez te wszystkie daty w losowej kolejności.
+Dla każdej z nich wykonuje zapytanie do serwisu internetowego magazynu
+\emph{Billboard}\footnote{https://www.billboard.com/charts}, wykorzystując w tym celu dedykowaną
+pythonową bibliotekę \emph{billboard.py}\footnote{https://github.com/guoguo12/billboard-charts}.
+Zapytanie to zwraca dla danej daty listę tytułów utworów, wraz z nazwiskami artystów (album nie jest
+znany). Przechodząc przez kolejne rankingi generator zapisuje i sprawdza, czy znalezione utwory nie
+były już wcześniej zwrócone, ponieważ często się zdarza, że ten sam utwór występuje na wielu
+rankingach. Podsumowując, generator ten dostarcza losowe pozycje z rankingów \emph{Hot 100} magazynu
+\emph{Billboard} w postaci jednej, bardzo długiej, niezawierającej powtórzeń, generowanej
+dynamicznie listy.
+
+Drugą część implementacji stanowi uruchamiana w wielu wątkach jednocześnie funkcja
+\emph{find\_next\_hot\_song}. Zadaniem tej funkcji jest pobrać kolejną parę tytuł-nazwisko z
+opisywanego powyżej generatora i wyszukać ją w serwisie YouTube Music. Wyszukiwanie przebiega z
+pomocą opisywanej wcześniej biblioteki \emph{ytmusicapi}. Wyniki wyszukiwania są ograniczone do
+utworów muzycznych. Spośród pierwszych trzech wyników brany jest pierwszy taki, którego
+\emph{video\_id} nie zostało już pobrane dla jakiegoś innego utworu. Jeżeli znajdzie się takie
+nagranie, to jest ono pobierane na dysk (za pomocą opisywanego wcześniej skryptu pomocniczego z
+pliku i biblioteki \emph{pytube}) i dodawane do pliku indeksu. Wszystkie znalezione w ten sposób
+nagrania mają specjalną wartość \emph{pretrain} w kolumnie \emph{purpose}. Oczywiście wiersze
+indeksu związane z tymi nagraniami nie mają zapisanej ścieżki do pliku z oznaczeniami.
+
+W przypadku wyszukiwania dużej liczby utworów za pomocą tego algorytmu może dojść do sytuacji, że
+znalezione nagrania będą się powtarzać, nie będą związane z danym utworem lub, że w ogóle nie uda
+się znaleźć nagrania dla danego zapytania. Wszystkie te przypadki zostały rozważone i ze względu na
+naturę tego wyszukiwania nie są problematyczne. Algorytm został napisany tak, aby wszystkie wyniki
+były unikalne. Jeżeli nie uda się znaleźć unikalnego nagrania, po prostu algorytm przechodzi do
+kolejnej, losowej pozycji z rankingów \emph{Billboard}, aż nie zwróci zadanej liczby różnych nagrań
+z serwisu YouTube Music. Nagrania niepasujące do wyszukiwanych tytułów utworów również nie
+są problematyczne, ponieważ wykorzystanie tutaj tych a nie innych tytułów jest jedynie pewnym
+punktem wyjścia do zgromadzenia dużej liczby różnorodnych, popularnych nagrań. Pojedyncze przypadki
+nagrań spoza tej konkretnej listy nie stanowią najmniejszego problemu, są nawet pożądane, ze względu
+na różnorodność zbioru.
+
+
+\section{Wstępne przetwarzanie danych}
+todo
+
+% do dodania:
+% - słówko na temat jakości pobranych nagrań
+% - słówko na temat rozkładu akordów w zbiorze (lub zbiorach)
 % 
 % - wstępne przetwarzanie danych - format danych wejściowy i wyjściowy (wejściowy do sieci)
 %     - format i parsowanie plików z oznaczeniami i plików muzycznych
