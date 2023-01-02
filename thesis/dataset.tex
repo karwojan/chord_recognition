@@ -319,8 +319,93 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 
 
 % annotation parser i implementacja WCSR
-\subsection{Parsowanie plików z oznaczeniami akordów}
-todo
+\subsection{Model akordów i parsowanie plików z oznaczeniami}
+
+% potrzeba parsowania - wstęp
+Po zgromadzeniu, oczyszczeniu i zindeksowaniu zbiorów z oznaczeniami akordów, należało przygotować
+skrypty parsujące te oznaczenia. Wszystkie znalezione zbiory oznaczeń, z wyjątkiem jednego, są w
+formacie \emph{lab}, który to format został opracowany w \cite{harte_towards_nodate}. Jest to format
+bardzo przemyślany i dopracowany, którego użycie przez wielu niezależnych badaczy potwierdza, że
+sprawdza się on jako standard. Drugi format, znacznie mniej usystematyzowany, opracowany został na
+potrzeby zbioru RS200, gdzie autorzy przygotowali własny sposób oznaczania akordów. Aby na końcu
+wykorzystać zarówno oznaczenia jak i nagrania muzyczne do treningu sieci neuronowych, trzeba
+przetłumaczyć pliki tekstowe z oznaczeniami, na odpowiednią, zrozumiałą dla komputera strukturę
+danych. W ramach tego podrozdziału opisana zostania najpierw ta struktura, a następnie algorytm
+parsowania obu dostępnych formatów oznaczeń akordów. Skrypty pythonowe, które realizują zadanie
+tłumaczenia oznaczeń w formacie plików tekstowych na odpowiednią strukturę danych, umieszczone
+zostały w module ,,src/annotation\_parser''.
+
+% Opis modelu akordu - skrypt chord_model.py
+\subsubsection{Model reprezentujący akordy muzyczne}
+
+% Podstawowy model logiczny akordu według Krzyśka
+W ramach niniejszej pracy przygotowany został logiczny model reprezentujący akord muzyczny. Model
+ten ma formę zestawu klas pythonowy (w pliku ,,src/annotation\_parser/chord\_model.py'') i bazuje
+ściśle na propozycji \cite{harte_towards_nodate}.  Według oryginalnego pomysłu, każdy akord
+reprezentowany jest przez trzy rzeczy: podstawę akordu (\emph{ang. root}), interwały składowe
+(\emph{ang. component intervals}) oraz bas (\emph{ang. bass note}). Podstawa to po prostu nazwa
+dźwięku, na którym akord jest zbudowany. Nazwa ta reprezentuje jeden z dwunastu dostępnych tonów,
+tak więc może być zakodowana wartością całkowitą od 0 do 11. Zarówno interwały składowe akordu jak
+i jego bas są reprezentowane jako interwały w odniesieniu do podstawy akordu. Aby zapisać interwał,
+trzeba przede wszystkim zawrzeć informację o jego stopniu (\emph{ang. degree}), związanym ze
+stopniem skali diatoniczniej i pozwalającym przedstawić interwały czyste oraz wielkie. Do
+przedstawienia pozostałych interwałów (małych, zmniejszonych, itd.) trzeba dodać informację o
+modyfikatorze, który odpowiednio zmniejsza lub zwiększa liczbę półtonów budujących interwał. Te dwie
+informacje - stopień i modyfikator - reprezentują jednoznacznie interwał i mogą być zapisane jako
+dwie wartości całkowite. Ostatecznie akord reprezentowany jest więc przez podstawę (liczba
+całkowita), jeden interwał oznaczający bas i listę interwałów składowych.
+
+% tłumaczenie na labelki - potrzeba (do treningu), zasady (z MIREXa) i nazwy metod (to/from_label)
+Powyższy model pozwala jednoznacznie zakodować pojedynczy akord muzyczny w formie prostej i
+zrozumiałej dla pozostałej części programu. Model ten, składający się z dwóch klas - \emph{Interval}
+i \emph{Chord} - i kilku liczb całkowitych, został rozszerzony o dodatkowe klasy i metody. Przede
+wszystkim dodane zostały metody umożliwiające tłumaczenie akordów na etykiety (\emph{ang. labels}),
+lub inaczej klasy z predefiniowanego zbioru (słownika). Podczas treningu sieci neuronowej trzeba
+bowiem zdefinować skończony i dyskretny zbiór klas, które sieć ma rozpoznawać. Istnieje wiele
+sposobów, według których można podzielić wszystkie możliwe akordy na skończonę liczbę klas.
+Najprostszy z nich to podzielenie akordów na 13 klas, 12 odpowiada wszystkim możliwym podstawom
+akordu a ostatnia (lub pierwsza) oznacza brak akordu. Innym, najpopularniejszym w literaturze i
+stosowanym również w ramach niniejszej pracy jest tzw. podział major/minor, czyli 25 klas: klasa 0
+oznacza brak akordu, klasy od 1 do 12 oznaczają akordy majorowe o różnych podstawach, a klasy od 13
+do 24 oznaczają akordy minorowe. Istnieją również inne zestawy klas akordów, nie były one jednak
+wykorzystywane w ramach niniejszej pracy, choć przygotowana implementacja pozostawia możliwość
+łatwego dodawania nowych słowników akordów. Zgodnie z filozofią stosowaną w konkursie
+MIREX\footnote{https://www.music-ir.org/mirex/wiki/2021:Audio_Chord_Estimation}, aby akord został
+przyporządkowany do danej klasy (np. klasy C-dur), to musi mieć dokładnie tę samą podstawę,
+dokładnie ten sam bas oraz musi być spełniony warunkek, że interwały składowe akordu docelowego są
+największym w ramach słownika podzbiorem zbioru interwałów akordu wejściowego. Cała ta logika
+została zaimplementowana w metodzie \emph{to\_label} klasy \emph{Chord}. Przygotowana została
+również metoda \emph{from\_label}, która tworzy istancję klasy \emph{Chord} z wartości całkowitej,
+oznaczającej etykietę z danego słownika.
+
+% pozostałe funkcjonalności - Chord/LabelOccurence, shifts, CSR
+Aby przedstawić plik z oznaczeniami akordów w postaci pojedynczej struktury danych, musi być
+możliwość zakodowania informacji nie tylko o akordzie, ale również o czasie jego występowania. W tym
+celu przygotowane zostały dwie dodatkowe klasy: \emph{ChordOccurence} oraz \emph{LabelOccurence}. Ta
+pierwsza przechowuje instancję klasy \emph{Chord} oraz dwie dodatkowe wartości zmiennoprzecinkowe,
+reprezentujące początek i koniec czasu trwania danego akordu. Ta druga, zamiast przechowywać
+instancję akordu, przechowuje wartość całkowitą reprezentującą już konkretną etykietę. Oba typy
+dostarczają proste metody umożliwiające przechodzenie z jednego na drugi. Dodatkową funkcjonalnością
+pomocniczą klasy \emph{Chord} i \emph{ChordOccurence} są metody pozwalające przesunąć podstawę
+akordu o wybraną liczbę półtonów w dół lub w górę - jest to związane z opisanymi dalej
+augmentacjami. Ostatnią część pliku zawierającego model akordów stanowi bardzo krótka i elegancka,
+własna implementacja miary CSR, której wartość wyliczana jest dla dwóch list instancji klasy
+\emph{LabelOccurence} - implementacja ta wykorzystuje więc przygotowany uprzednio model akordów.
+Cały model akordów muzycznych został przedstawiony na rysunku \ref{todo} w postaci diagramu klas.
+
+\subsubsection{Parsowanie plików \emph{lab}}
+
+% wstęp o formacie lab
+Chris Harte w swojej pracy \cite{harte_towards_nodate}, zanim przedstawił szczegółowo autorski
+format zapisu akordów, uzasadnił obszernie zapotrzebowanie na tego typu rozwiązanie i wyliczył
+podstawowe idee, którymi się kierował. Wykazywał między innymi, że nie istnieje inny,
+ustandaryzowany między gatunkami i szkołami, uniwersalny system zapisu akordów.  Wymieniał
+podstawowe problemy z jakimi trzeba się mierzyć, poczynając od niejednoznaczności i ograniczeń
+istniejących form zapisu, a kończąć na problemach związanych z dużym ryzykiem błędów w pisowni
+niektórych symboli. Zaproponowany przez niego format zapisu akordów odpowiada trzyczęściowej
+strukturze akordów, tekstowa reprezentacja akordu składa się kolejno z symbolu oznaczającego
+podstawę, listy interwałów (przedstawionych jako stopień z modyfikatorem) i na końcu pojedynczego
+interwału oznaczającego bas. 
 
 
 % skrypt evaluation, downloading, 02, 03 i 05 - znalezienie i pobranie najlepiej pasujących nagrań muzycznych
