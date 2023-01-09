@@ -191,7 +191,7 @@ Pobrane oznaczenia znowu nie wymagały żadnych poprawek. Zawartość katalog
 Zbiór \emph{RS200} \cite{de_clercq_corpus_2011} został stworzony przez dwóch badaczy z amerykańskiej
 uczelni muzycznej \emph{Eastman School of Music} w Rochester. Powstał on na bazie listy \emph{500
 Greatest Songs of All Time} z magazynu \emph{Rolling Stone}. Początkowo zawierał jedynie 100 utworów i w
-takiej formie zostały wykorzystany w oryginalnej publikacji, gdzie autorzy analizowali częstość
+takiej formie został wykorzystany w oryginalnej publikacji, gdzie autorzy analizowali częstość
 występowania różnych akordów i ich progresji. Utwory te zostały wybrane tak, aby pochodziły z wielu
 różnych dekad. Z czasem zbiór został rozszerzony do 200 utworów i w takiej formie jest dostępny do
 dzisiaj. Każdy z dwóch twórców, niezależnie od drugiego, przygotował swoje oznaczenia dla wszystkich
@@ -319,41 +319,41 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 
 
 % annotation parser i implementacja WCSR
-\subsection{Model akordów i parsowanie plików z oznaczeniami}
+\subsection{Model akordów muzycznych i parsowanie plików z oznaczeniami}
 
 % potrzeba parsowania - wstęp
 Po zgromadzeniu, oczyszczeniu i zindeksowaniu zbiorów z oznaczeniami akordów, należało przygotować
-skrypty parsujące te oznaczenia. Wszystkie znalezione zbiory oznaczeń, z wyjątkiem jednego, są w
-formacie \emph{lab}, który to format został opracowany w \cite{harte_towards_nodate}. Jest to format
-bardzo przemyślany i dopracowany, którego użycie przez wielu niezależnych badaczy potwierdza, że
-sprawdza się on jako standard. Drugi format, znacznie mniej usystematyzowany, opracowany został na
-potrzeby zbioru RS200, gdzie autorzy przygotowali własny sposób oznaczania akordów. Aby na końcu
-wykorzystać zarówno oznaczenia jak i nagrania muzyczne do treningu sieci neuronowych, trzeba
-przetłumaczyć pliki tekstowe z oznaczeniami, na odpowiednią, zrozumiałą dla komputera strukturę
-danych. W ramach tego podrozdziału opisana zostania najpierw ta struktura, a następnie algorytm
-parsowania obu dostępnych formatów oznaczeń akordów. Skrypty pythonowe, które realizują zadanie
-tłumaczenia oznaczeń w formacie plików tekstowych na odpowiednią strukturę danych, umieszczone
-zostały w module ,,src/annotation\_parser''.
+skrypty parsujące pliki z tymi oznaczenia. Wszystkie znalezione zbiory oznaczeń, z wyjątkiem
+jednego, są w formacie \emph{lab}, który to format został opracowany w \cite{harte_towards_nodate}.
+Jest to format bardzo przemyślany i dopracowany, którego użycie przez wielu niezależnych badaczy
+potwierdza, że sprawdza się on jako standard. Drugi format, znacznie mniej usystematyzowany,
+opracowany został na potrzeby zbioru RS200, gdzie autorzy przygotowali własny sposób oznaczania
+akordów. Aby na końcu wykorzystać zarówno oznaczenia jak i nagrania muzyczne do treningu sieci
+neuronowych, trzeba przetłumaczyć pliki tekstowe z oznaczeniami, na odpowiednią, zrozumiałą dla
+komputera strukturę danych. W ramach tego podrozdziału opisana zostania najpierw ta struktura, a
+następnie algorytm parsowania obu dostępnych formatów oznaczeń akordów. Skrypty pythonowe, które
+realizują zadanie tłumaczenia oznaczeń w formacie plików tekstowych na odpowiednią strukturę danych,
+umieszczone zostały w module ,,src/annotation\_parser''.
 
 % Opis modelu akordu - skrypt chord_model.py
-\subsubsection{Model reprezentujący akordy muzyczne}
+\subsubsection{Model obiektowy reprezentujący akordy muzyczne}
 
-% Podstawowy model logiczny akordu według Krzyśka
-W ramach niniejszej pracy przygotowany został logiczny model reprezentujący akord muzyczny. Model
+% Podstawowy model obiektowy akordu według Krzyśka
+W ramach niniejszej pracy przygotowany został obiektowy model reprezentujący akord muzyczny. Model
 ten ma formę zestawu klas pythonowy (w pliku ,,src/annotation\_parser/chord\_model.py'') i bazuje
-ściśle na propozycji \cite{harte_towards_nodate}.  Według oryginalnego pomysłu, każdy akord
-reprezentowany jest przez trzy rzeczy: podstawę akordu (\emph{ang. root}), interwały składowe
-(\emph{ang. component intervals}) oraz bas (\emph{ang. bass note}). Podstawa to po prostu nazwa
-dźwięku, na którym akord jest zbudowany. Nazwa ta reprezentuje jeden z dwunastu dostępnych tonów,
-tak więc może być zakodowana wartością całkowitą od 0 do 11. Zarówno interwały składowe akordu jak
-i jego bas są reprezentowane jako interwały w odniesieniu do podstawy akordu. Aby zapisać interwał,
-trzeba przede wszystkim zawrzeć informację o jego stopniu (\emph{ang. degree}), związanym ze
-stopniem skali diatoniczniej i pozwalającym przedstawić interwały czyste oraz wielkie. Do
-przedstawienia pozostałych interwałów (małych, zmniejszonych, itd.) trzeba dodać informację o
-modyfikatorze, który odpowiednio zmniejsza lub zwiększa liczbę półtonów budujących interwał. Te dwie
-informacje - stopień i modyfikator - reprezentują jednoznacznie interwał i mogą być zapisane jako
-dwie wartości całkowite. Ostatecznie akord reprezentowany jest więc przez podstawę (liczba
-całkowita), jeden interwał oznaczający bas i listę interwałów składowych.
+ściśle na propozycji \cite{harte_towards_nodate}. Według oryginalnego pomysłu, każdy akord
+reprezentowany jest przez trzy części składowe podstawę akordu (\emph{ang. root}), interwały
+składowe (\emph{ang. component intervals}) oraz bas (\emph{ang. bass note}). Podstawa to po prostu
+nazwa dźwięku, na którym akord jest zbudowany. Nazwa ta reprezentuje jeden z dwunastu dostępnych
+tonów i na potrzeby tego projektu jest kodowana wartością całkowitą od 0 do 11. Zarówno interwały
+składowe akordu jak i jego bas są reprezentowane jako interwały w odniesieniu do podstawy akordu.
+Aby zapisać interwał, trzeba przede wszystkim zawrzeć informację o jego stopniu (\emph{ang.
+degree}), związanym ze stopniem skali diatoniczniej i pozwalającym przedstawić interwały czyste oraz
+wielkie. Do przedstawienia pozostałych interwałów (małych, zmniejszonych, itd.) trzeba dodać
+informację o modyfikatorze, który odpowiednio zmniejsza lub zwiększa liczbę półtonów budujących
+interwał. Te dwie informacje - stopień i modyfikator - reprezentują jednoznacznie interwał i mogą
+być zapisane jako dwie wartości całkowite. Ostatecznie akord reprezentowany jest więc przez podstawę
+(liczba całkowita), jeden interwał oznaczający bas i listę interwałów składowych.
 
 % tłumaczenie na labelki - potrzeba (do treningu), zasady (z MIREXa) i nazwy metod (to/from_label)
 Powyższy model pozwala jednoznacznie zakodować pojedynczy akord muzyczny w formie prostej i
@@ -370,7 +370,7 @@ oznacza brak akordu, klasy od 1 do 12 oznaczają akordy majorowe o różnych pod
 do 24 oznaczają akordy minorowe. Istnieją również inne zestawy klas akordów, nie były one jednak
 wykorzystywane w ramach niniejszej pracy, choć przygotowana implementacja pozostawia możliwość
 łatwego dodawania nowych słowników akordów. Zgodnie z filozofią stosowaną w konkursie
-MIREX\footnote{https://www.music-ir.org/mirex/wiki/2021:Audio_Chord_Estimation}, aby akord został
+MIREX\footnote{https://www.music-ir.org/mirex/wiki/2021:Audio\_Chord\_Estimation}, aby akord został
 przyporządkowany do danej klasy (np. klasy C-dur), to musi mieć dokładnie tę samą podstawę,
 dokładnie ten sam bas oraz musi być spełniony warunkek, że interwały składowe akordu docelowego są
 największym w ramach słownika podzbiorem zbioru interwałów akordu wejściowego. Cała ta logika
@@ -401,12 +401,198 @@ format zapisu akordów, uzasadnił obszernie zapotrzebowanie na tego typu rozwi�
 podstawowe idee, którymi się kierował. Wykazywał między innymi, że nie istnieje inny,
 ustandaryzowany między gatunkami i szkołami, uniwersalny system zapisu akordów.  Wymieniał
 podstawowe problemy z jakimi trzeba się mierzyć, poczynając od niejednoznaczności i ograniczeń
-istniejących form zapisu, a kończąć na problemach związanych z dużym ryzykiem błędów w pisowni
-niektórych symboli. Zaproponowany przez niego format zapisu akordów odpowiada trzyczęściowej
-strukturze akordów, tekstowa reprezentacja akordu składa się kolejno z symbolu oznaczającego
-podstawę, listy interwałów (przedstawionych jako stopień z modyfikatorem) i na końcu pojedynczego
-interwału oznaczającego bas. 
+istniejących form zapisu, a kończąc na problemach związanych z dużym ryzykiem błędów w pisowni
+niektórych symboli.
 
+% opis słowny formatu lab
+Zaproponowany przez niego format zapisu akordów odpowiada trzyczęściowej strukturze akordów.
+Tekstowa reprezentacja akordu składa się kolejno z symbolu oznaczającego podstawę, listy interwałów
+w postaci skrótu i/lub dodatkowych interwałów podanych jawnie oraz pojedynczego interwału na końcu
+oznaczającego bas. Ogólna forma zapisu jest następująca: 
+\begin{equation}
+    \textrm{root : shorthand (interval1, interval2...) / bass}
+\end{equation}
+W przeciwieństwie do opisywanej wcześniej struktury danych, w przypadku zapisu tekstowego, podstawa
+akordu zapisywana jest w postaci symbolicznej: nazwa jednego z 7 dźwięków (,,ABCDEFG''), po której w
+razie konieczności następują modyfikatory - krzyżyki i bemole, zapisywane odpowiednio jako znaki
+,,\#'' oraz ,,b''. Następnie jest dwukropek, po którym zapisuje się listę interwałów. Może mieć ona
+postać jawnej listy, poprzedzielanej przecinkami i ujętej w nawiasy, gdzie każdy interwał zapisywany
+jest jako liczba całkowita oznaczająca stopień, w razie potrzeby poprzedzona krzyżykami lub
+bemolami. Zamiast podawać listę można skorzystać z predefiniowanego skrótu, implikującego
+odpowiednią listę interwałów. Przykładem takiego skrótu jest ,,min'', oznaczający ciąg interwałów
+\texttt{(1, b3, 5)}. Można również wykorzystać zarówno skrót jak i listę w nawiasach, dodając w ten
+sposób dodatkowe interwały ponad te wynikające ze skrótu, lub usuwając wybrane interwały z
+predefinowanej listy, poprzedzając je znakiem ,,*''. Niepodanie ani listy ani żadnego ze skrótów
+traktuje się jako zwykły akord majorowy (interwały \texttt{1, 3, 5}). Na końcu występuje opcjonalny,
+dodatkowy interwał oznaczający bas, poprzedzony znakiem ,,/''. Jeżeli bas nie jest podany, zakłada
+się interwał prymy, czyli że podstawa akordu jest jednocześnieg jego najniższym dźwiękiem. Zapisany
+według tej metody akord C-dur wygląda tak:
+\begin{equation}
+    \textrm{C:(1,3,5)}
+\end{equation}
+lub po prostu tak:
+\begin{equation}
+    \textrm(C)
+\end{equation}
+Z kolei akord Cis-moll w pierwszym przewrocie, bez użycia skrótu wygląda tak:
+\begin{equation}
+    \textrm{C\#:(1,b3,5,b7)/b3}
+\end{equation}
+Wykorzystując skóty, ten sam akord ma postać:
+\begin{equation}
+    \textrm{C\#:min/b3}
+\end{equation}
+Cały plik \emph{lab} składa się z trzech kolumn oddzielonych białymi znakami (np. tabulatorami).
+Pierwsza i druga kolumna zawierają liczby zmiennoprzecinkowe, oznaczające odpowiedni czas
+rozpoczęcia i zakończenia trwania akordu w sekundach. Trzecia kolumna zawiera symbol akordu.
+
+% parsowanie lark'iem - idea, gramatyka, transformer
+Aby parsować pliki z oznaczeniami akordów wykorzystana została biblioteka
+\emph{lark}\footnote{https://github.com/lark-parser/lark}. Biblioteka ta jest zestawem narzędzi,
+pozwalającym generować parsery do języków bezkontekstowych \emph{ang. context-free
+language}\footnote{https://en.wikipedia.org/wiki/Context-free\_language}. Język tego typu definiowany
+jest przez odpowiednią gramatykę bezkontekstową \emph{ang. context-free
+grammar}\footnote{https://en.wikipedia.org/wiki/Context-free\_grammar}, a przykładem takiego języka
+jest praktycznie dowolny język programowania. Również format zapisu akordów stanowi przykład języka
+bezkontekstowego i dlatego biblioteka \emph{lark} pozwala bardzo łatwo, w sposób wydajny i
+uporządkowany parsować tego typu oznaczenia. Aby wygenerować instancję parsera, czyli obiektu
+odpowiedzialnego za proces parsowania, trzeba przygotować opis gramatyki danego języka. Popularnym
+sposobem opisywania gramatyki bezkontekstowej jest notacja Backusa-Naura (\emph{ang. Backus-Naur
+form}, której wersję rozszerzoną (\emph{ang. Extended Backu-Naur
+form})\footnote{https://en.wikipedia.org/wiki/Extended\_Backus-Naur\_form} wykorzystuje właśnie
+biblioteka \emph{lark}. Tak więc przygotowany został plik
+,,src/annotation\_parser/labfile\_grammar.lark'', który zawiera definicję gramatyki formatu
+\emph{lab} (jego zawartość prezentowana jest w tabeli \ref{tab:lab_syntax}). Po sparsowaniu tekstu
+według podanej gramatyki, parser tworzy drzewiastą strukturę, która dzieli ten tekst w sposób
+hierarchiczny. Przechodząc przez tę strukturę wiadomo, jaką każdy fragment tekstu pełni logiczną
+rolę (zgodnie z daną gramatyką) i jakiej większej konstrukcji jest on częścią. Biblioteka
+\emph{lark} pozwala przygotować tzw. transformer, czyli obiekt który jest odpowiedzialny za
+mapowanie ze wspomnianej struktury drzewiastej (wyniku parsowania) na własną, obiektową strukturę
+danych. W pliku ,,src/annotation\_parser/labfile\_transformer.py'' przygotowana została właśnie taka
+klasa, która pozwala zamienić wynik parsowania pliku \emph{lab} na instancje klas opisywanego
+wcześniej modelu obiektowego, a dokładnie listę obiektów klasy \texttt{ChordOccurence}. Aby móc
+przetłumaczyć tekstowe oznaczenia akordów na model obiektowy, potrzebne były mapowania z symboli
+literowych reprezentujących dźwięki na wartości całkowite oraz ze skrótów na konkretne zbiory
+interwałów. Mapy te w postaci słowników pythonowych zawiera plik
+,,src/annotation\_parser/labfile\_symbols.py''. Kod odpowiedzialny za stworzenie instancji
+transformera i parsera oraz opakowanie tego w funkcję pomocniczą, umieszczony został w pliku
+,,src/annotation\_parser/\_\_init\_\_.py''. 
+
+\begin{table}
+    \caption{Opis składni oznaczeń akordów \emph{lab} za pomocą rozszerzonej notacji Backusa-Naura}
+    \label{tab:lab_syntax}
+    \begin{tabular}{|lcl} \hline
+        labfile             & : & line (\_WHITES line)* \_WHITES \\
+        line                & : & FLOAT \_WHITES FLOAT \_WHITES chord \\
+        chord               & : &   pitchname ":" SHORTHAND [ "(" components ")" ] [ "/" interval ] \\
+                            &   & | pitchname ":" "(" components ")" [ "/" interval ] \\
+                            &   & | pitchname [ "/" interval ] \\
+                            &   & | NO\_CHORD \\
+        pitchname           & : & NATURAL MODIFIER* \\
+        interval            & : & MODIFIER* INTEGER \\
+        interval\_to\_add     & : & interval \\
+        interval\_to\_remove  & : & "*" interval \\
+        \_component          & : & interval\_to\_add | interval\_to\_remove \\
+        components          & : & \_component ("," \_component)* \\
+        NATURAL             & : & "A" | "B" | "C" | "D" | "E" | "F" | "G" \\
+        MODIFIER            & : & "b" | "\#" \\
+        SHORTHAND           & : &   "minmaj7" | "maj7" | "min7" | "dim7" | "hdim7"  \\
+                            &   & | "maj6" | "min6" | "maj9" | "min9" | "sus2" | "sus4"  \\
+                            &   & | "maj" | "min" | "dim" | "aug" | "7" | "9" | "1" | "5" \\
+                            &   & | "maj11" | "11" | "min11" | "maj13" | "13" | "min13" \\
+        NO\_CHORD            & : & "N" | "X" \\
+        NON\_ZERO\_DIGIT      & : & "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" \\
+        DIGIT               & : & "0" | NON\_ZERO\_DIGIT \\
+        INTEGER             & : & NON\_ZERO\_DIGIT DIGIT* \\
+        FLOAT               & : & DIGIT+ "." DIGIT+ ("e" "-"? DIGIT+)? \\
+        \_WHITES             & : & /\\s+/ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% tworzenie plików lab
+Przygotowana została również możliwość wykonywania operacji odwrotnej do parsowania, czyli
+wytwarzania plików \emph{lab} z modelu obiektowego akordów, który z kolei może zostać wytworzony z
+predykcji sieci. Nie została tutaj wykorzystana żadna specjalistyczna biblioteka - jedynie
+podstawowe operacje na ciągach znaków, wraz ze wspomnianymi powyżej mapami symboli skrutów i symboli
+dźwięków. Cała logika wytwarznia oznaczeń w formacie \emph{lab} zawarta jest w plikuj
+,,src/annotation\_parser/labfile\_printer.py''.
+
+\subsubsection{Parsowanie plików oznaczeń dla zbioru RS200}
+
+% wstęp o formacie oznaczeń ze zbioru RS200
+Format oznaczeń akordów wykorzystany w zbiorze RS200 jest znacznie mniej rozbudowany od formatu
+\emph{lab}. Jest to jednocześnie format znacznie mniej uniwersalny, nie rozwiązujący większości
+problemów, które format \emph{lab} rozwiązuje. Nawet dwóch badaczy, którzy równolegle przygotowywali
+oznaczenia akordów dla zbioru RS200, aby później porównać je między sobą, tak naprawdę nie zachowali
+spójnej konwencji, mimo iż razem stworzyli ten konkretny format zapisu. Z tego też powodu, jak już
+wspomniane przy opisywaniu tego zbioru, dla ułatwienia zadania parsowania, wybrane zostały
+oznaczenia tylko jednego z badaczy, który przygotował je w znacznie prostszy i bardziej
+uporządkowany sposób.
+
+% opis słowny formatu oznaczeń ze zbioru RS200
+Każde wystąpienie akordu w utworze charakteryzowane jest przez rodzaj tego akordu i czas jego
+wystąpienia. Jeżeli chodzi o to drugie, to autorzy zdecydowali się na wykorzystanie rekurencyjnej
+składni (podobnej do notacji Backusa-Naura), wykorzystującej fakt, że utwory dzielą się na pewne
+logiczne, powtarzalne części. Symbol każdego akord umieszczony jest w odpowiedniej części taktu, a
+same takty są pogrupowane w większe struktury, które powtarzają się według określonych wzorców. W
+ten sposób, za pomocą zaledwie kilku znaków, można opisać cały utwór. Jest to format jak najbardziej
+czytelny dla człowieka, ale nie zawierający docelowej informacji, w której konkretnie sekundzie
+zaczyna się i kończy dany akord. Na szczęście autorzy zbioru przygotowali również skrypty, które
+łączą informacje o tempie utworu z oznaczeniami akordów. Skrypty te tworzą nowe pliki z oznaczeniami
+(dostępne do pobrania i wykorzystane w tej pracy zamiast oryginalnych oznaczeń), które mają format
+zbliżony do plików \emph{lab}, gdzie pierwsza kolumna zawiera czas rozpoczęcia danego akordu. Jeżeli
+chodzi o symbole akordów, to tutaj również autorzy poszli w kierunku relatywnego sposobu oznaczania,
+ponieważ zamiast wykorzystać symbole konkretnych dźwięków, wykorzystują liczby rzymskie oznaczające
+odległość względem toniki danego utworu.  Symbol każdego akordu składa się najpierw z liczby
+rzymskiej, poprzedzonej ewentualnie modyfikatorem - krzyżykiem lub bemolem. Jeżeli znaki są małe, to
+oznacza tryb minorowy, jeżeli wielkie, tryb majorowy. Następnie aż do znaku ukośnika mogą występować
+dowolne symbole, informujące o modyfikacjach względem zwykłego trójdźwieku majorowego lub
+minorowego. W praktyce są to informacje o występowaniu akordów septymowych, numerach przewrotów oraz
+akordach, zwiększonych, zmniejszonych i występowaniu dodatkowych składników jak kwarta. Opcjonalnie,
+na końcu może wystąpić znak ukośnika i kolejna liczba rzymska, oznaczająca akordy wtrącone (todo
+aplied chords). W praktyce symbol akordu wykorzystywany jest jedynie do stworzenia listy interwałów
+i basu.  Podstawa akordu nie musi być wyliczana na podstawie liczby rzymskiej, ponieważ we
+wspomnianym powyżej przetworzonym formacie oznaczeń, zawierającym kolumnę z czasem rozpoczęcia
+akordu, dodane jest również kolumna z wartościami całkowitymi, reprezentującymi podstawę akordu
+względem dźwięku C, a nie tonacji utworu.
+
+% krótki opis implementacji, bo większość była opisana dla formatu lab
+Jeżeli chodzi o parsowanie plików z oznaczeniami dla zbioru RS200, to również wykorzystana została
+biblioteka \emph{lark}. Trzeba więc było przygotować odpowiedni opis gramatyki i odpowiednią klasę
+transformującą na model obiektowy. To pierwsze znajduje się w pliku
+,,src/annotation\_parser/rs200\_dt\_grammar.lark'' a to drugie w pliku
+,,src/annotation\_parser/rs200\_dt\_transformer.py''. Tabel \ref{tab:rs200_dt_syntax} prezentuje
+zawartość pliku z gramatyką. Podobnie jak w przypadku parsowania formatu \emph{lab}, plik
+,,src/anotation\_parser/\_\_init\_\_.py'' zawiera kod tworzący instancję parser i transformera, oraz
+opakowuje je w funkcję pomocniczą.
+
+\begin{table}
+    \caption{Opis składni oznaczeń akordów w zbiorze RS200 za pomocą rozszerzonej notacji Backusa-Naura}
+    \label{tab:rs200_dt_syntax}
+    \begin{tabular}{|lcl} \hline
+        cltfile             & : & line (\_WHITES line) * \_WHITES \\
+        line                & : &   FLOAT \_WHITES FLOAT \_WHITES chord \_WHITES INTEGER \_WHITES INTEGER \_WHITES INTEGER \_WHITES INTEGER \\
+                            &   & | FLOAT \_WHITES FLOAT \_WHITES "End" \\
+        chord               & : & ( triad | seventh ) [ "/" ( major\_triad  | minor\_triad ) ] \\
+        seventh             & : & ( major\_triad | minor\_triad ) [ SEVENTH\_MODIFIER ] SEVENTH\_INVERSION \\
+        triad               & : & ( major\_triad | minor\_triad ) [ TRIAD\_MODIFIER ] [ TRIAD\_INVERSION ] \\
+        major\_triad         & : & MODIFIER* UPPER\_RN \\
+        minor\_triad         & : & MODIFIER* LOWER\_RN \\
+        TRIAD\_INVERSION     & : & "6" | "64" \\
+        TRIAD\_MODIFIER      & : & "o" | "a" | "s4" | "11" | "b5" \\
+        SEVENTH\_INVERSION   & : & "7" | "65" | "43" | "42" \\
+        SEVENTH\_MODIFIER    & : & "d" | "h" | "x" \\
+        UPPER\_RN            & : & "I" | "II" | "III" | "IV" | "V" | "VI" | "VII" \\
+        LOWER\_RN            & : & "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" \\
+        MODIFIER            & : & "b" | "\#" \\
+        DIGIT               & : & "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" \\
+        INTEGER             & : & DIGIT+ \\
+        FLOAT               & : & "-"? DIGIT+ "." DIGIT+ ("e" "-"? DIGIT+)? \\
+        \_WHITES             & : & /\\s+/ \\
+        \hline
+    \end{tabular}
+\end{table}
 
 % skrypt evaluation, downloading, 02, 03 i 05 - znalezienie i pobranie najlepiej pasujących nagrań muzycznych
 \subsection{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
