@@ -32,8 +32,8 @@ nagraniami muzycznymi, aż po wstępne przetwarzanie danych do formatu odpowiedn
 neuronowej. Dodatkowo rozdział ten, poza opisem zastosowanych rozwiązań, zawiera również ogólny opis
 implementacji tychże rozwiązań, którą to implementację stanowią skrypty języka Python.
 
-
-\section{Dane oznaczone}
+% od początku do uzyskania wszystkich oznaczeń ('data/chordlab') oraz pierwszego indeksu (skrypt 01)
+\section{Pozyskanie zbiorów danych z oznaczeniami akordów}
 
 % trudno o dane oznaczone w ACR
 Ze względu na powszechną dostępność dużej ilości danych w Internecie, zgromadzenie zbioru danych
@@ -47,10 +47,6 @@ czasu. Oznaczenia powstałe w ten sposób nadal pozostają subiektywne i będą 
 zależności od osoby, która utwory oznaczała. Wszystkie wymienione powody są przyczyną tego, że nie
 przygotowano więcej niż kilka publicznie dostępnych zbiorów oznaczeń akordów muzycznych, które mogą
 zostać wykorzystane do treningu modeli uczenia maszynowego.
-
-
-% od początku do uzyskania wszystkich oznaczeń ('data/chordlab') oraz pierwszego indeksu (skrypt 01)
-\subsection{Pozyskanie zbiorów danych z oznaczeniami akordów}
 
 % zbiory są takie, co to inni wykorzystywali
 W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpoznawania akordów za
@@ -86,7 +82,7 @@ pliki tekstowe z oznaczeniami akordów. Pliki z nagranimi muzycznymi, ze względ
 nie są udostępniane. Pozyskanie odpowiednich nagrań stanowi osobny problem, opisany w dalszej części
 rozdziału.
 
-\subsubsection{Zbiór Isophonics}
+\subsection{Zbiór Isophonics}
 
 % ogólny opis, jakie i ile utworów, format zapisu
 \emph{Isophonics} to właściwie nazwa serwisu internetowego\footnote{www.isophonics.net/about},
@@ -123,7 +119,7 @@ przeprowadzeniu opisanych powyżej operacji, zostały zapisane w repozytorium pr
 \filepath{data/chordlab/isophonics}.
 
 
-\subsubsection{Zbiór McGill Billboard}
+\subsection{Zbiór McGill Billboard}
 
 % ogólny opis, jakie i ile utworów, format zapisu
 Zbiór \emph{McGill Billboard} \cite{burgoyne_expert_2011} został stworzony przez grupę \emph{DDMAL
@@ -164,7 +160,7 @@ Pobrane oznaczenia akordów nie wymagały właściwie żadnych poprawek. Cały k
 \filepath{McGill-Billboard} został przeniesiony do repozytorium projetu, do katalogu
 \filepath{data/chordlab/mcgill\_billboard}.
 
-\subsubsection{Zbiór Robbie Williams}
+\subsection{Zbiór Robbie Williams}
 
 % ogólny opis, jakie i ile utworów, format zapisu
 Zbiór \emph{Robbie Williams} \cite{giorgi_automatic_2013} składa się z oznaczeń akordów oraz tonacji
@@ -187,7 +183,7 @@ Pobrane oznaczenia znowu nie wymagały żadnych poprawek. Zawartość katalog
 \filepath{RobbieWilliamsAnnotations/chords/} została przeniesiona do repozytorium projektu, do katalogu
 \filepath{data/chordlab/robbie\_williams}.
 
-\subsubsection{Zbiór RS200}
+\subsection{Zbiór RS200}
 
 % ogólny opis, jakie i ile utworów, format zapisu
 Zbiór \emph{RS200} \cite{de_clercq_corpus_2011} został stworzony przez dwóch badaczy z amerykańskiej
@@ -225,7 +221,7 @@ nieistniejących plików), został wykorzystany do generowania głównego indeks
 Wybrane pliki z suffiksem ,,dt'' nie wymagały już więcej poprawek. Zostały wszystkie, przeniesione
 do katalogu \filepath{data/chordlab/rs200}.
 
-\subsubsection{Zbiór RWC POP}
+\subsection{Zbiór RWC POP}
 
 % ogólny opis, jakie i ile utworów, format zapis
 Zbiór RWC POP \cite{goto_rwc_nodate} stanowi część większego zbioru o nazwie RWC (Real World
@@ -259,7 +255,7 @@ ze wszystkimi tymi informacjami. Tabela ta zapisana została w pliku
 Przygotowane przez nowojorskich studentów oznaczenia nie wymagały żadnych poprawek. Wszystkie pliki
 \filetype{lab} zostały umieszczone w katalogu \filepath{data/chordlab/rwc\_pop}.
 
-\subsubsection{Zbiór Uspop2002}
+\subsection{Zbiór Uspop2002}
 
 % ogólny opis, jakie i ile utworów, format zapis
 Zbiór uspop2002 \cite{berenzweig_large-scale_2004} został przygotowany w ramach współpracy naukowców
@@ -289,7 +285,7 @@ Ponownie oznaczenia nie wymagały żadnych poprawek. Całą zawartość katalogu
 przeniesiono do katalogu projektu \filepath{data/chordlab/uspop}.
 
 % duplikaty i podsumowanie
-\subsubsection{Usuwanie duplikatów i podsumowanie pozyskanych oznaczeń}
+\subsection{Usuwanie duplikatów i podsumowanie pozyskanych oznaczeń}
 
 Ostatnim etapem przygotowania wspólnego indeksu, opisującego wszystkie pozyskane pliki z
 oznaczeniami, jest usunięcie duplikatów. Procedura ta, stanowiąca ostatni fragment skryptu
@@ -328,7 +324,7 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 
 
 % annotation parser i implementacja WCSR
-\subsection{Model akordów muzycznych i parsowanie plików z oznaczeniami}
+\section{Model akordów muzycznych i parsowanie plików z oznaczeniami}
 
 % potrzeba parsowania - wstęp
 Po zgromadzeniu, oczyszczeniu i zindeksowaniu zbiorów z oznaczeniami akordów, należało przygotować
@@ -345,7 +341,7 @@ realizują zadanie tłumaczenia oznaczeń w formacie plików tekstowych na odpo
 umieszczone zostały w module \filepath{src/annotation\_parser}.
 
 % Opis modelu akordu - skrypt chord_model.py
-\subsubsection{Model obiektowy reprezentujący akordy muzyczne}
+\subsection{Model obiektowy reprezentujący akordy muzyczne}
 
 % Podstawowy model obiektowy akordu według Krzyśka
 W ramach niniejszej pracy przygotowany został obiektowy model reprezentujący akord muzyczny. Model
@@ -400,9 +396,17 @@ akordu o wybraną liczbę półtonów w dół lub w górę - jest to związane 
 augmentacjami. Ostatnią część pliku zawierającego model akordów stanowi bardzo krótka i elegancka,
 własna implementacja miary CSR, której wartość wyliczana jest dla dwóch list instancji klasy
 \code{LabelOccurence} - implementacja ta wykorzystuje więc przygotowany uprzednio model akordów.
-Cały model akordów muzycznych został przedstawiony na rysunku \ref{todo} w postaci diagramu klas.
+Cały model akordów muzycznych został przedstawiony na rysunku \ref{fig:chord_model} w postaci
+diagramu klas UML.
 
-\subsubsection{Parsowanie plików \filetype{lab}}
+\begin{figure}
+    \centering
+    \caption{Diagram klas UML przedstawiający model obiektowy akordów muzycznych}
+    \label{fig:chord_model}
+    \includegraphics[width=1.0\textwidth]{./images/chord_model.png}
+\end{figure}
+
+\subsection{Parsowanie plików \filetype{lab}}
 
 % wstęp o formacie lab
 Chris Harte w swojej pracy \cite{harte_towards_nodate}, zanim przedstawił szczegółowo autorski
@@ -422,18 +426,18 @@ oznaczającego bas. Ogólna forma zapisu jest następująca:
     \code{root : shorthand (interval1, interval2...) / bass}
 \end{center}
 W przeciwieństwie do opisywanej wcześniej struktury danych, w przypadku zapisu tekstowego, podstawa
-akordu zapisywana jest w postaci symbolicznej: nazwa jednego z 7 dźwięków (,,ABCDEFG''), po której w
+akordu zapisywana jest w postaci symbolicznej: nazwa jednego z 7 dźwięków (\code{ABCDEFG}), po której w
 razie konieczności następują modyfikatory - krzyżyki i bemole, zapisywane odpowiednio jako znaki
-,,\#'' oraz ,,b''. Następnie jest dwukropek, po którym zapisuje się listę interwałów. Może mieć ona
+\code{\#} oraz \code{b}. Następnie jest dwukropek, po którym zapisuje się listę interwałów. Może mieć ona
 postać jawnej listy, poprzedzielanej przecinkami i ujętej w nawiasy, gdzie każdy interwał zapisywany
 jest jako liczba całkowita oznaczająca stopień, w razie potrzeby poprzedzona krzyżykami lub
 bemolami. Zamiast podawać listę można skorzystać z predefiniowanego skrótu, implikującego
-odpowiednią listę interwałów. Przykładem takiego skrótu jest ,,min'', oznaczający ciąg interwałów
+odpowiednią listę interwałów. Przykładem takiego skrótu jest \code{min}, oznaczający ciąg interwałów
 1, b3 i 5. Można również wykorzystać zarówno skrót jak i listę w nawiasach, dodając w ten
 sposób dodatkowe interwały ponad te wynikające ze skrótu, lub usuwając wybrane interwały z
-predefinowanej listy, poprzedzając je znakiem ,,*''. Niepodanie ani listy ani żadnego ze skrótów
+predefinowanej listy, poprzedzając je znakiem \code{*}. Niepodanie ani listy ani żadnego ze skrótów
 traktuje się jako zwykły akord majorowy (interwały 1, 3 i 5). Na końcu występuje opcjonalny,
-dodatkowy interwał oznaczający bas, poprzedzony znakiem ,,/''. Jeżeli bas nie jest podany, zakłada
+dodatkowy interwał oznaczający bas, poprzedzony znakiem \code{/}. Jeżeli bas nie jest podany, zakłada
 się interwał prymy, czyli że podstawa akordu jest jednocześnieg jego najniższym dźwiękiem. Zapisany
 według tej metody akord C-dur wygląda tak:
 \begin{center}
@@ -487,7 +491,8 @@ interwałów. Mapy te w postaci słowników pythonowych zawiera plik
 transformera i parsera oraz opakowanie tego w funkcję pomocniczą, umieszczony został w pliku
 \filepath{src/annotation\_parser/\_\_init\_\_.py}. 
 
-\begin{figure}[h]
+\begin{figure}
+    \centering
     \caption{Opis składni oznaczeń akordów \emph{lab} za pomocą rozszerzonej notacji Backusa-Naura}
     \label{fig:lab_syntax}
     {\scriptsize \verbatiminput{../src/annotation_parser/labfile_grammar.lark}}
@@ -501,7 +506,7 @@ podstawowe operacje na ciągach znaków, wraz ze wspomnianymi powyżej mapami sy
 dźwięków. Cała logika wytwarznia oznaczeń w formacie \filetype{lab} zawarta jest w plikuj
 \filepath{src/annotation\_parser/labfile\_printer.py}.
 
-\subsubsection{Parsowanie plików oznaczeń dla zbioru RS200}
+\subsection{Parsowanie plików oznaczeń dla zbioru RS200}
 
 % wstęp o formacie oznaczeń ze zbioru RS200
 Format oznaczeń akordów wykorzystany w zbiorze RS200 jest znacznie mniej rozbudowany od formatu
@@ -550,14 +555,16 @@ zawartość pliku z gramatyką. Podobnie jak w przypadku parsowania formatu \fil
 \filepath{src/anotation\_parser/\_\_init\_\_.py} zawiera kod tworzący instancję parser i transformera, oraz
 opakowuje je w funkcję pomocniczą.
 
-\begin{figure}[h]
+\begin{figure}
+    \centering
     \caption{Opis składni oznaczeń akordów w zbiorze RS200 za pomocą rozszerzonej notacji Backusa-Naura}
     \label{fig:rs200_dt_syntax}
     {\scriptsize \verbatiminput{../src/annotation_parser/rs200_dt_grammar.lark}}
 \end{figure}
 
+
 % skrypt evaluation, downloading, 02, 03 i 05 - znalezienie i pobranie najlepiej pasujących nagrań muzycznych
-\subsection{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
+\section{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
 
 % to jest problem generalnie
 Znalezienie odpowiednich plików z nagraniami muzycznymi stanowiło jeden z głównych problemów,
@@ -567,7 +574,7 @@ akordów dostarczane są zazwyczaj bez nagrań muzycznych, ze względu na prawa 
 (wyjątkiem jest oczyszczony z praw autorskich zbiór RWC POP).
 
 % nie można tak po prostu łatwo ich wyszukać - opis i ocena ręcznej procedury
-\subsubsection{Analiza koncepcji ręcznego wyszukiwanie nagrań} Pierwszym i prawdopodobnie
+\subsection{Analiza koncepcji ręcznego wyszukiwanie nagrań} Pierwszym i prawdopodobnie
 prowadzącym do najmniejszej liczby pomyłek sposobem pozyskania utworów muzycznych jest szukanie
 ,,ręczne''. Polegało by ono na znalezieniu odpowiednich artystów, albumów i konkretnych nagrań w
 serwisach muzycznych oraz innych ogólnie dostępnych źródłach. W razie potrzeby wymagało by
@@ -591,7 +598,7 @@ przemyślany, jest jedynie teoretyczny (nie był zrealizowany od początku do ko
 jakie problemy okazałyby się mało znaczące, a jakie nie zostały wzięte pod uwagę. 
 
 % motywacja i decyzja o procedurze automatycznej
-\subsubsection{Motywacja i decyzja o automatycznym wyszukiwaniu nagrań}
+\subsection{Motywacja i decyzja o automatycznym wyszukiwaniu nagrań}
 W ramach niniejszej pracy zdecydowano się na automatyczną procedurę wyszukiwania odpowiednich
 utworów muzycznych w serwisie YouTube Music\footnote{music.youtube.com}. Takie podejście prowadzi
 prawdopodobnie do pozyskania większej ilości niepasujących nagrań i co ważniejsze, w ogóle do
@@ -611,7 +618,7 @@ pobieranie konkretnego nagrania na dysk lokalny oraz ewaluacja tego nagrania - o
 zgodne z dostępnymi oznaczeniami akordów. Wszystkie trzy operacje są szczegółowo opisane poniżej.
 
 % opis wyszukiwania utworów i liba ytmusicapi
-\subsubsection{Wyszukiwanie utworów w serwisie YouTube Music}
+\subsection{Wyszukiwanie utworów w serwisie YouTube Music}
 Wyszukiwanie utworów w serwisie YouTube Music zostało wykonane za pomocą nieoficjalnego klienta
 pythonowego do tego serwisu - \emph{ytmusicapi}\footnote{https://github.com/sigma67/ytmusicapi}.
 Daje on mniej więcej takie same możliwości jak korzystanie z oficjalnego, graficznego klienta
@@ -628,7 +635,7 @@ indentyfikatorze zasobu (\code{video\_id}), tytule utworu, artyście (lub artyst
 (jeżeli dotyczy).
 
 % opis pobierania utworów - skryptu i liba pytube
-\subsubsection{Pobieranie nagrań z serwisu YouTube na dysk lokalny}
+\subsection{Pobieranie nagrań z serwisu YouTube na dysk lokalny}
 Pobieranie nagrań na dysk lokalny również jest zrealizowane za pomocą nieoficjalnego, pythonowego
 klienta, tym razem już do całego serwisu YouTube -
 \emph{pytube}\footnote{https://github.com/pytube/pytube}. Służy on właściwie nie tyle do
@@ -644,7 +651,7 @@ wskazego katalogu. Pobieranie to może się z różnych powodów nie powieść (
 podejrzane żądanie, etc.).
 
 % opis idei ewaluacji nagrań i liba madmom
-\subsubsection{Ewaluacja nagrań - ocena dopasowania do oznaczeń akordów}
+\subsection{Ewaluacja nagrań - ocena dopasowania do oznaczeń akordów}
 Ewaluacja nagrań jest najbardziej skomplikowaną i jednocześnie najważniejszą częścią całego procesu
 wyszukiwania nagrań. Aby automatycznie ocenić czy nagranie pasuje do oznaczeń trzeba automatycznie
 rozpoznać jakie akordy w nim występują. Z kolei przygotowanie algorytmu rozpoznającego akordy
@@ -685,7 +692,7 @@ wysoka wartość miary CSR. W konsekwencji miara ta nie pozwala łatwo wyelimino
 powodu różnej długości z całą pewnością nie pasują do oznaczeń.
 
 % opis całego algorytmu ze skryptu 02
-\subsubsection{Algorytm automatycznego wyszukiwania pasujących nagrań muzycznych}
+\subsection{Algorytm automatycznego wyszukiwania pasujących nagrań muzycznych}
 Poniższe kroki są wykonywane dla każdej pozycji z indeksu (\filepath{data/index.csv}) opisującego cały
 dostępny zbiór oznaczeń. Przechodzenie przez cały indeks dzieje się równolegle w 16 procesach, jako
 że w zastosowanym algorytmie nie ma żadnych zależności między poszczególnymi utworami. Wynikiem
@@ -728,7 +735,7 @@ Kroki algorytmu są następujące:
 \end{enumerate}
 
 % opis skryptu 03 - selekcja i podział na trening/test/walidacja
-\subsubsection{Selekcja i podział utworów, dla których znaleziono dobre nagranie}
+\subsection{Selekcja i podział utworów, dla których znaleziono dobre nagranie}
 Na tym etapie indeks opisujący wszystkie dostępne pliki z oznaczeniami był rozszerzony o kolumny
 zawierające informacje o identyfikatorze nagrania z YouTube oraz o metrykach z ewaluacji tego
 nagrania. Chociaż prawie dla każdego pliku z oznaczeniami znalezione zostało jakieś
@@ -761,7 +768,7 @@ zbioru oznaczeń). Podział ten został zapisany w nowej kolumnie \code{purpose}
 \filepath{data/index.csv}. Wpis w tej kolumnie jest jednocześnie znacznikiem, że dla danego pliku z
 oznaczeniami znaleziono pasujące nagranie.
 
-\subsubsection{Pobieranie utworów i podsumowanie ich liczebności}
+\subsection{Pobieranie utworów i podsumowanie ich liczebności}
 Ostatnim etapem jest ponowne pobranie wszystkich nagrań z serwisu YouTube. Operacja ta została
 wydzielona do osobnego kroku i osobnego skryptu, ponieważ nagrania te zajmują względnie dużo miejsca
 i dodatkowo nie powinny być rozpowszechniane. Dzięki temu nie muszą być więc przechowywane a mogą
@@ -810,16 +817,15 @@ walidacyjnym.
         \hline
         Treningowy  & 790 & todo \\
         Testowy     & 102 & todo \\
-        Walidacyjny & 102 & tood \\
+        Walidacyjny & 102 & todo \\
         \hline
     \end{tabular}
 \end{table}
 
 
-\section{Dane nieoznaczone}
+\section{Wyszukiwanie utworów bez oznaczeń z rankingów magazynu Billboard}
 
-\subsection{Wprowadzenie}
-
+% wprowadzenie
 Jak już wspomniano wcześniej, zgromadzenie zbioru danych nieoznaczonych było znacznie prostsze. Dla
 przypomnienia, chodzi tutaj jedynie o same nagrania muzyczne, bez oznaczeń akordów. W najprostszym
 rozumieniu wystarczyło by więc pobrać dowolną liczbę dowolnych nagrań muzycznych z internetu i
@@ -835,8 +841,6 @@ różnych okresów, od różnych artystów i w różnych stylach. Będą równie
 popularność, stanowiły reprezentatywną grupę muzyki popularnej zachodu. Znalezione w ten sposób
 utwory były następnie wyszukiwane w serwisie YouTube Music i w razie dostępności pobierane i
 dodawane do pliku indeksu. Wyszukanych i pobranych tą metodą zostało 10000 różnych nagrań.
-
-\subsection{Wielowątkowa implementacja wyszukiwania utworów z rankingów magazynu Billboard}
 
 Cały alogorytm automatycznego preszukiwania rankingów magazynu \emph{Billboard} oraz serwisu YouTube
 Music został zaimplementowany w skrypcie \filepath{src/dataset\_scripts/04-collect\_big\_dataset.py}. Jest
@@ -886,15 +890,12 @@ punktem wyjścia do zgromadzenia dużej liczby różnorodnych, popularnych nagra
 nagrań spoza tej konkretnej listy nie stanowią najmniejszego problemu, są nawet pożądane, ze względu
 na różnorodność zbioru.
 
-
 \section{Wstępne przetwarzanie danych}
 todo
 
 % do dodania:
 % - słówko na temat jakości pobranych nagrań
 % - słówko na temat rozkładu akordów w zbiorze (lub zbiorach)
-% - przestawić nagłówki (section/subsection/subsubsection) o oczko w górę
-% - ogarnąć jak formatować ścieżki i jak formatować kod (monospace)
 % - wstępne przetwarzanie danych - format danych wejściowy i wyjściowy (wejściowy do sieci)
 %     - format i parsowanie plików z oznaczeniami i plików muzycznych
 %     - podział na ramki i dopasowanie labelek do ramek
