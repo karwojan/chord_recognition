@@ -2,29 +2,27 @@
 % szczegóły techniczne, jak co zwraca, co przyjmuje dana funkcja pominąć), zerknąć na COMMITY !!!
 \chapter{Zbiór danych}
 
-\section{Wprowadzenie}
-
 % potrzeba danych!
 Pierwszym i jednocześnie najważniejszym etapem w tworzeniu rozwiązania opartego o uczenie maszynowe
 jest zgromadzenie odpowiedniego zbioru danych. Jest to etap kluczowy, co wydaje się oczywiste po
-uwzględnieniu natury tychże algorytmów - wynajdują one pewne reguły w oparciu o podane przykłady.
+uwzględnieniu natury tychże algorytmów --- wynajdują one pewne reguły na bazie podanych przykłady.
 
 % potrzeba danych oznaczonych (jak zawsze) i nieoznaczonych (bo pomogą a są)
 Głęboki sieci neuronowe, co do zasady potrzebują ,,dużo'' (zazwyczaj wiele milionów) przykładów
-uczących, aby móc znaleźć poprawne reguły i wzorce - aby nauczyć się odpowiedniej ekstrakcji cech. W
+uczących, aby móc znaleźć poprawne reguły i wzorce --- aby nauczyć się odpowiedniej ekstrakcji cech. W
 celu wytrenowania sieci do konkretnego zadania (np. do klasyfikacji obrazów), potrzeba zbioru
-zawierającego dane wejściowe do modelu i oczekiwane dane wyjściowe z modelu. Takie uczenie w oparciu
-o przykłady oznaczone (ze znaną wartością oczekiwaną) to \emph{uczenie nadzorowane}. Często jednak
+zawierającego dane wejściowe do modelu i oczekiwane dane wyjściowe z modelu. Takie uczenie na
+podstawie przykładów oznaczonych (ze znaną wartością oczekiwaną) to \emph{uczenie nadzorowane}. Często jednak
 ilość danych oznaczonych jest ograniczona, można wtedy wykorzystać dane bez oznaczeń w różnych
 algorytmach \emph{uczenia nienadzorowanego}, aby nauczyć sieć struktury tych danych, bez
 ukierunkowania na konkretne zadanie. Dopiero później wykorzystuje się mniejszą ilość danych
-oznaczonych aby dotrenować sieć (ang. \emph{finetuning}) i nauczyć ją rozwiązywać dany problem.
+oznaczonych, aby dotrenować sieć (ang. \emph{finetuning}) i nauczyć ją rozwiązywać dany problem.
 
 % co zawiera ten rozdział - od szukania danych do wejścia do sieci + opis skryptów
 W ramach niniejszej pracy, ze względu na ograniczoną ilość danych oznaczonych, zastosowane zostało
 właśnie powyższe podejście. Do przeprowadzenia eksperymentów potrzebne były dwa zbiory: pierwszy to
 ,,niewielki'' zbiór danych oznaczonych a drugi to ,,zdecydowanie większy'' zbiór danych bez
-oznaczeń. W tym rodzdziale opisany został proces pozyskiwania obu zbiorów danych z ogólnie
+oznaczeń. W tym rozdziale opisany został proces pozyskiwania obu zbiorów danych z ogólnie
 dostępnych źródeł. Zawarto tutaj opis wszystkich kroków wykonanych w celu przygotowania danych do
 treningu sieci, poczynając od wyszukiwania oznaczeń utworów muzycznych i przygotowanie parsera dla
 plików z tymi oznaczeniami, poprzez automatyczne wyszukiwania i pobieranie odpowiednich plików z
@@ -50,18 +48,18 @@ zostać wykorzystane do treningu modeli uczenia maszynowego.
 
 % zbiory są takie, co to inni wykorzystywali
 W ramach niniejszej pracy przestudiowana została literatura z dziedziny rozpoznawania akordów za
-pomocą sieci neuronowych - większość wykorzystywanych przez badaczy zbiorów danych udało się
+pomocą sieci neuronowych --- większość wykorzystywanych przez badaczy zbiorów danych udało się
 odnaleźć i wykorzystać. Zostały one szczegółowo opisane poniżej. Każdy zbiór oznaczeń został
 pobrany, odpowiednio oczyszczony (wybrane zostały tylko niezbędne pliki) i zapisany w repozytorium
-projektu (w katalogu \filepath{data/chordlab}). Po przeanalizowaniu struktury zbiorów stworzony został
-pierwszy skrypt przygotowujący dane - \filepath{src/dataset\_scripts/01-generate\_index\_of\_chordlab.py} -
-który, w postaci pliku \filetype{csv}, generuje jeden wspólny indeks (\filepath{data/index.csv}) dla wszystkich
+projektu (w katalogu \url{data/chordlab}). Po przeanalizowaniu struktury zbiorów stworzony został
+pierwszy skrypt przygotowujący dane --- \url{src/dataset\_scripts/01-generate\_index\_of\_chordlab.py} ---
+który, w postaci pliku \filetype{csv}, generuje jeden wspólny indeks (\url{data/index.csv}) dla wszystkich
 zbiorów, tak że mogą one być już traktowane jako jeden zbiór danych. Fragment tego indeksu został
-przedstawionyw w \ref{tab:indeks_01}.
+przedstawiony w \ref{tab:indeks_01}.
 
 \begin{table}
     \centering
-    \caption{Fragment indeksu zbioru danych po pierwszym etapie jego tworzenia}
+    \caption{Fragment indeksu zbioru danych po pierwszym etapie jego tworzenia.}
     \label{tab:indeks_01}
     \makebox[\textwidth][c]{
     {\scriptsize \ttfamily \begin{tabular}{rllllr}
@@ -78,7 +76,7 @@ przedstawionyw w \ref{tab:indeks_01}.
 \end{table}
 
 Trzeba jeszcze zaznaczyć, że wszystkie te zbiory są udostępniane za darmo, ale jedynie jako same
-pliki tekstowe z oznaczeniami akordów. Pliki z nagranimi muzycznymi, ze względu na prawa autorskie,
+pliki tekstowe z oznaczeniami akordów. Pliki z nagraniami muzycznymi, ze względu na prawa autorskie,
 nie są udostępniane. Pozyskanie odpowiednich nagrań stanowi osobny problem, opisany w dalszej części
 rozdziału.
 
@@ -116,7 +114,7 @@ usunięciem niewykorzystywanych plików, dotyczą artystki Carole King. Polegał
 kilku skrótów typów akordów, które występowały jedynie tutaj a były niezgodne z przyjętą w
 \cite{harte_towards_nodate} konwencją. Wszystkie oznaczenia zbioru \emph{isohponics}, po
 przeprowadzeniu opisanych powyżej operacji, zostały zapisane w repozytorium projektu, w katalogu
-\filepath{data/chordlab/isophonics}.
+\url{data/chordlab/isophonics}.
 
 
 \subsection{Zbiór McGill Billboard}
@@ -146,8 +144,8 @@ w postaci skompresowanych (na kilka sposobów) archiwów \filetype{tar}. Dostęp
 powyżej dwoma zestawami dźwiękowych cech utworów, dostępny jest zestaw wszystkich oznaczeń we
 własnym formacie twórców zbioru, oraz zestaw oznaczeń samych akordów, w postaci plików \filetype{lab}.
 Do niniejszej pracy wykorzystany został jedynie ten ostatni zestaw, zawierający pliki \filetype{lab}. Pobrane
-archiwum zawiera główny katalog \filepath{McGill-Billboard}, w którym znajduje się 890 katalogów nazwanych
-liczbowymi identyfikatorami utworów ze zbioru. Każdy taki katalog zawiera jeden plik \filepath{full.lab} z
+archiwum zawiera główny katalog \url{McGill-Billboard}, w którym znajduje się 890 katalogów nazwanych
+liczbowymi identyfikatorami utworów ze zbioru. Każdy taki katalog zawiera jeden plik \url{full.lab} z
 oznaczeniami akordów. Twórcy zbioru dostarczają również indeks w postaci pliku \filetype{csv}, wiążący
 identyfikatory utworów z tytułem, artystą (album nie jest podany) i innymi informacjami związanymi z
 rankingiem, z którego pochodzi utwór. Indeks ten jest niestety bardzo wybrakowany i dla wielu
@@ -157,8 +155,8 @@ własnego indeksu.
 
 % poprawki i zapisanie w projekcie
 Pobrane oznaczenia akordów nie wymagały właściwie żadnych poprawek. Cały katalog
-\filepath{McGill-Billboard} został przeniesiony do repozytorium projetu, do katalogu
-\filepath{data/chordlab/mcgill\_billboard}.
+\url{McGill-Billboard} został przeniesiony do repozytorium projetu, do katalogu
+\url{data/chordlab/mcgill\_billboard}.
 
 \subsection{Zbiór Robbie Williams}
 
@@ -172,16 +170,16 @@ przygotowano dla 65 utworów.
 % pobieranie i indeksowanie
 Zbiór ten dostępny jest do pobrania ze strony
 \footnote{https://www.researchgate.net/publication/260399240\_Chord\_and\_Harmony\_annotations\_of\_the\_first\_five\_albums\_by\_Robbie\_Williams}
-w postaci archiwum zip. Znajduje się w nim katalog \filepath{RobbieWilliamsAnnotations}, który zawiera
-dwa główne podkatalogi: \filepath{chords} i \filepath{keys}. W każdym z tych podkatalogów znajduje się po pięć
+w postaci archiwum zip. Znajduje się w nim katalog \url{RobbieWilliamsAnnotations}, który zawiera
+dwa główne podkatalogi: \url{chords} i \url{keys}. W każdym z tych podkatalogów znajduje się po pięć
 podkatalogów (po jednym na album). W każdym katalogu z albumem znajdują się pliki \emph{txt} z
 oznaczeniami akordów w formacie \filetype{lab}. Zbiór ten nie posiada żadnych dodatkowych metadanych,
 własny indeks wygenerowany został na podstawie znormalizowanych nazw katalogów.
 
 % poprawki i zapisanie w projekcie
 Pobrane oznaczenia znowu nie wymagały żadnych poprawek. Zawartość katalog
-\filepath{RobbieWilliamsAnnotations/chords/} została przeniesiona do repozytorium projektu, do katalogu
-\filepath{data/chordlab/robbie\_williams}.
+\url{RobbieWilliamsAnnotations/chords/} została przeniesiona do repozytorium projektu, do katalogu
+\url{data/chordlab/robbie\_williams}.
 
 \subsection{Zbiór RS200}
 
@@ -207,7 +205,7 @@ Zbiór ten dostępny jest do pobrania ze strony
 \footnote{http://rockcorpus.midside.com/harmonic\_analyses.html}. Właściwie autorzy oferują trzy
 formaty, z których ostatni jest już rozwinięty do postaci zbliżonej do plików \filetype{lab}. Główna
 różnica to wspomniany powyżej sposób oznaczania konkretnych akordów. Po pobraniu i rozpakowaniu archiwum
-\emph{zip} znaleźć można pojedynczy katalog \filepath{rs200\_harmony\_clt}, który zawiera pliki z
+\emph{zip} znaleźć można pojedynczy katalog \url{rs200\_harmony\_clt}, który zawiera pliki z
 rozszerzeniem \emph{clt}, po dwa dla każdego utworu, jeden z suffiksem ,,dt' a drugi ,,tdc'' (od
 nazwisk autorów). Ze względu na to, że oznaczenia jednego z autorów były znacznie bardziej
 uporządkowane i prostsze a kwestia różnić w oznaczeniach dwóch różnych osób nie jest szczególnie
@@ -219,7 +217,7 @@ nieistniejących plików), został wykorzystany do generowania głównego indeks
 
 % poprawki i zapisanie w projekcie
 Wybrane pliki z suffiksem ,,dt'' nie wymagały już więcej poprawek. Zostały wszystkie, przeniesione
-do katalogu \filepath{data/chordlab/rs200}.
+do katalogu \url{data/chordlab/rs200}.
 
 \subsection{Zbiór RWC POP}
 
@@ -243,17 +241,17 @@ pozyskać tą samą metodą jak w przypadku pozostałych zbiorów danych.
 % pobieranie i indeksowanie
 Oznaczenia akordów do zbioru RWC POP są dostępne za darmo do pobrania w Internecie jako repozytorium
 git w serwisie GitHub\footnote{https://github.com/tmc323/Chord-Annotations}. Bezpośrednio w
-repozytorium znajduje się katalog \filepath{RWC\_Pop\_Chords}, który zawiera pliki z oznaczeniami akordów w
-dwóch formatach: \filepath{svl} oraz \filetype{lab}. Wykorzystane zostały jedynie pliki \filetype{lab}. Nazwy
+repozytorium znajduje się katalog \url{RWC\_Pop\_Chords}, który zawiera pliki z oznaczeniami akordów w
+dwóch formatach: \url{svl} oraz \filetype{lab}. Wykorzystane zostały jedynie pliki \filetype{lab}. Nazwy
 tych plików zawierają liczbowe identyfikatory poszczególnych nagrań. Aby przygotować indeks i
 pozyskać informacje o tytułach, nazwach albumów i nazwiskach artystów ze strony
 projektu\footnote{https://staff.aist.go.jp/m.goto/RWC-MDB/rwc-mdb-p.html} skopiowana została tabela
 ze wszystkimi tymi informacjami. Tabela ta zapisana została w pliku
-\filepath{data/chordlab/rwc\_pop/rwc\_pop.txt} i była wykorzystana w skrypcie generującym indeks.
+\url{data/chordlab/rwc\_pop/rwc\_pop.txt} i była wykorzystana w skrypcie generującym indeks.
 
 % poprawki i zapisanie w projekcie
 Przygotowane przez nowojorskich studentów oznaczenia nie wymagały żadnych poprawek. Wszystkie pliki
-\filetype{lab} zostały umieszczone w katalogu \filepath{data/chordlab/rwc\_pop}.
+\filetype{lab} zostały umieszczone w katalogu \url{data/chordlab/rwc\_pop}.
 
 \subsection{Zbiór Uspop2002}
 
@@ -275,14 +273,14 @@ wspomnianych 195 plików z oznaczeniami, które to dopiero były wykorzystane w 
 Dokładnie tak jak w przypadku zbioru RWC POP oznaczenia są dostępne za darmo do pobrania w
 Internecie - stanowią część tego samego reozytorium w serwisie
 GitHub\footnote{https://github.com/tmc323/Chord-Annotations}. Znajdują się w katalogu
-\filepath{uspopLabels}, który zawiera katalogi nazwane nazwiskami artystów. Każdy z katalogów artysty
+\url{uspopLabels}, który zawiera katalogi nazwane nazwiskami artystów. Każdy z katalogów artysty
 zawiera katalogi (zazwyczaj jeden) z nazwami albumów. Dopiero w katalogach z albumami znajdują się
 pliki \filetype{lab}, zawierające w nazwie tytuły konkretnych utworów. Nazwy katalogów i nazwy plików
 zostały wykorzystane podczas generowania indeksu.
 
 % poprawki i zapisanie w projekcie
-Ponownie oznaczenia nie wymagały żadnych poprawek. Całą zawartość katalogu \filepath{uspopLabels}
-przeniesiono do katalogu projektu \filepath{data/chordlab/uspop}.
+Ponownie oznaczenia nie wymagały żadnych poprawek. Całą zawartość katalogu \url{uspopLabels}
+przeniesiono do katalogu projektu \url{data/chordlab/uspop}.
 
 % duplikaty i podsumowanie
 \subsection{Usuwanie duplikatów i podsumowanie pozyskanych oznaczeń}
@@ -308,7 +306,7 @@ oznaczeniami między poszczególne, opisane wcześniej zbiory danych.
 
 \begin{table}
     \centering
-    \caption{Liczebności plików z oznaczeniami dla poszczególnych zbiorów danych}
+    \caption{Liczebności plików z oznaczeniami dla poszczególnych zbiorów danych.}
     \label{tab:datasets1}
     \begin{tabular}{|l|c|c|c|c|c|c|c|} \hline
         Nazwa zbioru & Liczba utworów (z duplikatami) \\ \hline
@@ -338,14 +336,14 @@ neuronowych, trzeba przetłumaczyć pliki tekstowe z oznaczeniami, na odpowiedni
 komputera strukturę danych. W ramach tego podrozdziału opisana zostania najpierw ta struktura, a
 następnie algorytm parsowania obu dostępnych formatów oznaczeń akordów. Skrypty pythonowe, które
 realizują zadanie tłumaczenia oznaczeń w formacie plików tekstowych na odpowiednią strukturę danych,
-umieszczone zostały w module \filepath{src/annotation\_parser}.
+umieszczone zostały w module \url{src/annotation\_parser}.
 
 % Opis modelu akordu - skrypt chord_model.py
 \subsection{Model obiektowy reprezentujący akordy muzyczne}
 
 % Podstawowy model obiektowy akordu według Krzyśka
 W ramach niniejszej pracy przygotowany został obiektowy model reprezentujący akord muzyczny. Model
-ten ma formę zestawu klas pythonowy (w pliku \filepath{src/annotation\_parser/chord\_model.py}) i bazuje
+ten ma formę zestawu klas pythonowy (w pliku \url{src/annotation\_parser/chord\_model.py}) i bazuje
 ściśle na propozycji \cite{harte_towards_nodate}. Według oryginalnego pomysłu, każdy akord
 reprezentowany jest przez trzy części składowe podstawę akordu (ang. \emph{root}), interwały
 składowe (ang. \emph{component intervals}) oraz bas (ang. \emph{bass note}). Podstawa to po prostu
@@ -401,7 +399,7 @@ diagramu klas UML.
 
 \begin{figure}
     \centering
-    \caption{Diagram klas UML przedstawiający model obiektowy akordów muzycznych}
+    \caption{Diagram klas UML przedstawiający model obiektowy akordów muzycznych.}
     \label{fig:chord_model}
     \includegraphics[width=1.0\textwidth]{./images/chord_model.png}
 \end{figure}
@@ -474,26 +472,26 @@ sposobem opisywania gramatyki bezkontekstowej jest notacja Backusa-Naura (ang. \
 form}, której wersję rozszerzoną (ang. \emph{Extended Backu-Naur
 form})\footnote{https://en.wikipedia.org/wiki/Extended\_Backus-Naur\_form} wykorzystuje właśnie
 biblioteka \emph{lark}. Tak więc przygotowany został plik
-\filepath{src/annotation\_parser/labfile\_grammar.lark}, który zawiera definicję gramatyki formatu
+\url{src/annotation\_parser/labfile\_grammar.lark}, który zawiera definicję gramatyki formatu
 \filetype{lab} (jego zawartość prezentowana jest w tabeli \ref{fig:lab_syntax}). Po sparsowaniu tekstu
 według podanej gramatyki, parser tworzy drzewiastą strukturę, która dzieli ten tekst w sposób
 hierarchiczny. Przechodząc przez tę strukturę wiadomo, jaką każdy fragment tekstu pełni logiczną
 rolę (zgodnie z daną gramatyką) i jakiej większej konstrukcji jest on częścią. Biblioteka
 \emph{lark} pozwala przygotować tzw. transformer, czyli obiekt który jest odpowiedzialny za
 mapowanie ze wspomnianej struktury drzewiastej (wyniku parsowania) na własną, obiektową strukturę
-danych. W pliku \filepath{src/annotation\_parser/labfile\_transformer.py} przygotowana została właśnie taka
+danych. W pliku \url{src/annotation\_parser/labfile\_transformer.py} przygotowana została właśnie taka
 klasa, która pozwala zamienić wynik parsowania pliku \filetype{lab} na instancje klas opisywanego
 wcześniej modelu obiektowego, a dokładnie listę obiektów klasy \code{ChordOccurence}. Aby móc
 przetłumaczyć tekstowe oznaczenia akordów na model obiektowy, potrzebne były mapowania z symboli
 literowych reprezentujących dźwięki na wartości całkowite oraz ze skrótów na konkretne zbiory
 interwałów. Mapy te w postaci słowników pythonowych zawiera plik
-\filepath{src/annotation\_parser/labfile\_symbols.py}. Kod odpowiedzialny za stworzenie instancji
+\url{src/annotation\_parser/labfile\_symbols.py}. Kod odpowiedzialny za stworzenie instancji
 transformera i parsera oraz opakowanie tego w funkcję pomocniczą, umieszczony został w pliku
-\filepath{src/annotation\_parser/\_\_init\_\_.py}. 
+\url{src/annotation\_parser/\_\_init\_\_.py}. 
 
 \begin{figure}
     \centering
-    \caption{Opis składni oznaczeń akordów \emph{lab} za pomocą rozszerzonej notacji Backusa-Naura}
+    \caption{Opis składni oznaczeń akordów \emph{lab} za pomocą rozszerzonej notacji Backusa-Naura.}
     \label{fig:lab_syntax}
     {\scriptsize \verbatiminput{../src/annotation_parser/labfile_grammar.lark}}
 \end{figure}
@@ -504,7 +502,7 @@ wytwarzania plików \filetype{lab} z modelu obiektowego akordów, który z kolei
 predykcji sieci. Nie została tutaj wykorzystana żadna specjalistyczna biblioteka - jedynie
 podstawowe operacje na ciągach znaków, wraz ze wspomnianymi powyżej mapami symboli skrutów i symboli
 dźwięków. Cała logika wytwarznia oznaczeń w formacie \filetype{lab} zawarta jest w plikuj
-\filepath{src/annotation\_parser/labfile\_printer.py}.
+\url{src/annotation\_parser/labfile\_printer.py}.
 
 \subsection{Parsowanie plików oznaczeń dla zbioru RS200}
 
@@ -549,15 +547,15 @@ względem dźwięku C, a nie tonacji utworu.
 Jeżeli chodzi o parsowanie plików z oznaczeniami dla zbioru RS200, to również wykorzystana została
 biblioteka \emph{lark}. Trzeba więc było przygotować odpowiedni opis gramatyki i odpowiednią klasę
 transformującą na model obiektowy. To pierwsze znajduje się w pliku
-\filepath{src/annotation\_parser/rs200\_dt\_grammar.lark} a to drugie w pliku
-\filepath{src/annotation\_parser/rs200\_dt\_transformer.py}. Tabel \ref{fig:rs200_dt_syntax} prezentuje
+\url{src/annotation\_parser/rs200\_dt\_grammar.lark} a to drugie w pliku
+\url{src/annotation\_parser/rs200\_dt\_transformer.py}. Tabel \ref{fig:rs200_dt_syntax} prezentuje
 zawartość pliku z gramatyką. Podobnie jak w przypadku parsowania formatu \filetype{lab}, plik
-\filepath{src/anotation\_parser/\_\_init\_\_.py} zawiera kod tworzący instancję parser i transformera, oraz
+\url{src/anotation\_parser/\_\_init\_\_.py} zawiera kod tworzący instancję parser i transformera, oraz
 opakowuje je w funkcję pomocniczą.
 
 \begin{figure}
     \centering
-    \caption{Opis składni oznaczeń akordów w zbiorze RS200 za pomocą rozszerzonej notacji Backusa-Naura}
+    \caption{Opis składni oznaczeń akordów w zbiorze RS200 za pomocą rozszerzonej notacji Backusa-Naura.}
     \label{fig:rs200_dt_syntax}
     {\scriptsize \verbatiminput{../src/annotation_parser/rs200_dt_grammar.lark}}
 \end{figure}
@@ -642,9 +640,9 @@ klienta, tym razem już do całego serwisu YouTube -
 przeszukiwania serwisu YouTube co do pobieranie z niego całych filmów lub samych ścieżek dźwiękowych
 w dostępnych formatach i jakościach. Aby z niego skorzystać trzeba stworzyć instancję klasy
 \code{YouTube} podając jako argument adres URL konkretnego filmu, przy czym wystarczy oczywiście
-znać jedynie jego \code{video\_id} (\code{http://youtube.com/watch?v=\emph{video\_id}}). Następnie
+znać jedynie jego \code{video\_id} (\url{http://youtube.com/watch?v=\emph{video\_id}}). Następnie
 można filtrować dostępne formaty i ostatecznie pobrać wybrany strumień na dysk. Przygotowana została
-funkcja pomocnicza (\filepath{src/dataset\_scripts/downloading.py}), która dla danego \code{video\_id},
+funkcja pomocnicza (\url{src/dataset\_scripts/downloading.py}), która dla danego \code{video\_id},
 jeżeli nagranie nie zostało już pobrane (nie istnieje plik we wskazanym katalogu), wybiera pośród
 dostępnych strumieni z samym dźwiękiem ten w najlepszej jakości i zapisuje go jako plik dźwiękowy do
 wskazego katalogu. Pobieranie to może się z różnych powodów nie powieść (błąd sieci, YouTube odrzuca
@@ -681,7 +679,7 @@ dla każdego nagrania liczone jest przesunięcie czasowe pomiędzy początkiem p
 (\code{start\_diff}), oraz przesunięcie czasowe pomiędzy końcem ostatniego oczekiwanego i ostatniego
 rozpoznanego akordu (\code{stop\_diff}). Oczywiście poprzez wystąpienie akordu rozumie się
 wystąpienie akordu dowolnej klasy poza \emph{no chord}. Realizująca wszystkie te operacje funkcja
-pomocnicza znajduje się w pliku \filepath{src/dataset\_scripts/evaluation.py}. W przypadku, gdy żaden akord
+pomocnicza znajduje się w pliku \url{src/dataset\_scripts/evaluation.py}. W przypadku, gdy żaden akord
 nie występuje w oznaczeniach lub nie został rozpoznany, funkcja ta nie zwraca żadnych wartości.
 
 % interpretacja metryk
@@ -693,10 +691,10 @@ powodu różnej długości z całą pewnością nie pasują do oznaczeń.
 
 % opis całego algorytmu ze skryptu 02
 \subsection{Algorytm automatycznego wyszukiwania pasujących nagrań muzycznych}
-Poniższe kroki są wykonywane dla każdej pozycji z indeksu (\filepath{data/index.csv}) opisującego cały
+Poniższe kroki są wykonywane dla każdej pozycji z indeksu (\url{data/index.csv}) opisującego cały
 dostępny zbiór oznaczeń. Przechodzenie przez cały indeks dzieje się równolegle w 16 procesach, jako
 że w zastosowanym algorytmie nie ma żadnych zależności między poszczególnymi utworami. Wynikiem
-działania algorytmu są dodatkowe kolumny w pliku \filepath{index.csv}, prezentujące identyfikator
+działania algorytmu są dodatkowe kolumny w pliku \url{index.csv}, prezentujące identyfikator
 najlepszego znalezionego nagrania (\code{video\_id}) oraz wyniki ewaluacji tego nagrania:
 przesunięcie początku pierwszego akordu (\code{start\_diff}) i zakończenia ostatniego
 (\code{stop\_diff}) względem pliku z oznaczeniami oraz wartość miary CSR (\code{csr}).
@@ -759,13 +757,13 @@ niestety znaleźć innej metody ewaulacji i ostatecznie trzeba było zdecydować
 progową, wiedząc, że opiera się ona po części na intuicji, a po części na ślepym losie.
 
 Operację odfiltrowania ,,niepasujących'' nagrań zaimplementowano w skrypcie
-\filepath{src/dataset\_scripts/03-select\_proposals\_and\_split.py}. Po wykonaniu progowania z 1268 utworów
+\url{src/dataset\_scripts/03-select\_proposals\_and\_split.py}. Po wykonaniu progowania z 1268 utworów
 pozostało jedynie 995. Następnie usuwane są również te utwory, które mają dopasowane to samo
 nagranie co inny utwór. Znalazł się tylko 1 taki przypadek. Tak więc ostatecznie pozyskano nagrania
 dla 994 utworów. W ramach tego samego skryptu, wszystkie te utwory zostały podzielone na 3
 podzbiory: treningowy, testowy i walidacyjny w proporcjach odpowiednio $8:1:1$ (ramach każdego
 zbioru oznaczeń). Podział ten został zapisany w nowej kolumnie \code{purpose} w pliku
-\filepath{data/index.csv}. Wpis w tej kolumnie jest jednocześnie znacznikiem, że dla danego pliku z
+\url{data/index.csv}. Wpis w tej kolumnie jest jednocześnie znacznikiem, że dla danego pliku z
 oznaczeniami znaleziono pasujące nagranie.
 
 \subsection{Pobieranie utworów i podsumowanie ich liczebności}
@@ -774,19 +772,19 @@ wydzielona do osobnego kroku i osobnego skryptu, ponieważ nagrania te zajmują 
 i dodatkowo nie powinny być rozpowszechniane. Dzięki temu nie muszą być więc przechowywane a mogą
 być z łatwością od nowa pobrane z serwisu YouTube, kiedy projekt jest klonowany lub przenoszony na
 inną maszynę. Mając więc gotowy plik indeksu, stanowiący stałą część repozytorium projektu, należy
-wywołać skrypt \filepath{src/dataset\_scripts/05-download\_songs.py}, który pobiera wszystkie nagrania z
+wywołać skrypt \url{src/dataset\_scripts/05-download\_songs.py}, który pobiera wszystkie nagrania z
 pliku indeksu, dla których istnieje wartość w kolumnie \code{purpose}. Pobiera je, wykorzystując
-opisaną wcześniej funkcje pomocniczą z pliku \filepath{src/dataset\_scripts/downloading.py}, czyli
+opisaną wcześniej funkcje pomocniczą z pliku \url{src/dataset\_scripts/downloading.py}, czyli
 wybierając najlepszy dostępny strumień dźwiękowy i zapisując go w postaci pliku dźwiękowego (w
-odpowiednim formacie, w większości \filepath{webm}, czasami \filepath{mp4}). Wszystkie pobrane pliki
-zapisywane są w katalogu \filepath{data/audio}.
+odpowiednim formacie, w większości \url{webm}, czasami \url{mp4}). Wszystkie pobrane pliki
+zapisywane są w katalogu \url{data/audio}.
 
 Tabela \ref{tab:datasets2} prezentuje rozkład 994 pobranych i wykorzystywanych do eksperymentów
 nagrań, pomiędzy poszczególne zbiory danych z oznaczeniami.
 
 \begin{table}
     \centering
-    \caption{Liczebności pobranych i wykorzystywanych do eksperymentów nagrań między poszczególnymi zbiorami danych z oznaczeniami}
+    \caption{Liczebności pobranych i wykorzystywanych do eksperymentów nagrań między poszczególnymi zbiorami danych z oznaczeniami.}
     \label{tab:datasets2}
     \begin{tabular}{|l|c|c|}
         \hline
@@ -809,7 +807,7 @@ walidacyjnym.
 
 \begin{table}
     \centering
-    \caption{Liczności zbiorów treningowego, testowego i walidacyjnego}
+    \caption{Liczności zbiorów treningowego, testowego i walidacyjnego.}
     \label{tab:datasets3}
     \begin{tabular}{|l|c|c|}
         \hline
@@ -843,7 +841,7 @@ utwory były następnie wyszukiwane w serwisie YouTube Music i w razie dostępno
 dodawane do pliku indeksu. Wyszukanych i pobranych tą metodą zostało 10000 różnych nagrań.
 
 Cały alogorytm automatycznego preszukiwania rankingów magazynu \emph{Billboard} oraz serwisu YouTube
-Music został zaimplementowany w skrypcie \filepath{src/dataset\_scripts/04-collect\_big\_dataset.py}. Jest
+Music został zaimplementowany w skrypcie \url{src/dataset\_scripts/04-collect\_big\_dataset.py}. Jest
 to implementacja umożliwiająca przeszukiwanie w wielu wątkach jednocześnie (w ramach pracy
 wykorzystanych zostało 5 wątków), ze względu na to, że krytycznymi pod wzlędem czasu operacjami są
 zapytania do Internetu, a cała procedura jest czasochłonna. Algorytm ten składa się z dwóch
