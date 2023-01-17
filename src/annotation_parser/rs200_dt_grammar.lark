@@ -1,7 +1,5 @@
 cltfile: line (_WHITES line) * _WHITES
-line: FLOAT _WHITES FLOAT _WHITES chord _WHITES INTEGER 
-      _WHITES INTEGER _WHITES INTEGER _WHITES INTEGER 
-      | FLOAT _WHITES FLOAT _WHITES "End"
+line: FLOAT _WHITES FLOAT _WHITES chord _WHITES INTEGER _WHITES INTEGER _WHITES INTEGER _WHITES INTEGER | FLOAT _WHITES FLOAT _WHITES "End"
 chord: ( triad | seventh ) [ "/" ( major_triad  | minor_triad ) ]
 seventh: ( major_triad | minor_triad ) [ SEVENTH_MODIFIER ] SEVENTH_INVERSION
 triad: ( major_triad | minor_triad ) [ TRIAD_MODIFIER ] [ TRIAD_INVERSION ]
