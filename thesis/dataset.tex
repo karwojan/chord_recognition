@@ -1,6 +1,7 @@
-% pamiętać, żeby opisać wszystkie kroki, wszystkie SKRYPTY (koncepcję i algorytmy spisać szczegółowo,
-% szczegóły techniczne, jak co zwraca, co przyjmuje dana funkcja pominąć), zerknąć na COMMITY !!!
 \chapter{Zbiór danych}
+
+% pamiętać, żeby opisać wszystkie kroki, wszystkie SKRYPTY (koncepcję i algorytmy opisać szczegółowo,
+% szczegóły techniczne, jak co zwraca, co przyjmuje dana funkcja pominąć), zerknąć na COMMITY
 
 % potrzeba danych!
 Pierwszym i jednocześnie najważniejszym etapem w tworzeniu rozwiązania opartego o uczenie maszynowe
@@ -399,9 +400,9 @@ diagramu klas UML.
 
 \begin{figure}
     \centering
+    \includegraphics[width=1.0\textwidth]{./images/chord_model.png}
     \caption{Diagram klas UML przedstawiający model obiektowy akordów muzycznych.}
     \label{fig:chord_model}
-    \includegraphics[width=1.0\textwidth]{./images/chord_model.png}
 \end{figure}
 
 \subsection{Parsowanie plików \filetype{lab}}
@@ -491,9 +492,9 @@ transformera i parsera oraz opakowanie tego w funkcję pomocniczą, umieszczony 
 
 \begin{figure}
     \centering
+    {\scriptsize \verbatiminput{../src/annotation_parser/labfile_grammar.lark}}
     \caption{Opis składni oznaczeń akordów \emph{lab} za pomocą rozszerzonej notacji Backusa-Naura.}
     \label{fig:lab_syntax}
-    {\scriptsize \verbatiminput{../src/annotation_parser/labfile_grammar.lark}}
 \end{figure}
 
 % tworzenie plików lab
@@ -536,7 +537,7 @@ oznacza tryb minorowy, jeżeli wielkie, tryb majorowy. Następnie aż do znaku u
 dowolne symbole, informujące o modyfikacjach względem zwykłego trójdźwieku majorowego lub
 minorowego. W praktyce są to informacje o występowaniu akordów septymowych, numerach przewrotów oraz
 akordach, zwiększonych, zmniejszonych i występowaniu dodatkowych składników jak kwarta. Opcjonalnie,
-na końcu może wystąpić znak ukośnika i kolejna liczba rzymska, oznaczająca akordy wtrącone (todo
+na końcu może wystąpić znak ukośnika i kolejna liczba rzymska, oznaczająca akordy wtrącone (TODO
 aplied chords). W praktyce symbol akordu wykorzystywany jest jedynie do stworzenia listy interwałów
 i basu.  Podstawa akordu nie musi być wyliczana na podstawie liczby rzymskiej, ponieważ we
 wspomnianym powyżej przetworzonym formacie oznaczeń, zawierającym kolumnę z czasem rozpoczęcia
@@ -555,9 +556,9 @@ opakowuje je w funkcję pomocniczą.
 
 \begin{figure}
     \centering
+    {\scriptsize \verbatiminput{../src/annotation_parser/rs200_dt_grammar.lark}}
     \caption{Opis składni oznaczeń akordów w zbiorze RS200 za pomocą rozszerzonej notacji Backusa-Naura.}
     \label{fig:rs200_dt_syntax}
-    {\scriptsize \verbatiminput{../src/annotation_parser/rs200_dt_grammar.lark}}
 \end{figure}
 
 
@@ -767,6 +768,7 @@ zbioru oznaczeń). Podział ten został zapisany w nowej kolumnie \code{purpose}
 oznaczeniami znaleziono pasujące nagranie.
 
 \subsection{Pobieranie utworów i podsumowanie ich liczebności}
+
 Ostatnim etapem jest ponowne pobranie wszystkich nagrań z serwisu YouTube. Operacja ta została
 wydzielona do osobnego kroku i osobnego skryptu, ponieważ nagrania te zajmują względnie dużo miejsca
 i dodatkowo nie powinny być rozpowszechniane. Dzięki temu nie muszą być więc przechowywane a mogą
@@ -775,13 +777,24 @@ inną maszynę. Mając więc gotowy plik indeksu, stanowiący stałą część r
 wywołać skrypt \url{src/dataset\_scripts/05-download\_songs.py}, który pobiera wszystkie nagrania z
 pliku indeksu, dla których istnieje wartość w kolumnie \code{purpose}. Pobiera je, wykorzystując
 opisaną wcześniej funkcje pomocniczą z pliku \url{src/dataset\_scripts/downloading.py}, czyli
-wybierając najlepszy dostępny strumień dźwiękowy i zapisując go w postaci pliku dźwiękowego (w
-odpowiednim formacie, w większości \filetype{webm}, czasami \filetype{mp4}). Wszystkie pobrane pliki
-zapisywane są w katalogu \url{data/audio}. Dodatkowo do pliku indeksu dodawana jest nowa kolumna
+wybierając najlepszy dostępny strumień dźwiękowy i zapisując go w postaci pliku dźwiękowego, w
+katalogu \url{data/audio}. Dodatkowo do pliku indeksu dodawana jest nowa kolumna
 \code{audio\_filepath}, która dla każdego pobranego utworu zapisuje ścieżkę do pliku dźwiękowego.
 
 Tabela \ref{tab:datasets2} prezentuje rozkład 994 pobranych i wykorzystywanych do eksperymentów
-nagrań, pomiędzy poszczególne zbiory danych z oznaczeniami.
+nagrań, pomiędzy poszczególne zbiory danych z oznaczeniami. Tabela \ref{tab:datasets3} prezentuje
+natomiast liczebność nagrań w zbiorach treningowym, testowym i walidacyjnym. Nagrania pobierane są w
+najlepszej dostępnej jakości. Prawie wszystkie pliki (z wyjątkiem dwóch) zostały pobrane w formacie
+\filetype(webm), z częstotliwością próbkowania $48000$Hz i $32$-bitową dokładnością zapisu.
+Pozostałe dwa nagrania pobrane zostały w formacie \filetype(mp4) z częstotliwością próbkowania
+$44100$ i tą samą dokładnością zapisu.
+
+Jak widać w tabeli \ref{tab:datasets2}, nie udało się znaleźć żadnego pasującego nagrania do
+oznaczeń ze zbioru RWC POP. Jest to spowodowane faktem, że większość utworów w tym zbiorze to
+japońska muzyka popularna, która nie jest dostępna, lub nie udało się jej wyszukać zastosowaną
+metodą w serwisie YouTube Music. Sytuacja ta jest jednak zupełnie akceptowalna i zrozumiała w
+kontekście próby stworzenia całkowicie automatycznego algorytmu wyszukiwania odpowiednich nagrań w
+Internecie.
 
 \begin{table}
     \centering
@@ -791,20 +804,17 @@ nagrań, pomiędzy poszczególne zbiory danych z oznaczeniami.
         \hline
         Nazwa zbioru & Liczba nagrań & Łączny czas trwania [h] \\
         \hline
-        Isophonics          & 217 & todo \\
-        McGill Billboard    & 420 & todo \\
-        Robbie Williams     & 54 & todo \\
-        RS200               & 142 & todo \\
-        RWC POP             & 0 & todo \\
-        Uspop2002           & 161 & todo \\
+        Isophonics          & $217$ & $10.5$ \\ % Loaded 217 songs (10:18:27)
+        McGill Billboard    & $420$ & $24.5$ \\ % Loaded 420 songs (1 day, 0:34:52)
+        Robbie Williams     & $54$  & $4$    \\ % Loaded 54 songs  (4:10:22)
+        RS200               & $142$ & $8.5$  \\ % Loaded 142 songs (8:43:31)
+        RWC POP             & $0$   & $0$    \\
+        Uspop2002           & $161$ & $11.5$ \\ % Loaded 161 songs (11:19:29)
         \hline
-        SUMA                & 994 & todo \\
+        SUMA                & $994$ & $59$   \\
         \hline
     \end{tabular}
 \end{table}
-
-Tabela \ref{tab:datasets3} prezentuje liczebność nagrań w zbiorach treningowym, testowym i
-walidacyjnym.
 
 \begin{table}
     \centering
@@ -812,19 +822,32 @@ walidacyjnym.
     \label{tab:datasets3}
     \begin{tabular}{|l|c|c|}
         \hline
-        Nazwa zbioru & Liczba nagrań & Łączny czas trwania [h] \\
+        Nazwa zbioru & Liczba nagrań \\
         \hline
-        Treningowy  & 790 & todo \\
-        Testowy     & 102 & todo \\
-        Walidacyjny & 102 & todo \\
+        Treningowy  & 790 \\
+        Testowy     & 102 \\
+        Walidacyjny & 102 \\
         \hline
     \end{tabular}
 \end{table}
 
+Mając już wybrane, które konkretnie utwory będą wykorzystywane do eksperymentów, można było zbadać
+rozkład częstości występowania poszczególnych typów akordów w tych utworach. Rysunek
+\ref{fig:chords_histogram} prezentuje ile godzin zajął sumarycznie każdy z $25$ rozpoznawanych typów
+akordów.
+
+\begin{figure}
+    \centering
+    \makebox[\textwidth][c]{\includegraphics[width=1.7\textwidth]{./images/chords_histogram.png}}
+    \caption{Rozkład występowania każdej z $25$ klas akordów w $994$ utworach wykorzystywanych w eksperymentach}
+    \label{fig:chords_histogram}
+\end{figure}
+
 
 \section{Wyszukiwanie utworów bez oznaczeń z rankingów magazynu Billboard}
 
-% wprowadzenie
+% TODO: statystyki o zbiorze nieoznaczonym
+% wstęp
 Jak już wspomniano wcześniej, zgromadzenie zbioru danych nieoznaczonych było znacznie prostsze. Dla
 przypomnienia, chodzi tutaj jedynie o same nagrania muzyczne, bez oznaczeń akordów. W najprostszym
 rozumieniu wystarczyło by więc pobrać dowolną liczbę dowolnych nagrań muzycznych z internetu i
@@ -891,6 +914,7 @@ na różnorodność zbioru.
 
 \section{Wstępne przetwarzanie danych}
 
+% TODO: dodać jakiś ładny schemat prezentujący cały preprocessing (obrazki spektrogramów itd.)
 % wstęp
 W poprzednich podrozdziałach opisany został proces zgromadzenia plików z oznaczeniami, zgromadzenia
 plików z nagraniami i utworzenia indeksu, opisującego cały powstały zbiór danych. Ostatnim etapem
@@ -1086,7 +1110,7 @@ wartość równą $1$. Fakt, że każdy zwracany przykład zaczyna się w losowy
 rodzaj augmentacji.
 
 % znaczenie song_mutliplier i item_multiplier (nieszczęsny kompromis)
-Parametr \code{song\_multiplier} pozwala uniknąć występowania zbyt krótki epok, które prowadzą do
+Parametr \code{song\_multiplier} pozwala uniknąć występowania zbyt krótkich epok, które prowadzą do
 zbyt częstej walidacji i spowolnienia treningu. Parametr \code{item\_multiplier} zapobiega zbyt
 częstemu wczytywaniu tych samych plików z dysku aby załadować jedynie ich małe fragmenty. Wartość
 tego parametru razem z podanym w konfiguracji treningu rozmiarem batch'a determinuje faktyczną
@@ -1108,9 +1132,3 @@ przypadku stosowania augmentacji. Później, podczas treningu wczytuje się dane
 i dzieli jedynie na 10-sekundowe przykłady. Oczywistą przyczyną powstania tego mechanizmu jest fakt,
 że wstępne przetwarzanie, zwłaszcza augmentacje, dekodowanie skompresowanych formatów plików i
 resampling, zajmuje zbyt wiele czasu, żeby powtarzać je co epokę dla każdego utworu.
-
-
-% do dodania:
-% - jakieś rysuneczki do preprocessingu
-% - słówko na temat jakości pobranych nagrań
-% - słówko na temat rozkładu akordów w zbiorze (lub zbiorach)
