@@ -125,19 +125,19 @@ class SongDataset(Dataset):
             )
 
         def _load_song(song_metadata):
-            print(f"Loading {song_metadata.song}", flush=True)
-
-            # check if song is already cached (with all augmentations if conifgured)
+            # check if song is already cached (with all augmentations if configured)
             if all(
                 os.path.exists(
                     os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz")
                 )
                 for i in range(0, 12 if config.pitch_shift_augment else 1)
             ):
+                print(f"Loading {song_metadata.song} (from cache)", flush=True)
                 audio = np.load(
                     os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz")
                 )["audio"]
             else:
+                print(f"Loading {song_metadata.song}", flush=True)
                 # load audio file (supress librosa warnings)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
@@ -294,19 +294,20 @@ if __name__ == "__main__":
     # from src.training.dataset import SongDataset
 
     ds = SongDataset(
-        purposes=["train"],
+        purposes=["train", "test", "validate"],
         config=SongDatasetConfig(
             sample_rate=22050,
             frame_size=2048,
             hop_size=2048,
-            frames_per_item=108,
-            item_multiplier=5,
-            song_multiplier=2,
-            audio_preprocessing=JustSplitPreprocessing(),
+            frames_per_item=100,
+            item_multiplier=1,
+            song_multiplier=1,
+            audio_preprocessing=CQTPreprocessing(),
             standardize_audio=True,
-            pitch_shift_augment=False,
+            pitch_shift_augment=True,
             labels_vocabulary="maj_min",
-            subsets=["isophonics"],
+            subsets=["uspop"],
+            fraction=None
         ),
     )
     print(ds.mean, ds.std)
