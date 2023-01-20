@@ -4,10 +4,12 @@
 \usepackage[polish]{babel}
 \usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsmath}
 
 \author{Jan Karwowski}
 \title{Nienadzorowane uczenie sieci neuronowych w zadaniu rozpoznawania akordów muzycznych}
-\includeonly{dataset,analiza}
+\includeonly{analiza,dataset,experiments}
 
 \pagestyle{headings}
 \sloppy
@@ -15,14 +17,17 @@
 \newcommand{\url}[1]{\texttt{#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\filetype}[1]{\texttt{#1}}
+\renewcommand{\matrix}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\defmatrix}[3]{\ensuremath{\matrix{#1} \in \mathbb{R}^{#2 \times #3}}}
 
 \begin{document}
 
 \maketitle
 \tableofcontents
 
-\include{dataset}
 \include{analiza}
+\include{dataset}
+\include{experiments}
 
 \bibliographystyle{plain}
 \bibliography{bibliography}
