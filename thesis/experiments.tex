@@ -12,7 +12,7 @@ wyniki z pracy referencyjnej. W tym celu wykonany został zwykły trening nadzor
 wykorzystaniem zbliżonego zbioru danych, zbliżonej procedury i identycznego modelu, jak w
 oryginalnych badaniach.
 
-W następnej koleności model został uproszczony i pozbawiony autorskich usprawnień, po czym wykonana
+W następnej kolejności model został uproszczony i pozbawiony autorskich usprawnień, po czym wykonana
 została seria eksperymentów mająca na celu uzyskać tym modelem jak najlepsze wyniki. Celem tego
 etapu było przygotowanie punktu odniesienia dla późniejszych eksperymentów z uczeniem
 nienadzorowanym. Model został uproszczony aby nie zaciemniać właściwego tematu pracy, jakim jest
@@ -33,9 +33,10 @@ przeprowadzona została dyskusja otrzymanych wyników.
 
 % model (model.py), trening nadzorowany (training.py), trening nienadzorowany (mae_training.py) i
 % ewaluacja (evaluate.py)
-\section{Algorytm rozpoznawania akordów muzycznych wykorzystujący uczenie nienadzorowane}
+\section{Algorytm rozpoznawania akordów muzycznych}
 
-% wstęp - dyskusja na temat podejścia do rozpoznawania akordów
+% wstęp - dyskusja na temat podejścia do rozpoznawania akordów (TODO: czy to dobry wstęp i w ogóle
+% dobry tytuł tej pierwszej z dwóch części rozdziału, może ta dyskusja powinna być gdzieś indziej)
 Jak wspomniano powyżej, do rozpoznawania akordów muzycznych wykorzystano sieci neuronowe. Modele te
 są jednak bardzo ogólne i wykorzystując je, wciąż można podejść do zadania rozpoznawania akordów na
 bardzo wiele różnych sposobów. Samo zadanie polega właściwie na podzieleniu wejściowego nagrania
@@ -43,40 +44,42 @@ muzycznego na logiczne części, w których wybrzmiewają pojedyncze, rozpoznane
 Można więc potraktować to zadanie jako dwa podzadania, albo przeformułować je tak, aby było prostsze
 ale dawało takie same rezultaty. 
 
-Po pierwsze należy więc zadać sobie pytanie, z jaką dokładnością w dziedzinie czasu mają być
-rozpoznawane akordy. Sygnał dźwiękowy jest sygnałem ciągłym, ale zapisany jest w postaci cyfrowej z
-określoną częstotliwością próbkowania. Można zatem próbować rozpoznawać akordy z największą możliwą
-dokładnością, czyli co do pojedynczej próbki. Jest to jednak dokładność zdecydowanie nadmiarowa w
-kontekście tego zadania. Zakładając z kolei, że dane wejściowe nie będą miały postaci surowych
-próbek ale postać spektrogramu, dokładność rozpoznawania można ograniczyć do pojedynczych ramek
-czasowych tworzących spektrogram. Podejście takie jest o tyle proste, że zadanie rozpoznawania
-akordów staje się stricte zadaniem klasyfikacji ramek spektrogram, które są po prostu wektorami
-pewnych cech. Uzyskana dokładność czasowa, rzędu dziesiątych części sekundy, wydaje się być jak
-najbardziej wystarczająca. Takie też podejście zostało zastosowane w niniejszej pracy, co jasno
-widać bo opisanym w poprzednim rozdziale wstępnym przetwarzaniu danych.
+Po pierwsze należy więc zadać sobie pytanie, z jaką dokładnością mają być rozpoznawane chwile
+rozpoczęcia i zakończenia trwania akordów. Sygnał dźwiękowy jest sygnałem ciągłym, ale zapisany jest
+w postaci cyfrowej z określoną częstotliwością próbkowania. Można zatem próbować rozpoznawać akordy
+z największą możliwą dokładnością, czyli co do pojedynczej próbki. Jest to jednak dokładność
+zdecydowanie nadmiarowa w kontekście tego zadania. Zakładając z kolei, że dane wejściowe nie
+będą miały postaci surowych próbek ale postać spektrogramu, dokładność rozpoznawania można
+ograniczyć do pojedynczych ramek czasowych tworzących spektrogram. Podejście takie jest o tyle
+proste, że zadanie rozpoznawania akordów staje się stricte zadaniem klasyfikacji ramek spektrogramu,
+które są po prostu wektorami pewnych cech. Uzyskana dokładność czasowa, rzędu dziesiątych części
+sekundy, wydaje się być jak najbardziej wystarczająca. Takie też podejście zostało zastosowane w
+niniejszej pracy, co jasno widać po opisanym w poprzednim rozdziale wstępnym przetwarzaniu danych.
 
-Kolejną tematem jest sposób przetwarzania ramek spektrogram przez sieć neuronową. Teoretycznie każda
-ramka może być najpierw klasyfikowana osobno, bez uwzględnienia kontekstu przed i po danej chwili
-czasu. Powstała w ten sposób, zapewne dość zaszumiona sekwencja akordów, może być wygładzona
+Kolejnym tematem jest sposób przetwarzania ramek spektrogram przez sieć neuronową. Teoretycznie
+każda ramka może być najpierw klasyfikowana osobno, bez uwzględnienia kontekstu przed i po danej
+chwili czasu. Powstała w ten sposób, zapewne dość zaszumiona sekwencja akordów, może być wygładzona
 kolejnym algorytmem. Wiele podejść tego typu było wcześniej stosowanych. Lepszym pomysłem wydaje się
-jednak wykorzystanie kontekstu czasowego na etapie rozpoznawania pojedynczych akordów. Można np.
-podawać na wejście sieci dłuższy (trwający więcej niż sekundę) fragment a rozpoznawać jedynie akord
-brzmiący na samym środku tego fragmentu, jak to zostało zrobione w \cite{korzeniowski_fully_2016}.
-Wciąż można później zaaplikować algorytm uwzględniający szerszy kontekst, czyli np. konkretne
-progresje akordów. Najlepiej by jednak było, gdyby model rozpoznający akordy był jeden i łączył w
-sobie zarówno informacje lokalne (brzmiące w danym ułamu sekndy częstotliwości) jak i informacje
-globalne (progresje akordów). Można więc podawać na wejście sieci od razu dłuższy fragment utworu i
-z dokładnością do ramek czasowych dokonywać swego rodzaju segmentacji semantycznej, czyli
-przypisywać od razu klasę dla każdej ramki. Takie podejście zostało właśnie zastosowane w
-\cite{park_bi-directional_2019} i idąc za tym oryginalnym i najbardziej naturalnym pomysłem również
-w niniejszej pracy. Opisanie zastosowanego algorytmu rozpoznawania akordów sprowadza się opisania
-architektury modelu i procedur wykonanych treningów, co zostało wykonane poniżej.
+jednak wykorzystanie szerszego kontekstu czasowego na etapie rozpoznawania pojedynczych akordów.
+Można np.  podawać na wejście sieci dłuższy (trwający więcej niż sekundę) fragment a rozpoznawać
+jedynie akord brzmiący na samym środku tego fragmentu, jak to zostało zrobione w
+\cite{korzeniowski_fully_2016}.  Wciąż można później zaaplikować algorytm uwzględniający szerszy
+kontekst, czyli np. konkretne progresje akordów. Najlepiej by jednak było, gdyby model rozpoznający
+akordy był jeden i łączył w sobie zarówno informacje lokalne (brzmiące w danym ułamu sekndy
+częstotliwości) jak i informacje globalne (progresje akordów). Można więc podawać na wejście sieci
+od razu dłuższy fragment utworu i z dokładnością do ramek czasowych dokonywać swego rodzaju
+segmentacji semantycznej, czyli przypisywać klasę dla każdej ramki. Takie podejście zostało właśnie
+zastosowane w \cite{park_bi-directional_2019}. Idąc za tym najprostszym i być może najbardziej
+naturalnym pomysłem zastosowano go również w niniejszej pracy. 
 
-\subsection{Opis wykorzystanego modelu transformera}
+\subsection{Opis wykorzystanego modelu sieci neuronowej}
 
-Do rozpoznawani akordów wykorzystany został popularny w ostatnim latach model sieci neuronowej o
-nazwie \emph{Transformer}. Model ten został zaimplementowany samodzielnie, na bazie przykładów i
-literatury. Implementacja znajduje się w pliku \url{src/training/model.py}.
+Do rozpoznawani akordów, podobnie jak w \cite{park_bi-directional_2019}, wykorzystany został
+popularny w ostatnim latach model sieci neuronowej o nazwie \emph{Transformer}. W niniejszej pracy,
+poza fazą reprodukcją wyników z \cite{park_bi-directional_2019}, wykorzystana została jak
+najprostsza i jak najbardziej zbliżona do oryginału wersja tego modelu. Implementacja została,
+przygotowana samodzielnie (plik \url{src/training/model.py}) na bazie literatury i innych
+implementacji.
 
 \subsubsection{Krótka historia transformerów}
 
@@ -89,16 +92,16 @@ sekwencjami słów --- zapominały kontekst jeżeli przetwarzany tekst nie był 
 rozwiązania tego problemu wprowadzono mechanizm atencji (ang. \emph{attention}), który pozwalał
 uwzględnić dalszy kontekst zdania \cite{bahdanau_neural_2016}. Pomysł twórców transformera polega na
 tym, aby zrezygnować z sieci rekurencyjnych i pozostawić jedynie mechanizm atencji, w połączeniu z
-warstwami gęstymi (MLP). Transformer nie jest więc ani siecią rekurencyjną, ani siecią splotową. Po
-odniesieniu ogromnego sukcesu w NLP (dziś praktycznie wszystkie modele do NLP są budowane na bazie
-transformerów), architektura ta została wykorzystana również w przetwarzaniu obrazów
-\cite{dosovitskiy_image_2021}. Na potrzeby klasyfikacji zdjęć została nieco uproszczona ponieważ
-pozostawiony został sam enkoder. Na tym polu transformery również odniosły sukces, chociaż nie
-wyparły sieci splotowych \cite{liu_convnet_2022}, tak jak wyparły sieci rekurencyjne. Ostatecznie
-modele tego typu zostały wykorzystane również do przetwarzania dźwięku, w tym do klasyfikacji
-dźwięków \cite{gong_ast_2021} i do rozpoznawania mowy \cite{kim_squeezeformer_2022}. Transformery są
-więc dziś bardzo popularnymi modelami, które znajdują zastosowanie praktycznie w każdej dziedzinie
-wykorzystującej uczenie maszynowe.
+warstwami liniowymi i funkcjami aktywacji (MLP). Transformer nie jest więc ani siecią rekurencyjną,
+ani siecią splotową. Po odniesieniu ogromnego sukcesu w NLP (dziś praktycznie wszystkie modele do
+NLP są budowane na bazie transformerów), architektura ta została wykorzystana również w
+przetwarzaniu obrazów \cite{dosovitskiy_image_2021}. Na potrzeby klasyfikacji zdjęć została nieco
+uproszczona ponieważ pozostawiony został sam enkoder. Na tym polu transformery również odniosły
+sukces, chociaż nie wyparły sieci splotowych \cite{liu_convnet_2022}, tak jak wyparły sieci
+rekurencyjne. Ostatecznie modele tego typu zostały wykorzystane również do przetwarzania dźwięku, w
+tym do klasyfikacji dźwięków \cite{gong_ast_2021} i do rozpoznawania mowy
+\cite{kim_squeezeformer_2022}. Transformery są więc dziś bardzo popularnymi modelami, które znajdują
+zastosowanie praktycznie w każdej dziedzinie wykorzystującej uczenie maszynowe.
 
 \subsubsection{Ogólny opis architektury}
 
@@ -133,18 +136,18 @@ $\defmatrix{W_{in}}{F}{d_{\mathrm{model}}}$ to macierz parametrów tej warstwy. 
 $d_{\mathrm{model}}$, podobnie jak liczba tokenów $N$, nie zmienia się podczas przechodzenia przez
 kolejne warstwy, co różni transformer od sieci splotowych, gdzie rozmiar danych przechodzących przez
 sieć jest sukcesywnie zmniejszany. W rzeczywistości istnieją architektury oparte o oryginalny
-transformer, które podobnie jak sieć splotowa zmniejszają rozmiar danych wejściowych
+transformer, które podobnie jak sieć splotowa, zmniejszają rozmiar danych wejściowych
 \cite{liu_swin_2021}, ale to tylko głupie wymysły Microsoftu. Przed wejściem do stanowiących
 właściwą część transformera serii bloków, do tokenów dokładana jest informacja o ich pozycji w
-sekwencji - jest to kodowanie pozycji (ang. \emph{positional encoding}). Szczegóły tej operacji
+sekwencji --- jest to kodowanie pozycji (ang. \emph{positional encoding}). Szczegóły tej operacji
 zostały opisane poniżej.
 
 % ogólny opis architektury - bloki, w tym MLP i normalizacja
-Centralną część transformera stanowi ciąg identycznych bloków ,,BLK''. Liczba tych bloków ($B$), w
+Centralną część transformera stanowi ciąg identycznych bloków BLK. Liczba tych bloków ($B$), w
 połączeniu z wymiarowością tokenów ($d_{\mathrm{model}}$), stanowią główne hiperparametry modelu i
-decydują o jego rozmiarze. Każdy blok składa się z dwóch głównych warstw: warstwy atencyjnej ,,MSA''
-(ang. \emph{Mulit-Head Self-Attention}) i niewielkiego perceptrona wielowarstwowego ,,MLP'' (ang.
-\emph{Mulitlayer Perceptron}). Każdą z tych warstw poprzedza normalizacja ,,Norm'' typu \emph{Layer
+decydują o jego rozmiarze. Każdy blok składa się z dwóch głównych warstw: warstwy atencyjnej MSA
+(ang. \emph{Mulit-Head Self-Attention}) i niewielkiego perceptrona wielowarstwowego MLP (ang.
+\emph{Mulitlayer Perceptron}). Każdą z tych warstw poprzedza normalizacja Norm typu \emph{Layer
 Normalization} \cite{ba_layer_2016}, a kończy połączenie rezydualne \cite{he_deep_2015}, czyli
 dodanie do wartości na wyjściu nieznormalizowanej wartości z wejścia. Operacje realizowane przez
 pojedynczy blok dla ciągu tokenów $\defmatrix{T}{N}{d_{\mathrm{model}}}$ można opisać równaniami:
@@ -173,11 +176,11 @@ odpowiedniej macierzy) $b_1 \in \mathbb{R}^{4d_{\mathrm{model}}}$ i $b_2 \in
 
 % ogólny opis architetury - dropout
 W rzeczywistości pojedynczy blok zawiera jeszcze jeden opcjonalny element, jakim są warstwy
-\emph{dropout}, umieszczone w połowie bloku (po warstwie atencyjnej) i na jego wyjściu. Dodatkowo
-\emph{dropout} może być stosowany również przed wejściem do sieci, czyli bezpośrednio na
-spektrogramie. Warstwy tego typu zerują z wybranym prawdopodobieństwem niektóre z przechodzących
-przez nie wartości w celu regularyzacji sieci i uniknięcia przetrenowania. Technika ta jest
-opcjonalna i nie była stosowana we wszystkich eksperymentach.
+\emph{dropout}, umieszczone po każdym z dwóch połączeń rezydualnych, czyli w połowie bloku i na jego
+wyjściu. Dodatkowo \emph{dropout} może być stosowany również przed wejściem do sieci, czyli
+bezpośrednio na spektrogramie. Warstwy tego typu zerują z wybranym prawdopodobieństwem niektóre z
+przechodzących przez nie wartości w celu regularyzacji sieci i uniknięcia przetrenowania. Technika
+ta jest opcjonalna i nie była stosowana we wszystkich eksperymentach.
 
 % ogólny opis architektury - wyjście (klasyfikacja)
 Po serii bloków następuje ostatnia część modelu, odpowiedzialna za klasyfikację. Najpierw,
@@ -220,7 +223,7 @@ PE_{(\textrm{pos},2i + 1)} = \cos(\textrm{pos}/10000^{2i/d_{\textrm{\tiny model}
 \end{equation}
 Równania te oznaczają, że każdy wymiar wektora kodującego pozycję odpowiada sinusoidzie o innej
 częstotliwości. Parzyste pozycje w wektorze to wartości odpowiednich funkcji sinus dla danej
-pozycji, a nieparzyste to wartości funkcji kosinus, dla danej pozycji. Stosowany jest również
+pozycji, a nieparzyste to wartości funkcji kosinus dla danej pozycji. Stosowany jest również
 wariant, gdzie pierwsza połowa wektora to wartości funkcji sinus a druga to wartości funkcji
 kosinus. Autorzy uzasadniają, że użycie tych funkcji pozwala modelowi łatwo wykorzystywać informację
 o pozycji, ponieważ między wektorami prezentującymi różne pozycje występują zależności liniowe. Na
@@ -237,24 +240,24 @@ nich to 256 (kolumny).
 \subsubsection{Multi-Head Self-Attention}
 
 % mutli-head self-attention - wstęp
-Najważniejszą część transformera stanowi warstwa atencyjna ,,MSA''. Jako jedyna w całym modelu
+Najważniejszą część transformera stanowi warstwa atencyjna MSA. Jako jedyna w całym modelu
 odpowiada ona za ,,wymianę'' informacji między tokenami --- uwzględnienie kontekstu pozostałych
 tokenów w sekwencji, podczas tworzenia nowej reprezentacji danego tokena.
 
 % mutli-head self-attention - ogólnie o mechaniźmie attention
-Sama idea mechanizmu \emph{attention} polega na tym, że mając dla danego tokena wejściowego
+Sama idea mechanizmu \emph{Attention} polega na tym, że mając dla danego tokena wejściowego
 zapytanie (ang. \emph{query}) i mając zbiór par klucz-wartość (ang. \emph{key-value}) związanych z
 innym (lub tym samym) ciągiem tokenów, wylicza się nową reprezentację tokena jako ważoną sumę tych
 wartości, gdzie wagi są wyliczane na podstawie dopasowania zapytania do kluczy. Wagi te informują
 więc o tym, jak dużo uwagi powinno poświęcić się danej wartości, tworząc nową reprezentację danego
-tokena. W przypdadku zadania tłumaczenia maszynowego, mechanizm ten pozwala skupić się na
+tokena. W przypadku zadania tłumaczenia maszynowego, mechanizm ten pozwala skupić się na
 odpowiednich częściach sekwencji wejściowej, podczas tworzenia sekwencji wyjściowej. Jeżeli zarówno
 zapytania jak i pary klucz-wartość pochodzą z tej samej sekwencji tokenów, mamy do czynienia z
 \emph{Self-Attention}. Warstwa tego typu wyznacza więc dla każdego tokena w sekwencji zapytanie,
 klucz i wartość, a następnie tworzy jego nową reprezentację jako ważoną sumę wartości pozostałych
 tokenów. Informacje zakodowane w poszczególnych tokenach mieszają się zatem między sobą. W praktyce
 warstwa atencyjna w transformerze realizuje równolegle kilka niezależnych operacji
-\emph{Self-Attention}, których wyniki na końcu są łączone w całość stąd też nazwa \emph{Multi-Head
+\emph{Self-Attention}, których wyniki na końcu są łączone w całość, stąd też nazwa \emph{Multi-Head
 Self-Attention}. Pozwala to uzyskać lepsze rezultaty niż pojedyncza operacja, nawet jeżeli
 wykorzysta się niżej wymiarowe reprezentacje.
 
@@ -279,7 +282,7 @@ Dla pojedynczej trójki macierzy $\matrix{Q}$, $\matrix{K}$ i $\matrix{V}$, oper
 \begin{equation} \label{eq:sa}
     \textrm{SA}(\matrix{Q}, \matrix{K}, \matrix{V}) = \textrm{softmax}(\frac{\matrix{Q}\matrix{K^T}}{\sqrt{d_k}})\matrix{V}
 \end{equation}
-Człon $\textrm{softmax}(\frac{\matrix{Q}\matrix{K^T}}{\sqrt{d_k}})$ oznacza wyliczenie macierzy
+Człon ,,$\textrm{softmax}(\frac{\matrix{Q}\matrix{K^T}}{\sqrt{d_k}})$'' oznacza wyliczenie macierzy
 atencji między wszystkimi parami klucz-zapytanie, poprzez wykonanie iloczynów skalarnych dla
 każdej z tych par, przeskalowanie uzyskanych wartości i wykorzystanie normalizującej funkcji
 \emph{softmax}. Dlatego też funkcja SA nazywa się właściwie \emph{Scaled Dot-Product Attention}.
@@ -316,7 +319,7 @@ hiperparametry transformera zostały zebrane w tabeli \ref{tab:transformer_param
         $F$ & Wymiarowość na wejściu \\
         $d_{\mathrm{model}}$ & Wymiarowość tokenów wewnątrz sieci \\
         $B$ & Liczba bloków transformera \\
-        $H$ & Liczba ,,głów'' w bloku ,,MSA'' \\
+        $H$ & Liczba ,,głów'' w bloku MSA \\
         $K$ & Liczba klas na wyjściu \\
         $p_d$ & Prawdopodobieństwo warstw \emph{dropout} \\ \hline
     \end{tabular}
@@ -327,17 +330,17 @@ hiperparametry transformera zostały zebrane w tabeli \ref{tab:transformer_param
 W pracy referencyjnej \cite{park_bi-directional_2019} autorzy postanowili wprowadzić drobne
 modyfikacje w stosunku do oryginalnego bloku transformera tworząc swój autorski model nazwany
 \emph{bi-directional transformer for chord recognition} (BTC). Pierwszą z nich jest zamiana warstw
-liniowych w module ,,MLP'', na jednowymiarowe warstwy splotowe z polem recepcyjnym szerokości 3
-tokenów. Według autorów ma to ułatwić sieci tworzenie bardziej ,,wygładzonych'' predykcji i lepsze
+liniowych w module MLP, na jednowymiarowe warstwy splotowe z polem recepcyjnym szerokości 3 tokenów.
+Według autorów ma to ułatwić sieci tworzenie bardziej ,,wygładzonych'' predykcji i lepsze
 wykorzystanie kontekstu otaczającego każdą ramkę. Druga różnica polega na tym, że pojedynczy blok
 transformerowy został rozbity na dwa, które dostają te same wartości na wejściu, a ich wartości
-wyjściowe są łączone za pomocą dodatkowej warstwy liniowej. Bloki te różnią się operacją ,,MSA''.
+wyjściowe są łączone za pomocą dodatkowej warstwy liniowej. Bloki te różnią się operacją MSA.
 Została w nich zastosowana technika maskowania, polegająca na modyfikacji macierzy atencji (wzór
 \ref{eq:sa}) w ten sposób, że dla danego tokena, wagi wszystkich wcześniejszych lub późniejszych
 tokenów są zerowane. Oznacza to, że tworząc nową reprezentację danego tokena wykorzystuje
-się jedynie tokeny poprzedzające, lub następujące po nim. W modelu BTC każdy z dwóch bloków
-tworzących moduł ,,MSA'' kierunek maskowania jest inny. Technika ta ma zmusić model do pełnego
-wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu dla każdej ramki.
+się jedynie tokeny poprzedzające, lub następujące po nim. W modelu BTC, każdy z dwóch bloków
+tworzących moduł MSA ma inny kierunek maskowania. Technika ta ma zmusić model do pełnego
+wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy klasyfikacji danej ramki.
 
 \subsection{Procedura treningu nadzorowanego}
 TODO
