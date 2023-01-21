@@ -44,6 +44,7 @@ class SongDatasetConfig:
     labels_vocabulary: str
     subsets: Optional[List[str]]
     fraction: Optional[float]
+    use_ram_cache: bool
 
     def generate_cache_description(self) -> str:
         desc = "cache"
@@ -82,6 +83,7 @@ class SongDatasetConfig:
         )
         parser.add_argument("--subsets", type=str, required=False, nargs="+")
         parser.add_argument("--dataset_fraction", type=float, required=False)
+        parser.add_argument("--use_ram_cache", action="store_true")
 
     @staticmethod
     def create_from_args(args):
@@ -104,6 +106,7 @@ class SongDatasetConfig:
             labels_vocabulary=args.labels_vocabulary,
             subsets=args.subsets,
             fraction=args.dataset_fraction,
+            use_ram_cache=args.use_ram_cache
         )
 
 
@@ -133,9 +136,12 @@ class SongDataset(Dataset):
                 for i in range(0, 12 if config.pitch_shift_augment else 1)
             ):
                 print(f"Loading {song_metadata.song} (from cache)", flush=True)
-                audio = np.load(
-                    os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz")
-                )["audio"]
+                audio_list = []
+                labels_list = []
+                for i in range(0, 12 if config.pitch_shift_augment else 1):
+                    song = np.load(os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz"))
+                    audio_list.append(song["audio"])
+                    labels_list.append(song["labels"])
             else:
                 print(f"Loading {song_metadata.song}", flush=True)
                 # load audio file (supress librosa warnings)
@@ -181,8 +187,9 @@ class SongDataset(Dataset):
                     for audio in audio_list
                 ]
 
-                for i, (audio, chords) in enumerate(zip(audio_list, chords_list)):
-                    # assign annotations (labels) to frames
+                # assign annotations (labels) to frames
+                labels_list = []
+                for audio, chords in zip(audio_list, chords_list):
                     labels = np.zeros(shape=audio.shape[:1], dtype=int)
                     for chord in chords:
                         labels[
@@ -190,17 +197,23 @@ class SongDataset(Dataset):
                                 chord.stop
                             )
                         ] = chord.to_label_occurence(config.labels_vocabulary).label
+                    labels_list.append(labels)
 
-                    # store in cache
+                # store in disk cache
+                for i, (audio, labels) in enumerate(zip(audio_list, labels_list)):
                     np.savez(
                         os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz"),
                         audio=audio.astype(np.float32),
                         labels=labels.astype(np.int32),
                     )
 
-                audio = audio_list[0]
-
-            return audio.shape, np.mean(audio), np.mean(audio**2)
+            audio = audio_list[0]
+            return (
+                audio.shape,
+                np.mean(audio),
+                np.mean(audio**2),
+                (audio_list, labels_list) if config.use_ram_cache else None
+            )
 
         # load index (songs metadata)
         self.songs_metadata = pd.read_csv("./data/index.csv", sep=";")
@@ -217,7 +230,7 @@ class SongDataset(Dataset):
             )
 
         # load songs
-        shape_per_song, mean_per_song, mean_2_per_song = zip(
+        shape_per_song, mean_per_song, mean_2_per_song, cache_per_song = zip(
             *tqdm(
                 ThreadPoolExecutor(max_workers=5).map(
                     _load_song, self.songs_metadata.itertuples()
@@ -227,10 +240,11 @@ class SongDataset(Dataset):
             )
         )
 
-        # store mean, std and dimensionality of dataset
+        # store mean, std, dimensionality of dataset and cache
         self.mean = np.mean(mean_per_song)
         self.std = np.sqrt(np.mean(mean_2_per_song) - self.mean**2)
         self.dim = shape_per_song[0][1]
+        self.ram_cache = cache_per_song
 
         # print info about loaded songs
         dataset_duration = (
@@ -251,18 +265,25 @@ class SongDataset(Dataset):
         return len(self.songs_metadata) * self.config.song_multiplier
 
     def __getitem__(self, index):
+        real_index = index % len(self.songs_metadata)
         # select random shift
         shift = np.random.randint(12) if self.config.pitch_shift_augment else 0
 
         # load whole preprocessed audio file
-        song = np.load(
-            os.path.join(
-                self.cache_path,
-                f"{self.songs_metadata.iloc[index % len(self.songs_metadata)].name}_{shift}.npz",
+        if self.config.use_ram_cache:
+            audio = self.ram_cache[real_index][0][shift]
+            labels = self.ram_cache[real_index][1][shift]
+        else:
+            song = np.load(
+                os.path.join(
+                    self.cache_path,
+                    f"{self.songs_metadata.iloc[real_index].name}_{shift}.npz",
+                )
             )
-        )
-        audio = song["audio"].astype(np.float32)
-        labels = song["labels"].astype(np.int64)
+            audio = song["audio"]
+            labels = song["labels"]
+        audio = audio.astype(np.float32)
+        labels = labels.astype(np.int64)
 
         # select 'item_multiplier' random items if item size is defined
         if self.config.frames_per_item > 0:
@@ -291,7 +312,7 @@ class SongDataset(Dataset):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    # from src.training.dataset import SongDataset
+    # from src.training.dataset import SongDataset, SongDatasetConfig, CQTPreprocessing
 
     ds = SongDataset(
         purposes=["train", "test", "validate"],
@@ -307,7 +328,8 @@ if __name__ == "__main__":
             pitch_shift_augment=True,
             labels_vocabulary="maj_min",
             subsets=["uspop"],
-            fraction=None
+            fraction=0.01,
+            use_ram_cache=True
         ),
     )
     print(ds.mean, ds.std)
