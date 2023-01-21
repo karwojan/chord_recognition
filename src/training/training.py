@@ -198,6 +198,12 @@ def train(args):
             "validate_ds_evaluation",
             args.frames_per_item,
         )
+        evaluate(
+            SongDataset(["test"], song_dataset_config_eval),
+            model,
+            "test_ds_evaluation",
+            args.frames_per_item,
+        )
 
 
 if __name__ == "__main__":
