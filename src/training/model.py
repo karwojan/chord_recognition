@@ -78,7 +78,10 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.msa = MultiheadSelfAttention(dim, n_heads)
         self.mlp = nn.Sequential(
-            nn.Linear(dim, dim * 4), nn.GELU(), nn.Linear(dim * 4, dim)
+            nn.Linear(dim, dim * 4),
+            nn.GELU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(dim * 4, dim)
         )
         self.norm1 = nn.LayerNorm(dim)
         self.norm2 = nn.LayerNorm(dim)
@@ -103,7 +106,6 @@ class BTCSubBlock(nn.Module):
             nn.Dropout(dropout_p),
             nn.Conv1d(dim, dim, kernel_size=3, padding=1),
             nn.GELU(),
-            nn.Dropout(dropout_p),
         )
         self.norm1 = nn.LayerNorm(dim)
         self.norm2 = nn.LayerNorm(dim)
@@ -206,6 +208,6 @@ class Transformer(nn.Module):
 if __name__ == "__main__":
     from torchinfo import summary
 
-    transformer = Transformer(144, 174, 6, 8, 25, "transformer", 0.2, 256)
-    print(transformer(torch.rand(5, 100, 144)))
-    summary(transformer, input_data=torch.rand(2, 108, 144))
+    transformer = Transformer(144, 172, 4, 8, 25, "transformer", 0.2)
+    # print(transformer(torch.rand(5, 100, 144)))
+    summary(transformer, input_data=torch.rand(2, 100, 144), depth=2)
