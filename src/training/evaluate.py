@@ -16,6 +16,7 @@ from sklearn.metrics import (
     precision_score,
     ConfusionMatrixDisplay,
 )
+from einops import repeat
 
 from src.training.dataset import SongDataset
 from src.training.model import Transformer
@@ -24,26 +25,39 @@ from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, cs
 from src.annotation_parser.labfile_printer import print_labfile
 
 
-def partial_predict(model: torch.nn.Module, audio: torch.Tensor, frames_per_item: int):
-    n_frames, n_features = audio.shape
-    predictions = torch.zeros(size=(n_frames,), dtype=torch.int, device=audio.device)
-    for i in range(0, n_frames, frames_per_item // 2):
-        # correct to end of song for last item(s)
-        if i + frames_per_item > n_frames:
-            i = n_frames - frames_per_item
-        # extract frames of single item
-        audio_item = audio[i: i + frames_per_item]
-        # predict labels
-        with torch.no_grad():
-            prediction = torch.argmax(model(audio_item.unsqueeze(0)), dim=2)[0]
-        # fill all predictions with new predictions
-        if i > 0:
-            predictions[
-                i + (frames_per_item // 4): i + frames_per_item
-            ] = prediction[frames_per_item // 4:]
-        else:
-            predictions[i: i + frames_per_item] = prediction
-    return predictions
+def partial_predict(
+    model: torch.nn.Module, audio: torch.Tensor, frames_per_item: int, padding: int
+):
+    hop_size = frames_per_item - 2 * padding
+    n_items = int(np.ceil(len(audio) / hop_size))
+    n_missing_right = (n_items * hop_size) - len(audio)
+
+    # add padding
+    audio_with_padding = torch.cat(
+        [
+            repeat(audio[0], "f -> n f", n=padding),
+            audio,
+            repeat(audio[-1], "f -> n f", n=n_missing_right + padding),
+        ],
+        dim=0,
+    )
+
+    # split the padded sequence into items
+    items = audio_with_padding[
+        torch.stack(
+            [
+                torch.arange(i * hop_size, i * hop_size + frames_per_item)
+                for i in range(n_items)
+            ]
+        )
+    ]
+
+    # predict
+    with torch.no_grad():
+        predictions = torch.argmax(model(items), dim=2)
+
+    # remove paddings and flatten to create final predictions sequence
+    return predictions[:, padding: frames_per_item - padding].flatten()[: len(audio)]
 
 
 def evaluate(
@@ -75,7 +89,7 @@ def evaluate(
         song_metadata = dataset.get_song_metadata(item_index)
 
         # get model predictions for song
-        predictions = partial_predict(model, audio, frames_per_item)
+        predictions = partial_predict(model, audio, frames_per_item, frames_per_item // 4)
 
         # convert to numpy
         predictions = predictions.cpu().numpy()
@@ -85,7 +99,9 @@ def evaluate(
         start_times = np.arange(len(predictions)) * (
             dataset.config.hop_size / dataset.config.sample_rate
         )
-        stop_times = start_times + (dataset.config.frame_size / dataset.config.sample_rate)
+        stop_times = start_times + (
+            dataset.config.frame_size / dataset.config.sample_rate
+        )
         pred_label_occurences: List[LabelOccurence] = []
         for start, stop, label in zip(start_times, stop_times, predictions):
             if (

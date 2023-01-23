@@ -139,7 +139,7 @@ class SongDataset(Dataset):
                 audio_list = []
                 labels_list = []
                 for i in range(0, 12 if config.pitch_shift_augment else 1):
-                    song = np.load(os.path.join(self.cache_path, f"{song_metadata.Index}_0.npz"))
+                    song = np.load(os.path.join(self.cache_path, f"{song_metadata.Index}_{i}.npz"))
                     audio_list.append(song["audio"])
                     labels_list.append(song["labels"])
             else:

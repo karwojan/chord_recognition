@@ -174,13 +174,13 @@ def train(args):
             for song_index in tqdm(range(len(validate_ds)), total=len(validate_ds), unit="song"):
                 audio, labels = validate_ds[song_index]
                 audio, labels = torch.tensor(audio).cuda(), torch.tensor(labels).cuda()
-                prediction = partial_predict(model, audio, args.frames_per_item)
+                prediction = partial_predict(model, audio, args.frames_per_item, args.frames_per_item // 4)
                 validate_accuracy(prediction, labels)
             acc = validate_accuracy.compute().item()
             if acc >= best_validate_accuracy:
                 best_validate_epoch = epoch
                 best_validate_accuracy = acc
-                best_model_state = model.state_dict()
+                best_model_state = {k: v.clone() for k, v in model.state_dict().items()}
             log_metric("validate / epoch / accuracy", acc, epoch)
             log_metric("validate / epoch / best_epoch", best_validate_epoch, epoch)
 
