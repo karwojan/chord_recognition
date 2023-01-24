@@ -72,6 +72,7 @@ def create_argparser():
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
     parser.add_argument("--ddp", action="store_true")
+    parser.add_argument("--num_workers", type=int, default=2, required=False)
 
     return parser
 
@@ -99,7 +100,7 @@ def train(args):
     train_dl = DataLoader(
         train_ds,
         batch_size=args.batch_size,
-        num_workers=5,
+        num_workers=args.num_workers,
         sampler=DistributedSampler(train_ds) if args.ddp else None,
         collate_fn=song_dataset_collate_fn,
         worker_init_fn=worker_init_fn,
