@@ -343,12 +343,90 @@ tworzących moduł MSA ma inny kierunek maskowania. Technika ta ma zmusić model
 wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy klasyfikacji danej ramki.
 
 \subsection{Procedura treningu nadzorowanego}
-TODO
+
+% wstęp
+Pierwszy z dwóch rodzajów wykonywanych treningów sieci to klasyczny trening nadzorowany.
+Wykorzystywane są w nim dane z oznaczeniami aby nauczyć model rozwiązywania konkretnego problemu ---
+w tym przypadku klasyfikacji akordów. 
+
+% epoki
+Pojedynczy trening (pojedynczy eksperyment) to jednokrotne nauczenie sieci na wybranych podzbiorach
+(parametr \emph{subset} w indeksie zbioru danych) wszystkich dostępnych, oznaczonych przykładów
+uczących i ocena wyników wytrenowanego modelu. W treningu zawsze wykorzystywane są dwa zbiory:
+treningowy i walidacyjny. Treningowy służy do właściwej nauki i optymalizacji parametrów modelu a
+walidacjny do sprawdzania w trakcie nauki, jak model radzi sobie z przykładami, na których nie był
+uczony (np. czy się przetrenowuje). Trening dzieli się na epoki, które z definicji oznaczają
+pojedyncze przejście przez wszystkie dostępne dane treningowe. Jak opisano w rozdziale
+\ref{sec:preprocessing}, w przypadku przeprowadzonych eksperymentów pojedyncza epoka oznacza
+kilkukrotne przejście przez wszystkie utwory treningowe, ale dla każdego utworu przetwarzany jest
+jedynie jego losowy fragment (lub fragmenty).
+
+% kroki
+Na epokę składają się kroki, gdzie każdy krok oznacza jedną zmianę parametrów modelu. W ramach
+każdego kroku model przetwarza równolegle cały \emph{batch} 10-sekundowych fragmentów utworów.
+Ponieważ, ze względów optymalizacyjnych, na jeden przykład ze zbioru danych składa się kilka
+fragmentów tego samego utworu, to na realny rozmiar batcha wpływają dwa parametry: liczba
+analizowanych równolegle przykładów (czyli utworów) oraz liczba zwracanych jednocześnie z datasetu
+fragmentów. Dla każdej ramki, z każdego fragmentu wejściowego, model zwraca predykcję akordów, w
+postaci rozkładów prawdopodobieństw. Rozkłady te są następnie porównywane z rzeczywistymi klasami
+akordów za pomocą funkcji kosztu, jaką jest entropia krzyżowa (ang. \emph{cross-entropy}). Dla
+pojedynczej ramki, czyli dla pojedynczego wyjściowego rozkładu prawdopodobieństw $t \in
+\mathbb{R}^K$ i indeksu $k$, oznaczającego numer rzeczywistej klasy tej ramki, entropia krzyżowa ma
+postać:
+\begin{equation}
+    \textrm{CE}(t, k) = - \log t_k
+\end{equation}
+Wartość tę uśrednia się później między wszystkimi tokenami i między sekwencjami, aby uzyskać
+pojedynczą liczbę rzeczywistą, reprezentującą błąd popełniany przez sieć. Następnie, zgodnie z
+algorytmem \emph{backpropagation}, obliczane są pochodne cząstkowe (gradient) tej funkcji kosztu po
+wszystkich parametrach modelu. Do optymalizacji parametrów modelu na podstawie obliczonych
+pochodnych wykorzystany jest algorytm \emph{AdamW}. Dodatkowo, na potrzeby późniejszej analizy, w
+każdym kroku zapisywane są wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha
+przykładów.
+
+% walidacja i ewaluacja
+Pod koniec każdej epoki, po przejściu cały zbiór treningowy, następuje bieżąca walidacja modelu.
+Polega ona na przejściu (również batchami) przez zbiór walidacyjny, wytworzenie predykcji dla
+wszystkich przykładów i zmierzenie \emph{accuracy}. Wartość tej metryki, zagregowana dla całego
+zbioru walidacyjnego, jest zapisywana do późniejszej analizy, podobnie jak wartości metryk zbierane
+podczas przechodzenia przez zbiór treningowy. Po przejściu przez wyznaczoną liczbę epok, na koniec
+pojedynczego treningu, wykonywana jest dogłębna ocena modelu, która szczegółowo została opisana
+poniżej.
+
+% parametry treningu i implementacja
+Wszystkie hiperparametry pojedynczego treningu nadzorowanego, wyłączając te związane z modelem (tabel
+\ref{tab:transformer_params}), zostały przedstawione w tabeli \ref{tab:sup_training_params}. Pętla
+treningowa została zaimplementowana w pliku \url{src/training/training.py}. Została ona przygotowana
+w taki sposób, aby można było trenować modele w sposób rozproszony, zgodnie z techniką
+\emph{Distributed Data Parallel}. Do rejestrowania treningów, ich hiperparametrów i wartości metryk
+wykorzystano system \emph{MLflow}.
+
+% TODO: to jeszcze do przemyślenia
+\begin{table}
+    \centering
+    \caption{Hiperparametry pojedynczego treningu nadzorowanego}
+    \label{tab:sup_training_params}
+    \begin{tabular}{|l|l|} \hline
+        Symbol & Znaczenie \\ \hline
+        \code{n\_epochs} & Liczba epok w treningu \\
+        \code{batch\_size} & Liczba utworów przetwarzanych w jednym kroku \\
+        \code{lr} & Współczynnik uczenia \\
+        \code{song\_multiplier} & Liczba przejść przez wszystkie utwory w jednej epoce \\
+        \code{item\_mutliplier} & Liczba przykładów zwracanych dla jednego utworu \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \subsection{Procedura samonadzorowanego treningu wstępnego}
+
+Nienadzorowany, a dokładnie samonadzorowany trening wstępny, stanowi kluczową część niniejszej
+pracy. Zastosowany algorytm stanowi autorską adaptację algorytmu MAE \cite{he_masked_2021},
+pochodzącego z obszaru przetwarzania obrazów. Algorytm MAE ma naturę bardzo ogólną i sam jest
+właściwie adaptacją oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stosowanego w dziedzinie
+przetwarzania języka naturalnego.
 TODO
 
-\subsection{Zasady ewluacji modelu}
+\subsection{Zasady ewaluacji modelu}
 TODO
 
 

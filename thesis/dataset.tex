@@ -912,7 +912,7 @@ punktem wyjścia do zgromadzenia dużej liczby różnorodnych, popularnych nagra
 nagrań spoza tej konkretnej listy nie stanowią najmniejszego problemu, są nawet pożądane, ze względu
 na różnorodność zbioru.
 
-\section{Wstępne przetwarzanie danych}
+\section{Wstępne przetwarzanie danych} \label{sec:preprocessing}
 
 % TODO: dodać jakiś ładny schemat prezentujący cały preprocessing (obrazki spektrogramów itd.)
 % wstęp
@@ -1090,8 +1090,8 @@ zaimplementowana jako opcjonalna i nie musi być wykorzystywana przy wszystkich 
 % wstęp - jak dzielić te dane na itemy i jak optymalizować
 Opisane zostało w jaki sposób każde nagranie jest wczytywane i przedstawiane w postaci spektrogramu.
 Opisane zostało również, jak oznaczenia akordów są wczytywane i dopasowywane do każdej ramki
-tworzącej ten spektrogram. Każdy utwór składa się więc z macierzy $S$ o wymiarach $T x 144$, gdzie
-$T$ oznacza liczbę ramek czasowych oraz z wektora liczb całkowitych $\vec l$ o długości $T$, który
+tworzącej ten spektrogram. Każdy utwór składa się więc z macierzy $\defmatrix{S}{T}{144}$ ($T$ to
+liczba ramek czasowych w utworze) oraz z wektora liczb całkowitych $\vec l \in \mathbb{R}^T$, który
 zawiera etykietę klasy dla każdej ramki. Ostatnim etapem wstępnego przetwarzania danych jest
 zdefiniowanie w jaki sposób dane te są dzielone na pojedyncze, 10-sekundowe przykłady wejściowe
 (ang. \emph{dataset items}). Problem ten jest silnie związany z zadaniem optymalizacji ładowania
@@ -1103,9 +1103,9 @@ około 10-sekundowy fragment utworu -- dokładnie $100$ następujących po sobie
 jest względnie wystarczający, aby dostarczyć modelowi rozpoznającemu akordy szerszy kontekst
 muzyczny, czyli całą grupę powiązanych ze sobą akordów. Pojedyncza epoka to wielokrotne (parametr
 \code{song\_mutliplier}) przejście przez wszystkie utwory z danego zbioru (np. treningowego). Dla
-danego utworu losowana jest jedna z $12$ tonacji (jeżeli zastosowano augmentacje) i zwracanych jest
-kilka (parametr \code{item\_multiplier}) 10-sekundowych fragmentów, zaczynających się od losowych
-ramek. Te dwa parametry są potrzebne tylko ze względu na optymalizację, teoretycznie mogłyby przyjąć
+każdego utworu losowana jest jedna z $12$ tonacji (jeżeli zastosowano augmentacje) i zwracanych jest
+kilka (parametr \code{item\_multiplier}) 10-sekundowych fragmentów, zaczynających się w losowych
+chwilach. Te dwa parametry są potrzebne tylko ze względu na optymalizację, teoretycznie mogłyby przyjąć
 wartość równą $1$. Fakt, że każdy zwracany przykład zaczyna się w losowym miejscu służy również jako
 rodzaj augmentacji.
 
