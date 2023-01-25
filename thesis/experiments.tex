@@ -4,18 +4,18 @@
 Rozpoznawanie akordów muzycznych zostało zrealizowane za pomocą sieci neuronowych. Wykorzystana
 została popularna ostatnio w wielu obszarach architektura transformera
 \cite{vaswani_attention_2017}. Modele tego typu były wykorzystywane w najnowszych pracach związanych
-z rozpoznawaniem akordów, w tym w pracy stanowiącej główny punkt odniesienie dla niniejszych badań
-\cite{park_bi-directional_2019}.
+z rozpoznawaniem akordów, w tym w pracy \cite{park_bi-directional_2019} stanowiącej główny punkt
+odniesienie dla niniejszych badań.
 
 Podczas realizacji zadania rozpoznawania akordów, w pierwszej kolejności zreprodukowane zostały
 wyniki z pracy referencyjnej. W tym celu wykonany został zwykły trening nadzorowany, z
 wykorzystaniem zbliżonego zbioru danych, zbliżonej procedury i identycznego modelu, jak w
 oryginalnych badaniach.
 
-W następnej kolejności model został uproszczony i pozbawiony autorskich usprawnień, po czym wykonana
-została seria eksperymentów mająca na celu uzyskać tym modelem jak najlepsze wyniki. Celem tego
+W następnej kolejności model został uproszczony i pozbawiony specjalnych usprawnień, po czym wykonana
+została seria eksperymentów, mająca na celu uzyskać tym modelem jak najlepsze wyniki. Celem tego
 etapu było przygotowanie punktu odniesienia dla późniejszych eksperymentów z uczeniem
-nienadzorowanym. Model został uproszczony aby nie zaciemniać właściwego tematu pracy, jakim jest
+nienadzorowanym. Model został uproszczony, aby nie zaciemniać właściwego tematu pracy, jakim jest
 wykorzystanie uczenia nienadzorowanego.
 
 Mając przygotowany działający i stosunkowo prosty model, który uzyskuje wyniki zbliżone do
@@ -75,7 +75,7 @@ naturalnym pomysłem zastosowano go również w niniejszej pracy.
 \subsection{Opis wykorzystanego modelu sieci neuronowej}
 
 Do rozpoznawani akordów, podobnie jak w \cite{park_bi-directional_2019}, wykorzystany został
-popularny w ostatnim latach model sieci neuronowej o nazwie \emph{Transformer}. W niniejszej pracy,
+popularny w ostatnim latach model sieci neuronowej, o nazwie \emph{Transformer}. W niniejszej pracy,
 poza fazą reprodukcją wyników z \cite{park_bi-directional_2019}, wykorzystana została jak
 najprostsza i jak najbardziej zbliżona do oryginału wersja tego modelu. Implementacja została,
 przygotowana samodzielnie (plik \url{src/training/model.py}) na bazie literatury i innych
@@ -101,7 +101,7 @@ sukces, chociaż nie wyparły sieci splotowych \cite{liu_convnet_2022}, tak jak 
 rekurencyjne. Ostatecznie modele tego typu zostały wykorzystane również do przetwarzania dźwięku, w
 tym do klasyfikacji dźwięków \cite{gong_ast_2021} i do rozpoznawania mowy
 \cite{kim_squeezeformer_2022}. Transformery są więc dziś bardzo popularnymi modelami, które znajdują
-zastosowanie praktycznie w każdej dziedzinie wykorzystującej uczenie maszynowe.
+zastosowanie praktycznie w każdej dziedzinie, wykorzystującej uczenie maszynowe.
 
 \subsubsection{Ogólny opis architektury}
 
@@ -176,11 +176,12 @@ odpowiedniej macierzy) $b_1 \in \mathbb{R}^{4d_{\mathrm{model}}}$ i $b_2 \in
 
 % ogólny opis architetury - dropout
 W rzeczywistości pojedynczy blok zawiera jeszcze jeden opcjonalny element, jakim są warstwy
-\emph{dropout}, umieszczone po każdym z dwóch połączeń rezydualnych, czyli w połowie bloku i na jego
-wyjściu. Dodatkowo \emph{dropout} może być stosowany również przed wejściem do sieci, czyli
-bezpośrednio na spektrogramie. Warstwy tego typu zerują z wybranym prawdopodobieństwem niektóre z
-przechodzących przez nie wartości w celu regularyzacji sieci i uniknięcia przetrenowania. Technika
-ta jest opcjonalna i nie była stosowana we wszystkich eksperymentach.
+\emph{dropout}, umieszczone w trzech miejscach: po funkcji aktywacji w module MLP oraz po każdym z
+dwóch połączeń rezydualnych, czyli w połowie bloku i na jego wyjściu. Dodatkowo \emph{dropout} może
+być stosowany również przed wejściem do sieci, czyli bezpośrednio na spektrogramie. Warstwy tego
+typu zerują z wybranym prawdopodobieństwem niektóre z przechodzących przez nie wartości w celu
+regularyzacji sieci i uniknięcia przetrenowania. Technika ta jest opcjonalna i nie była stosowana we
+wszystkich eksperymentach.
 
 % ogólny opis architektury - wyjście (klasyfikacja)
 Po serii bloków następuje ostatnia część modelu, odpowiedzialna za klasyfikację. Najpierw,
@@ -301,7 +302,7 @@ gdzie macierz $\defmatrix{W^O}{Hd_v}{d_{\mathrm{model}}}$ to parametry ostatniej
 atencyjnego warstwy liniowej, która rzutuje sklejone wektory z pojedynczych operacji SA na
 początkowe $d_{\mathrm{model}}$ wymiarów. Dzięki temu wymiarowość tokenów na wyjściu z warstwy
 atencyjnej pozostaje taka sama jak na wejściu. W niniejszej pracy zastosowane zostało powszechne
-podejście, aby liczba wymiarów wektorów zapytań, kluczy i wartości ustalić z góry i uzależnić od
+podejście, aby liczbę wymiarów wektorów zapytań, kluczy i wartości ustalić z góry i uzależnić od
 liczby wymiarów tokenów i liczby równoległych operacji SA. Zależność ta jest następująca:
 \begin{equation}
     d_k = d_v = \frac{d_{\mathrm{model}}}{H}
@@ -347,17 +348,19 @@ wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy kla
 % wstęp
 Pierwszy z dwóch rodzajów wykonywanych treningów sieci to klasyczny trening nadzorowany.
 Wykorzystywane są w nim dane z oznaczeniami aby nauczyć model rozwiązywania konkretnego problemu ---
-w tym przypadku klasyfikacji akordów. 
+klasyfikacji akordów muzycznych. 
 
-% epoki
-Pojedynczy trening (pojedynczy eksperyment) to jednokrotne nauczenie sieci na wybranych podzbiorach
-(parametr \emph{subset} w indeksie zbioru danych) wszystkich dostępnych, oznaczonych przykładów
-uczących i ocena wyników wytrenowanego modelu. W treningu zawsze wykorzystywane są dwa zbiory:
-treningowy i walidacyjny. Treningowy służy do właściwej nauki i optymalizacji parametrów modelu a
-walidacjny do sprawdzania w trakcie nauki, jak model radzi sobie z przykładami, na których nie był
-uczony (np. czy się przetrenowuje). Trening dzieli się na epoki, które z definicji oznaczają
-pojedyncze przejście przez wszystkie dostępne dane treningowe. Jak opisano w rozdziale
-\ref{sec:preprocessing}, w przypadku przeprowadzonych eksperymentów pojedyncza epoka oznacza
+% zbiory i epoki
+Pojedynczy trening nadzorowany (pojedynczy eksperyment) to jednokrotne nauczenie sieci na wszystkich
+dostępnych (lub tylko na wybranych podzbiorach --- parametr \emph{subset} w indeksie), oznaczonych
+przykładach uczących i ocena wyników wytrenowanego modelu. W eksperymencie zawsze wykorzystywane są
+wszystkie trzy części zbioru danych: część treningowa, walidacyjna i testowa. Treningowa służy do
+właściwej nauki i optymalizacji parametrów modelu. Zbiór walidacjny wykorzystuje się do sprawdzania
+w trakcie nauki, jak model radzi sobie z przykładami, na których nie był uczony (np. czy się
+przetrenowuje).  Zbiór testowy wykorzystywany jest po zakończeniu procesu nauki, aby uzyskać
+ostateczną ocenę jakości wytrenowanego modelu. Trening dzieli się na epoki, które z definicji
+oznaczają pojedyncze przejście przez wszystkie dostępne dane treningowe. Jak opisano w rozdziale
+\ref{sec:preprocessing}, w przypadku przeprowadzonych eksperymentów, pojedyncza epoka oznacza
 kilkukrotne przejście przez wszystkie utwory treningowe, ale dla każdego utworu przetwarzany jest
 jedynie jego losowy fragment (lub fragmenty).
 
@@ -366,8 +369,8 @@ Na epokę składają się kroki, gdzie każdy krok oznacza jedną zmianę parame
 każdego kroku model przetwarza równolegle cały \emph{batch} 10-sekundowych fragmentów utworów.
 Ponieważ, ze względów optymalizacyjnych, na jeden przykład ze zbioru danych składa się kilka
 fragmentów tego samego utworu, to na realny rozmiar batcha wpływają dwa parametry: liczba
-analizowanych równolegle przykładów (czyli utworów) oraz liczba zwracanych jednocześnie z datasetu
-fragmentów. Dla każdej ramki, z każdego fragmentu wejściowego, model zwraca predykcję akordów, w
+analizowanych równolegle przykładów (czyli utworów) oraz liczba zwracanych jednocześnie fragmentów
+pojedynczego utworu. Dla każdej ramki, z każdego fragmentu wejściowego, model zwraca predykcję akordów, w
 postaci rozkładów prawdopodobieństw. Rozkłady te są następnie porównywane z rzeczywistymi klasami
 akordów za pomocą funkcji kosztu, jaką jest entropia krzyżowa (ang. \emph{cross-entropy}). Dla
 pojedynczej ramki, czyli dla pojedynczego wyjściowego rozkładu prawdopodobieństw $t \in
@@ -376,33 +379,91 @@ postać:
 \begin{equation}
     \textrm{CE}(t, k) = - \log t_k
 \end{equation}
-Wartość tę uśrednia się później między wszystkimi tokenami i między sekwencjami, aby uzyskać
-pojedynczą liczbę rzeczywistą, reprezentującą błąd popełniany przez sieć. Następnie, zgodnie z
-algorytmem \emph{backpropagation}, obliczane są pochodne cząstkowe (gradient) tej funkcji kosztu po
-wszystkich parametrach modelu. Do optymalizacji parametrów modelu na podstawie obliczonych
-pochodnych wykorzystany jest algorytm \emph{AdamW}. Dodatkowo, na potrzeby późniejszej analizy, w
-każdym kroku zapisywane są wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha
-przykładów.
+Wartość tę uśrednia się później między wszystkimi tokenami (ramkami) i między sekwencjami
+(fragmentami), aby uzyskać pojedynczą liczbę rzeczywistą, reprezentującą błąd popełniany przez sieć.
+Następnie, zgodnie z algorytmem \emph{backpropagation}, obliczane są pochodne cząstkowe (gradient)
+tej funkcji kosztu po wszystkich parametrach modelu. Do optymalizacji parametrów modelu na podstawie
+obliczonych pochodnych wykorzystany jest algorytm optymalizacyjny \emph{AdamW}. Współczynnik nauki
+(ang. \emph{learning rate}), przez pierwszych pięć epok ma jedynie dziesiątą część swojej docelowej
+wartości, aby zapewnić małe zmiany parametrów modelu na początku treningu. Transformery są bowiem
+podantne na to, że z powodu zbyt dużych kroków w początkowej fazie treningu, przestaną zbiegać do
+konkretnego rozwiązania. Dodatkowo, na potrzeby późniejszej analizy, w każdym kroku zapisywane są
+wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha przykładów.
 
-% walidacja i ewaluacja
-Pod koniec każdej epoki, po przejściu cały zbiór treningowy, następuje bieżąca walidacja modelu.
-Polega ona na przejściu (również batchami) przez zbiór walidacyjny, wytworzenie predykcji dla
-wszystkich przykładów i zmierzenie \emph{accuracy}. Wartość tej metryki, zagregowana dla całego
-zbioru walidacyjnego, jest zapisywana do późniejszej analizy, podobnie jak wartości metryk zbierane
-podczas przechodzenia przez zbiór treningowy. Po przejściu przez wyznaczoną liczbę epok, na koniec
-pojedynczego treningu, wykonywana jest dogłębna ocena modelu, która szczegółowo została opisana
-poniżej.
+% walidacja
+Pod koniec każdej epoki, po przejściu przez cały zbiór treningowy, następuje bieżąca ocena modelu na
+zbiorze walidacyjnym. Aby zapewnić stabilność wyników tej oceny, nie stosuje się w niej, tego samego
+co w treningu, mechanizmu losowania fragmentów utworów. Zamiast tego, dla każdego utworu ze zbioru
+walidacyjnego, wykonuje się predykcję klas dla wszystkich ramek. Szczegóły procedury predykcji klas
+akordów dla całego utworu zostały opisane poniżej. Mając dla danego utworu predykcję wszystkich
+akordów, oblicza się na tej podstawie wartość metryki \emph{accuracy}. Po przejściu przez cały zbiór
+walidacyjny, wartość tej metryki jest agregowana dla wszystkich utworów z tego zbioru i zapisywana
+do późniejszej analizy. Na podstawie tej metryki zapamiętywane są również numer epoki i wagi modelu,
+dla których wartość \emph{accuracy} była największa.
 
-% parametry treningu i implementacja
-Wszystkie hiperparametry pojedynczego treningu nadzorowanego, wyłączając te związane z modelem (tabel
-\ref{tab:transformer_params}), zostały przedstawione w tabeli \ref{tab:sup_training_params}. Pętla
-treningowa została zaimplementowana w pliku \url{src/training/training.py}. Została ona przygotowana
-w taki sposób, aby można było trenować modele w sposób rozproszony, zgodnie z techniką
+% ewaluacja
+Po przejściu przez wyznaczoną liczbę epok, na koniec pojedynczego treningu, wykonywana jest dogłębna
+ocena modelu. W tym celu wczytywane są wagi, dające najlepsze wyniki na zbiorze walidacyjnym i
+wykonywana jest procedura \emph{ewaluacji} na wszystkich trzech zbiorach danych. Szczegóły tej
+procedury zostały opisane poniżej. Warto tylko jeszcze wspomnieć, że takie podejście, chociaż
+pozwala uniknąć przetrenowania na zbiorze treningowym, prowadzi do potencjalnego przetrenowania pod
+zbiór walidacyjny. Oznacza to, że np. możliwe by były lepsze wyniki na zbiorze testowym, ale nie
+zostały osiągnięte, bo przypadkowa, najwyższa wartość na zbiorze walidacyjnym, pojawiła się
+stosunkowo wcześnie podczas treningu. Problemy te są oczywiście związane z rozmiarem zbioru
+walidacyjnego --- czym mniejszy, tym większa szansa na takie niekorzystne scenariusze.
+
+% implementacja i sprzęt
+Pętla treningowa została zaimplementowana w pliku \url{src/training/training.py}. Została ona
+przygotowana w taki sposób, aby można było trenować modele w sposób rozproszony, zgodnie z techniką
 \emph{Distributed Data Parallel}. Do rejestrowania treningów, ich hiperparametrów i wartości metryk
-wykorzystano system \emph{MLflow}.
+wykorzystano system \emph{MLflow}\footnote{\url{https://mlflow.org/}}. Treningi odbywały się na
+jednej lub kilku kartach graficznych TODO.
 
-% TODO: to jeszcze do przemyślenia
-\begin{table}
+% podsumowanie parametrów treningu
+Wszystkie ustawienia pojedynczego treningu (eksperymentu) nadzorowanego, włączając w to parametry
+zbioru danych, hiperparametry modelu i hiperparametry samej pętli treningowej, zostały przedstawione
+w tabeli \ref{tab:sup_training_params}. Wartości parametrów z tej tabeli są wymieniane dla każdego
+udokumentowanego eksperymentu. W rzeczywistości, przygotowana implementacja umożliwia również zmianę
+parametrów, które zostały wybrane jako niezmienne dla niniejszej pracy i opisane w rozdziale
+\ref{sec:preprocessing}, takich jak długość przetwarzanego przez model fragmentu (100 ramek). Te
+parametry nie zostały wymienione w tabeli, ponieważ nie różnią się między eksperymentami. Pominięte
+również zostały parametry o charakterze ściśle technicznym, takie jak wykorzystanie pamięci
+podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
+
+% wszystkie parametry wynikające z argparse (F-fixed, T-technical, X-changed between experiments)
+% DATASET
+% F   sample_rate=22050
+% F   frame_size=2048
+% F   hop_size=2048
+% F   frames_per_item=100
+% X   item_multiplier
+% X   song_multiplier
+% F   audio_preprocessing (cqt, raw)=CQT
+% F   standardize_audio=YES
+% X   pitch_shift_augment
+% F   labels_vocabulary=MAJ_MIN
+% X   subsets
+% X   dataset_fraction (TODO: opisać w rozdziale o datasecie)
+% T   use_ram_cache
+% MODEL
+% X   model_dim
+% X   n_heads
+% X   n_blocks
+% X   block_type
+% X   dropout_p
+% T   extra_features_dim=NO
+% T   pretrained_encoder_path
+% T   pretrained_encoder_run_name
+% TRAINING
+% T   experiment_name
+% T   run_name
+% X   n_epochs
+% X   batch_size
+% X   lr
+% T   ddp
+% T   num_workers
+
+\begin{table} % TODO
     \centering
     \caption{Hiperparametry pojedynczego treningu nadzorowanego}
     \label{tab:sup_training_params}
@@ -417,6 +478,12 @@ wykorzystano system \emph{MLflow}.
     \end{tabular}
 \end{table}
 
+\subsubsection{Algorytm predykcji akordów dla całego utworu}
+% TODO
+
+\subsubsection{Szczegółowe zasady ewaluacji modelu}
+% TODO
+
 \subsection{Procedura samonadzorowanego treningu wstępnego}
 
 Nienadzorowany, a dokładnie samonadzorowany trening wstępny, stanowi kluczową część niniejszej
@@ -425,10 +492,6 @@ pochodzącego z obszaru przetwarzania obrazów. Algorytm MAE ma naturę bardzo o
 właściwie adaptacją oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stosowanego w dziedzinie
 przetwarzania języka naturalnego.
 TODO
-
-\subsection{Zasady ewaluacji modelu}
-TODO
-
 
 \section{Eksperymenty}
 TODO
