@@ -402,9 +402,9 @@ do późniejszej analizy. Na podstawie tej metryki zapamiętywane są również 
 dla których wartość \emph{accuracy} była największa.
 
 % ewaluacja
-Po przejściu przez wyznaczoną liczbę epok, na koniec pojedynczego treningu, wykonywana jest dogłębna
+Po przejściu przez wszystkie epoki, na koniec pojedynczego treningu, wykonywana jest dogłębna
 ocena modelu. W tym celu wczytywane są wagi, dające najlepsze wyniki na zbiorze walidacyjnym i
-wykonywana jest procedura \emph{ewaluacji} na wszystkich trzech zbiorach danych. Szczegóły tej
+wykonywana jest procedura ewaluacji modelu, na każdym z trzech zbiorów danych. Szczegóły tej
 procedury zostały opisane poniżej. Warto tylko jeszcze wspomnieć, że takie podejście, chociaż
 pozwala uniknąć przetrenowania na zbiorze treningowym, prowadzi do potencjalnego przetrenowania pod
 zbiór walidacyjny. Oznacza to, że np. możliwe by były lepsze wyniki na zbiorze testowym, ale nie
@@ -417,7 +417,7 @@ Pętla treningowa została zaimplementowana w pliku \url{src/training/training.p
 przygotowana w taki sposób, aby można było trenować modele w sposób rozproszony, zgodnie z techniką
 \emph{Distributed Data Parallel}. Do rejestrowania treningów, ich hiperparametrów i wartości metryk
 wykorzystano system \emph{MLflow}\footnote{\url{https://mlflow.org/}}. Treningi odbywały się na
-jednej lub kilku kartach graficznych TODO.
+jednej lub kilku kartach graficznych NVIDIA GeForce RTX 3090.
 
 % podsumowanie parametrów treningu
 Wszystkie ustawienia pojedynczego treningu (eksperymentu) nadzorowanego, włączając w to parametry
@@ -463,26 +463,95 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
 % T   ddp
 % T   num_workers
 
-\begin{table} % TODO
+\begin{table}
     \centering
     \caption{Hiperparametry pojedynczego treningu nadzorowanego}
     \label{tab:sup_training_params}
-    \begin{tabular}{|l|l|} \hline
-        Symbol & Znaczenie \\ \hline
+    \begin{tabular}{|l|p{0.6\linewidth}|} \hline
+        \multicolumn{2}{|c|}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier} & Liczba przykładów zwracanych dla jednego utworu \\
+        \code{song\_multiplier} & Liczba przejść przez wszystkie utwory w jednej epoce \\
+        \code{pitch\_shift\_augment} & Czy zastosowano augmentacje \\
+        \code{subsets} & Jakie podzbiory zostały wykorzystane do treningu \\
+        \code{dataset\_fraction} & Jaka część zbioru treningowego została wykorzystana do treningu \\ \hline
+        \multicolumn{2}{|c|}{MODEL} \\ \hline
+        \code{model\_dim} & Liczba wymiarów pojedynczego tokena przechodzącego przez model \\
+        \code{n\_heads} & Liczba równoległych operacji MSA \\
+        \code{n\_blocks} & Liczba bloków w modelu \\
+        \code{dropout\_p} & Prawdopodobieństwo zerowania w warstwach \emph{dropout} \\ \hline
+        \multicolumn{2}{|c|}{TRENING} \\ \hline
         \code{n\_epochs} & Liczba epok w treningu \\
         \code{batch\_size} & Liczba utworów przetwarzanych w jednym kroku \\
-        \code{lr} & Współczynnik uczenia \\
-        \code{song\_multiplier} & Liczba przejść przez wszystkie utwory w jednej epoce \\
-        \code{item\_mutliplier} & Liczba przykładów zwracanych dla jednego utworu \\
-        \hline
+        \code{lr} & Współczynnik uczenia \\ \hline
     \end{tabular}
 \end{table}
 
-\subsubsection{Algorytm predykcji akordów dla całego utworu}
-% TODO
+\subsubsection{Zasady predykcji akordów dla całego utworu}
 
-\subsubsection{Szczegółowe zasady ewaluacji modelu}
-% TODO
+Najprostszym sposobem, aby uzyskać predykcję dla całego utworu, który zazwyczaj składa się z kilku
+tysięcy ramek, jest podanie wszystkich ramek jednocześnie na wejście sieci neuronowej. O ile
+transformer może teoretycznie przyjąć na wejściu sekwencję dowolnej długości (ograniczeniem jest
+oczywiście pamięć), to w przypadku sekwencji dłuższych niż w treningu, wymaga to od modelu pewnej
+generalizacji. Jest to więc podejście ryzykowne i mało praktyczne, ze względu na ograniczenie
+pamięci, które w praktyce może spowodować, że i tak będzie trzeba dzielić utwór na kilka części.
+
+Najbezpieczniej podawać więc na wejście modelu fragmenty takiej długości, jak w treningu, czyli po
+$100$ ramek na raz. Pozostaje zdecydować, czy fragmenty mają się na siebie nakładać i jeśli tak, to
+w jaki sposób agregować kilka możliwych predykcji dla jednej ramki. W niniejszej pracy zdecydowano
+się na takie podejście, zgodnie z którym z każdej $100$-elementowej sekwencji, jedynie środkowe $50$
+brane jest do ostatecznego wyniku. Pozostałe $25$ ramek z początku i $25$ ramek z końca traktowane
+są jako kontekst. Wynika to z niezweryfikowanej hipotezy, że predykcje dla ramek z szerszym
+kontekstem przed nimi i po nich, są precyzyjniejsze, niż dla ramek na brzegu fragmentu, dla których
+nie wiadomo dobrze, co działo się przed nimi lub po nich. Oznacza to w praktyce, że kolejne
+fragmenty nakładają się na siebie w połowie. 
+
+Cała procedura wytwarzania predykcji dla pojedynczego nagrania, polega więc na:
+\begin{itemize}
+    \item podzieleniu nagrania na rozłączne fragmenty po $50$ ramek
+    \item dodaniu do każdego fragmentu po $25$ ramek z fragmentów wcześniejszego i późniejszego, w
+        przypadku pierwszego i ostatniego fragmentu, uzupełnić powtórzoną wielokrotnie odpowiednio
+        pierwszą i ostatnią ramką
+    \item wykonaniu predykcji dla wszystkich utworzonych w ten sposób fragmentów, po $100$ ramek
+        każdy
+    \item wyciągnięciu $50$ środkowych akordów z każdej sekwencji wyjściowej i złączeniu ich w jedną
+        sekwencję, o długości równej liczbie ramek utworu
+\end{itemize}
+Mechanizm ten, w ogólnej postaci, zaimplementowany został w funkcji \code{partial\_predict} w pliku
+\url{src/training/evaluate.py}. W rzeczywistości, wszystkie nakładające się na siebie fragmenty, są
+przetwarzane przez model równolegle, jako jeden batch przykładów.
+
+Proporcja między długością pojedynczego fragmentu ($100$ ramek), a długością kontekstu (po $25$
+ramek przed i po), została ustalona na podstawie intuicji. Nie przeprowadzono żadnej dokładnej
+analizy ani eksperymentów aby ustalić, jaki ma ona wpływ na jakość predykcji. Możliwe jest zarówno
+to, że bez nakładania na siebie fragmentów, predykcje nie byłyby w ogóle (lub znacząco) gorsze, jak
+i to, że zwiększenie długości kontekstu, poprawiłoby istotnie predykcje sieci.
+
+\subsubsection{Procedura ewaluacji modelu}
+
+Ewaluacja wytrenowanego modelu odbywa się na zadanym zbiorze danych. Jak wspomniano, na koniec
+każdego treningu jest ona wykonywana trzykrotnie: dla zbioru treningowego, walidacyjnego i
+testowego. Podstawą całej procedury jest wytworzenia predykcji dla każdego utworu ze zbioru. Na
+podstawie tych predykcji, dla każdego utworu wyliczane są:
+\begin{itemize}
+    \item ciąg wystąpień akordów (\code{ChordOccurence}), o określonym czasie rozpoczęcia i
+        zakończenia w sekundach (ciąg takich samych predykcji jest łączony w jedno wystąpienie
+        akordu)
+    \item wartość miary CSR na podstawie ciągu wystąpień akordów
+    \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana jak
+        pojedyncza predykcja:
+        \begin{itemize}
+            \item dokładność (ang. \emph{accuracy}) ($1$ wartość)
+            \item czułość (ang. \emph{recall}) per klasa ($25$ wartości)
+            \item precyzja (ang. \emph{precision}) per klasa ($25$ wartości)
+            \item macierz pomyłek (ang. \emph{confusion matrix})
+        \end{itemize}
+\end{itemize}
+Ciąg wystąpień akordów zapisywany jest w pliku \filetype{lab}, metryki CSR, dokładność, czułość i
+precyzja w pliku \filetype{json} a macierz pomyłek jako obrazek w pliku \filetype{png}. Po
+wytworzeniu predykcji i obliczeniu metryk dla każdego utworu, powyższe metryki (CSR, dokładność,
+czułość precyzja i macierz pomyłek) wyliczane są również dla całego zbioru (CSR zamienia się na
+WCSR) i również zapisywane w dwóch plikach \filetype{json} i \filetype{png}. Cała implementacja
+procedury ewaluacji modelu znajduje się w pliku \url{src/training/evaluate.py}.
 
 \subsection{Procedura samonadzorowanego treningu wstępnego}
 
@@ -491,7 +560,7 @@ pracy. Zastosowany algorytm stanowi autorską adaptację algorytmu MAE \cite{he_
 pochodzącego z obszaru przetwarzania obrazów. Algorytm MAE ma naturę bardzo ogólną i sam jest
 właściwie adaptacją oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stosowanego w dziedzinie
 przetwarzania języka naturalnego.
-TODO
+% TODO
 
 \section{Eksperymenty}
-TODO
+% TODO
