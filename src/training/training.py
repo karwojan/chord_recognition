@@ -1,4 +1,5 @@
 import argparse
+import tempfile
 from dataclasses import replace
 
 import os
@@ -168,8 +169,9 @@ def train(args):
         log_metric("train / epoch / loss", loss_metric.compute(), epoch)
         log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
 
-        # validate
         if is_rank_0():
+
+            # validate
             model.eval()
             validate_accuracy.reset()
             for song_index in tqdm(range(len(validate_ds)), total=len(validate_ds), unit="song"):
@@ -184,6 +186,17 @@ def train(args):
                 best_model_state = {k: v.clone() for k, v in model.state_dict().items()}
             log_metric("validate / epoch / accuracy", acc, epoch)
             log_metric("validate / epoch / best_epoch", best_validate_epoch, epoch)
+
+            # save model state
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                torch.save(
+                    {
+                        "best_state": best_model_state,
+                        "last_state": model.state_dict()
+                    },
+                    os.path.join(tmp_dir, "model_state.pt")
+                )
+                mlflow.log_artifacts(tmp_dir)
 
     # evaluate model
     if is_rank_0():

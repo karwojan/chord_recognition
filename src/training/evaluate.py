@@ -21,8 +21,8 @@ from einops import repeat
 from src.training.dataset import SongDataset
 from src.training.model import Transformer
 from src.annotation_parser import parse_annotation_file
-from src.annotation_parser.chord_model import LabelOccurence, ChordOccurence, csr
-from src.annotation_parser.labfile_printer import print_labfile
+from src.annotation_parser.chord_model import Chord, LabelOccurence, ChordOccurence, csr
+from src.annotation_parser.labfile_printer import print_labfile, print_chord
 
 
 def partial_predict(
@@ -69,13 +69,23 @@ def evaluate(
     assert dataset.config.frames_per_item <= 0, "dataset must return whole songs"
     model.eval()
 
+    display_labels = [
+        print_chord(Chord.from_label(label, dataset.config.labels_vocabulary))
+        for label in np.arange(dataset.n_classes)
+    ]
     recall_precision_kwargs = {
         "average": None,
         "labels": np.arange(dataset.n_classes),
         "zero_division": 0,
     }
-
-    plt.rcParams.update({"font.size": 5})  # for confusion matrix
+    # matplotlib settings for confusion matrix
+    plt.rcParams.update(
+        {
+            "font.size": 10,
+            "figure.figsize": [12.0, 12.0],
+            "figure.autolayout": True,
+        }
+    )
 
     output_dir = f"{output_dir_prefix}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
@@ -89,7 +99,9 @@ def evaluate(
         song_metadata = dataset.get_song_metadata(item_index)
 
         # get model predictions for song
-        predictions = partial_predict(model, audio, frames_per_item, frames_per_item // 4)
+        predictions = partial_predict(
+            model, audio, frames_per_item, frames_per_item // 4
+        )
 
         # convert to numpy
         predictions = predictions.cpu().numpy()
@@ -148,15 +160,21 @@ def evaluate(
                 "precision": list(
                     precision_score(labels, predictions, **recall_precision_kwargs)
                 ),
+                "quantity": [int((labels == label).sum()) for label in np.arange(dataset.n_classes)],
             }
             with open(os.path.join(tmp_dir, "metrics.json"), "w") as f:
                 json.dump(metrics, f)
 
             # plot confusion matrix
             ConfusionMatrixDisplay.from_predictions(
-                labels, predictions, labels=recall_precision_kwargs["labels"]
+                y_true=labels,
+                y_pred=predictions,
+                labels=np.arange(dataset.n_classes),
+                display_labels=display_labels,
+                xticks_rotation="vertical",
+                colorbar=False,
             )
-            plt.savefig(os.path.join(tmp_dir, "confusion_matrix.png"), dpi=200)
+            plt.savefig(os.path.join(tmp_dir, "confusion_matrix.png"))
             plt.close()
 
             # log to mlflow
@@ -181,6 +199,7 @@ def evaluate(
             "precision": list(
                 precision_score(labels, predictions, **recall_precision_kwargs)
             ),
+            "quantity": [int((labels == label).sum()) for label in np.arange(dataset.n_classes)],
             "worst_to_best_song_ids": [
                 str(dataset.get_song_metadata(i).name) for i in np.argsort(all_csrs)
             ],
@@ -188,7 +207,15 @@ def evaluate(
         with open(os.path.join(tmp_dir, "global_metrics.json"), "w") as f:
             json.dump(global_metrics, f)
         ConfusionMatrixDisplay.from_predictions(
-            labels, predictions, labels=recall_precision_kwargs["labels"]
+            y_true=labels,
+            y_pred=predictions,
+            labels=np.arange(dataset.n_classes),
+            display_labels=display_labels,
+            xticks_rotation="vertical",
+            colorbar=False,
+            normalize="true",
+            values_format=".2f",
         )
-        plt.savefig(os.path.join(tmp_dir, "global_confusion_matrix.png"), dpi=200)
+        plt.savefig(os.path.join(tmp_dir, "global_confusion_matrix.png"))
+        plt.close()
         mlflow.log_artifacts(tmp_dir, output_dir)
