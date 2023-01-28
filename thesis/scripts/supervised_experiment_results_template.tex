@@ -1,0 +1,74 @@
+% TODO: dodać krzywe uczenia ?
+\parbox{\textwidth}{\scriptsize
+
+\makebox[\textwidth][c]{\large \textbf{Wyniki eksperymentu !}} \\ \\
+
+\parbox{0.5\textwidth}{\centering
+\begin{tabular}{lc}
+    \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+    \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+    \code{item\_mutliplier}         & $!item_multiplier!$   \\
+    \code{song\_multiplier}         & $!song_multiplier!$   \\
+    \code{augment}                  & !augment!     \\
+    \code{subsets}                  & !subsets!     \\
+    \code{fraction}                 & $!fraction!$   \\
+    \hline \multicolumn{2}{c}{MODEL} \\ \hline
+    \code{model\_dim}               & $!model_dim!$   \\
+    \code{n\_heads}                 & $!n_heads!$   \\
+    \code{n\_blocks}                & $!n_blocks!$   \\
+    \code{dropout\_p}               & $!dropout_p!$   \\
+    \hline \multicolumn{2}{c}{TRENING} \\ \hline
+    \code{n\_epochs}                & $!n_epochs!$   \\
+    \code{batch\_size}              & $!batch_size!$   \\
+    \code{lr}                       & $!lr!$   \\ \\
+\end{tabular}
+
+\vspace{25pt}
+
+\begin{tabular}{lccc}
+    \multicolumn{4}{c}{\textbf{WYNIKI OGÓLNE}} \\
+    \multicolumn{3}{l}{Czas trwania} & $!duration!$h \\
+    \hline      & TEST              & TRENING           & WALIDACJA             \\ \hline
+    WCSR        & $!test_wcsr!$     & $!train_wcsr!$    & $!validate_wcsr!$        \\
+    Dokładność  & $!test_accuracy!$ & $!train_accuracy!$& $!validate_accuracy!$    \\
+\end{tabular}
+}
+\parbox{0.5\textwidth}{
+\begin{tabular}{l|c|c|c}
+    \multicolumn{4}{c}{\textbf{SZCZEGÓŁOWE WYNIKI DLA}} \\
+    \multicolumn{4}{c}{\textbf{ZBIORU TESTOWEGO}} \\
+    Klasa           & Czułość  & Precyzja  & Ilość \\ \hline
+    \code{N}        & $!R0! $  & $!P0! $ & $!Q0! $ \\
+    \code{C:maj}    & $!R1! $  & $!P1! $ & $!Q1! $ \\
+    \code{C\#:maj}  & $!R2! $  & $!P2! $ & $!Q2! $ \\
+    \code{D:maj}    & $!R3! $  & $!P3! $ & $!Q3! $ \\
+    \code{D\#:maj}  & $!R4! $  & $!P4! $ & $!Q4! $ \\
+    \code{E:maj}    & $!R5! $  & $!P5! $ & $!Q5! $ \\
+    \code{F:maj}    & $!R6! $  & $!P6! $ & $!Q6! $ \\
+    \code{F\#:maj}  & $!R7! $  & $!P7! $ & $!Q7! $ \\
+    \code{G:maj}    & $!R8! $  & $!P8! $ & $!Q8! $ \\
+    \code{G\#:maj}  & $!R9! $  & $!P9! $ & $!Q9! $ \\
+    \code{A:maj}    & $!R10!$  & $!P10!$ & $!Q10!$ \\
+    \code{A\#:maj}  & $!R11!$  & $!P11!$ & $!Q11!$ \\
+    \code{B:maj}    & $!R12!$  & $!P12!$ & $!Q12!$ \\
+    \code{C:min}    & $!R13!$  & $!P13!$ & $!Q13!$ \\
+    \code{C\#:min}  & $!R14!$  & $!P14!$ & $!Q14!$ \\
+    \code{D:min}    & $!R15!$  & $!P15!$ & $!Q15!$ \\
+    \code{D\#:min}  & $!R16!$  & $!P16!$ & $!Q16!$ \\
+    \code{E:min}    & $!R17!$  & $!P17!$ & $!Q17!$ \\
+    \code{F:min}    & $!R18!$  & $!P18!$ & $!Q18!$ \\
+    \code{F\#:min}  & $!R19!$  & $!P19!$ & $!Q19!$ \\
+    \code{G:min}    & $!R20!$  & $!P20!$ & $!Q20!$ \\
+    \code{G\#:min}  & $!R21!$  & $!P21!$ & $!Q21!$ \\
+    \code{A:min}    & $!R22!$  & $!P22!$ & $!Q22!$ \\
+    \code{A\#:min}  & $!R23!$  & $!P23!$ & $!Q23!$ \\
+    \code{B:min}    & $!R24!$  & $!P24!$ & $!Q24!$ \\
+\end{tabular}
+} \\ \\
+
+\makebox[\textwidth][c]{\textbf{MACIERZ POMYŁEK}} \\
+\makebox[\textwidth][c]{
+\includegraphics[width=0.75\textwidth]{!image_path!} \hspace{1cm}
+}
+
+}
