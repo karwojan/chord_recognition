@@ -471,9 +471,9 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
         \multicolumn{2}{|c|}{ZBIÓR DANYCH} \\ \hline
         \code{item\_mutliplier} & Liczba przykładów zwracanych dla jednego utworu \\
         \code{song\_multiplier} & Liczba przejść przez wszystkie utwory w jednej epoce \\
-        \code{pitch\_shift\_augment} & Czy zastosowano augmentacje \\
+        \code{augment} & Czy zastosowano augmentacje \\
         \code{subsets} & Jakie podzbiory zostały wykorzystane do treningu \\
-        \code{dataset\_fraction} & Jaka część zbioru treningowego została wykorzystana do treningu \\ \hline
+        \code{fraction} & Jaka część zbioru treningowego została wykorzystana do treningu \\ \hline
         \multicolumn{2}{|c|}{MODEL} \\ \hline
         \code{model\_dim} & Liczba wymiarów pojedynczego tokena przechodzącego przez model \\
         \code{n\_heads} & Liczba równoległych operacji MSA \\
@@ -562,5 +562,39 @@ właściwie adaptacją oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stos
 przetwarzania języka naturalnego.
 % TODO
 
+
+% eksperymenty
 \section{Eksperymenty}
-% TODO
+
+Niniejszy podrozdział zawiera opis wszystkich przeprowadzonych eksperymentów (treningów) i dyskusję
+ich wyników.  Eksperymenty zostały tematycznie pogrupowane w etapy, które są opisane poniżej.
+Szczegółowe wyniki wszystkich treningów, zebrane zostały na końcu tego podrozdziału.
+
+Bla bla bla dalszy wstęp o eksperymentach... % TODO
+
+\subsection{Etap 1. Reprodukcja wyników z pracy referencyjnej}
+
+Pierwszy ze wszystkich przeprowadzonych eksperymentów (\code{final-small-btc-reproduce}) miał na
+celu zreprodukować wyniki z \cite{park_bi-directional_2019}. W tym celu, z całego dostępnego zbioru
+danych, wybrane zostały jedynie trzy podzbiory, które wykorzystane zostały w pracy referencyjnej.
+Model sieci neuronowej jest praktycznie identyczny, gdyż własna implemenacja bloku BTC, przygotowana
+została na podstawie oryginalnej implementacji twórców tego modelu. Jeżeli chodzi i hiperparametry
+treningu, to \code{lr} został również wzięty taki sam jak u twórców tego rozwiązania. Rozmiar batcha
+i czas treningu wybrane zostały samodzielnie.
+% TODO: dalsze wyniki
+
+
+% strony z wynikami: powiększ, wklej, pomniejsz
+\newpage
+\addtolength{\voffset}{-2cm}
+\addtolength{\hoffset}{-2cm}
+\addtolength{\textwidth}{4cm}
+\addtolength{\textheight}{4cm}
+
+\input{results/results_final-small-btc-reproduce}
+% TODO: dalsze wyniki
+
+\addtolength{\voffset}{+2cm}
+\addtolength{\hoffset}{+2cm}
+\addtolength{\textwidth}{-4cm}
+\addtolength{\textheight}{-4cm}
