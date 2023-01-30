@@ -1,7 +1,7 @@
 % TODO: dodać krzywe uczenia ?
 \parbox{\textwidth}{\scriptsize
 
-\makebox[\textwidth][c]{\large \textbf{Wyniki eksperymentu !}} \\ \\
+\makebox[\textwidth][c]{\large \textbf{Eksperyment \code{!name!}}} \\ \\
 
 \parbox{0.5\textwidth}{\centering
 \begin{tabular}{lc}
@@ -28,6 +28,7 @@
 \begin{tabular}{lccc}
     \multicolumn{4}{c}{\textbf{WYNIKI OGÓLNE}} \\
     \multicolumn{3}{l}{Czas trwania} & $!duration!$h \\
+    \multicolumn{3}{l}{Numer najlepszej epoki} & $!best_epoch!$ \\
     \hline      & TEST              & TRENING           & WALIDACJA             \\ \hline
     WCSR        & $!test_wcsr!$     & $!train_wcsr!$    & $!validate_wcsr!$        \\
     Dokładność  & $!test_accuracy!$ & $!train_accuracy!$& $!validate_accuracy!$    \\
@@ -64,11 +65,13 @@
     \code{A\#:min}  & $!R23!$  & $!P23!$ & $!Q23!$ \\
     \code{B:min}    & $!R24!$  & $!P24!$ & $!Q24!$ \\
 \end{tabular}
-} \\ \\
-
-\makebox[\textwidth][c]{\textbf{MACIERZ POMYŁEK}} \\
-\makebox[\textwidth][c]{
-\includegraphics[width=0.75\textwidth]{!image_path!} \hspace{1cm}
+} \\ \\ \\ \\
+\makebox[\textwidth][c]{\textbf{KRZYWE UCZENIA I MACIERZ POMYŁEK}} \\ \\
+\makebox[\width][c]{
+\includegraphics[width=0.7\textwidth,angle=90]{!curves_path!}
+}
+\makebox[\width][c]{
+\includegraphics[width=0.70\textwidth]{!confusion_matrix_path!}
 }
 
 }
