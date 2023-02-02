@@ -72,32 +72,24 @@ def create_argparser():
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--lr", type=float, required=True)
+    parser.add_argument("--early_stopping", type=int, required=True)
     parser.add_argument("--ddp", action="store_true")
     parser.add_argument("--num_workers", type=int, default=2, required=False)
 
     return parser
 
 
-def train(args):
-    # init torch distributed
-    if args.ddp:
-        torch.distributed.init_process_group(backend="nccl")
-
-    # init mlflow
-    if is_rank_0():
-        mlflow.set_experiment(args.experiment_name)
-        mlflow.start_run(run_name=args.run_name)
-        mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
-        mlflow.log_params(
-            {key: value for key, value in args.__dict__.items() if key not in {"experiment_name", "run_name"}}
-        )
+def train(args, validate_fold):
+    print(f"========== TRAINING FOLD {validate_fold} ==========")
 
     # init datasets and data loaders
+    train_folds = [f"train_fold_{i}" for i in set(range(5)) - {args.validate_fold}]
+    validate_folds = [f"train_fold_{args.validate_fold}"]
     song_dataset_config = SongDatasetConfig.create_from_args(args)
     song_eval_dataset_config = replace(
         song_dataset_config, frames_per_item=0, pitch_shift_augment=False, song_multiplier=1, fraction=None
     )
-    train_ds = SongDataset(["train"], song_dataset_config)
+    train_ds = SongDataset(train_folds, song_dataset_config)
     train_dl = DataLoader(
         train_ds,
         batch_size=args.batch_size,
@@ -106,7 +98,7 @@ def train(args):
         collate_fn=song_dataset_collate_fn,
         worker_init_fn=worker_init_fn,
     )
-    validate_ds = SongDataset(["validate"], song_eval_dataset_config)
+    validate_ds = SongDataset(validate_folds, song_eval_dataset_config)
 
     # prepare model and optimizer
     model = Transformer(
@@ -166,62 +158,85 @@ def train(args):
                 )
 
         scheduler.step()
-        log_metric("train / epoch / loss", loss_metric.compute(), epoch)
-        log_metric("train / epoch / accuracy", train_accuracy.compute(), epoch)
+        log_metric(f"train / epoch / loss_{validate_fold}", loss_metric.compute(), epoch)
+        log_metric(f"train / epoch / accuracy_{validate_fold}", train_accuracy.compute(), epoch)
 
+        # validate
+        model.eval()
+        validate_accuracy.reset()
         if is_rank_0():
-
-            # validate
-            model.eval()
-            validate_accuracy.reset()
-            for song_index in tqdm(range(len(validate_ds)), total=len(validate_ds), unit="song"):
+            for song_index in tqdm(
+                range(len(validate_ds)), total=len(validate_ds), unit="song"
+            ):
                 audio, labels = validate_ds[song_index]
                 audio, labels = torch.tensor(audio).cuda(), torch.tensor(labels).cuda()
-                prediction = partial_predict(model, audio, args.frames_per_item, args.frames_per_item // 4)
+                prediction = partial_predict(
+                    model, audio, args.frames_per_item, args.frames_per_item // 4
+                )
                 validate_accuracy(prediction, labels)
-            acc = validate_accuracy.compute().item()
-            if acc >= best_validate_accuracy:
-                best_validate_epoch = epoch
-                best_validate_accuracy = acc
-                best_model_state = {k: v.clone() for k, v in model.state_dict().items()}
-            log_metric("validate / epoch / accuracy", acc, epoch)
-            log_metric("validate / epoch / best_epoch", best_validate_epoch, epoch)
 
-            # save model state
+        if args.ddp:
+            torch.distributed.barrier()
+        acc = validate_accuracy.compute().item()
+        if acc >= best_validate_accuracy:
+            best_validate_epoch = epoch
+            best_validate_accuracy = acc
+            best_model_state = {k: v.clone() for k, v in model.state_dict().items()}
+        log_metric(f"validate / epoch / accuracy_{validate_fold}", acc, epoch)
+        log_metric(f"validate / epoch / best_epoch_{validate_fold}", best_validate_epoch, epoch)
+
+        # save model state
+        if is_rank_0():
             with tempfile.TemporaryDirectory() as tmp_dir:
                 torch.save(
                     {
                         "best_state": best_model_state,
                         "last_state": model.state_dict()
                     },
-                    os.path.join(tmp_dir, "model_state.pt")
+                    os.path.join(tmp_dir, f"model_state_{validate_fold}.pt")
                 )
                 mlflow.log_artifacts(tmp_dir)
+
+        # early stopping
+        if epoch - best_validate_epoch > args.early_stopping:
+            break
 
     # evaluate model
     if is_rank_0():
         model.load_state_dict(best_model_state)
         model.eval()
         evaluate(
-            SongDataset(["train"], song_eval_dataset_config),
+            SongDataset(validate_folds, song_eval_dataset_config),
             model,
-            "train_ds_evaluation",
+            f"validate_ds_evaluation_{validate_fold}",
             args.frames_per_item,
         )
-        evaluate(
-            SongDataset(["validate"], song_eval_dataset_config),
-            model,
-            "validate_ds_evaluation",
-            args.frames_per_item,
-        )
-        evaluate(
-            SongDataset(["test"], song_eval_dataset_config),
-            model,
-            "test_ds_evaluation",
-            args.frames_per_item,
-        )
+
+    if args.ddp:
+        torch.distributed.barrier()
 
 
 if __name__ == "__main__":
     parser = create_argparser()
-    train(parser.parse_args())
+    args = parser.parser_args()
+
+    # init torch distributed
+    if args.ddp:
+        torch.distributed.init_process_group(backend="nccl")
+
+    # init mlflow
+    if is_rank_0():
+        mlflow.set_experiment(args.experiment_name)
+        mlflow.start_run(run_name=args.run_name)
+        mlflow.log_param("world_size", os.environ.get("WORLD_SIZE", "1"))
+        mlflow.log_params(
+            {key: value for key, value in args.__dict__.items() if key not in {"experiment_name", "run_name"}}
+        )
+
+    # trainings
+    for i in range(5):
+        train(args, i)
+
+    # close mlflow
+    if is_rank_0():
+        mlflow.end_run()

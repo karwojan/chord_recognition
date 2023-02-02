@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-test_fraction = 0.1
-validation_fraction = 0.1
-
 # load index
 index = pd.read_csv("./data/index.csv", sep=";")
 
@@ -16,16 +13,15 @@ for repeated_video_id in repeated_video_ids:
     repeated_songs = filtered_index.query("video_id == @repeated_video_id")
     filtered_index = filtered_index.drop(index=repeated_songs.sort_values(by="csr").iloc[:-1].index)
 
-# split to train/test (not empty purpose mark song as selected - with properly matched, unique video)
+# split to 5 folds and mark it in 'purpose' column (non empty purpose mark song
+# as valid and selected for training - with properly matched, unique video)
+k = 5
 index["purpose"] = None
 for subset in filtered_index.subset.unique():
     subset_indices = np.random.permutation(np.array(filtered_index.query("subset == @subset").index))
-    n_test_items = int(np.ceil(len(subset_indices) * test_fraction))
-    n_validation_items = int(np.ceil(len(subset_indices) * validation_fraction))
-
-    index.loc[subset_indices, "purpose"] = "train"
-    index.loc[subset_indices[:n_test_items], "purpose"] = "test"
-    index.loc[subset_indices[n_test_items:n_test_items + n_validation_items], "purpose"] = "validate"
+    fold_size = len(subset_indices) // k
+    for i in range(k):
+        index.loc[subset_indices[i * fold_size:], "purpose"] = f"train_fold_{i}"
 
 # save new index
 index.to_csv("./data/index.csv", sep=";", header=True, index=False)
