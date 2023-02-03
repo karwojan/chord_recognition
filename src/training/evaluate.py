@@ -14,6 +14,7 @@ from sklearn.metrics import (
     accuracy_score,
     recall_score,
     precision_score,
+    confusion_matrix,
     ConfusionMatrixDisplay,
 )
 from einops import repeat
@@ -160,6 +161,13 @@ def evaluate(
                 "precision": list(
                     precision_score(labels, predictions, **recall_precision_kwargs)
                 ),
+                "confusion_matrix": [
+                    [int(j) for j in i]
+                    for i in confusion_matrix(
+                        labels,
+                        predictions,
+                        labels=np.arange(dataset.n_classes)
+                    )],
                 "quantity": [int((labels == label).sum()) for label in np.arange(dataset.n_classes)],
             }
             with open(os.path.join(tmp_dir, "metrics.json"), "w") as f:
