@@ -83,8 +83,8 @@ def train(args, validate_fold):
     print(f"========== TRAINING FOLD {validate_fold} ==========")
 
     # init datasets and data loaders
-    train_folds = [f"train_fold_{i}" for i in set(range(5)) - {args.validate_fold}]
-    validate_folds = [f"train_fold_{args.validate_fold}"]
+    train_folds = [f"train_fold_{i}" for i in set(range(5)) - {validate_fold}]
+    validate_folds = [f"train_fold_{validate_fold}"]
     song_dataset_config = SongDatasetConfig.create_from_args(args)
     song_eval_dataset_config = replace(
         song_dataset_config, frames_per_item=0, pitch_shift_augment=False, song_multiplier=1, fraction=None
@@ -218,7 +218,7 @@ def train(args, validate_fold):
 
 if __name__ == "__main__":
     parser = create_argparser()
-    args = parser.parser_args()
+    args = parser.parse_args()
 
     # init torch distributed
     if args.ddp:
