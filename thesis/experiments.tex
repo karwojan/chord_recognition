@@ -72,6 +72,8 @@ segmentacji semantycznej, czyli przypisywać klasę dla każdej ramki. Takie pod
 zastosowane w \cite{park_bi-directional_2019}. Idąc za tym najprostszym i być może najbardziej
 naturalnym pomysłem zastosowano go również w niniejszej pracy. 
 
+
+
 \subsection{Opis wykorzystanego modelu sieci neuronowej}
 
 Do rozpoznawani akordów, podobnie jak w \cite{park_bi-directional_2019}, wykorzystany został
@@ -343,6 +345,8 @@ się jedynie tokeny poprzedzające, lub następujące po nim. W modelu BTC, ka�
 tworzących moduł MSA ma inny kierunek maskowania. Technika ta ma zmusić model do pełnego
 wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy klasyfikacji danej ramki.
 
+
+
 \subsection{Procedura treningu nadzorowanego}
 
 % wstęp
@@ -350,19 +354,20 @@ Pierwszy z dwóch rodzajów wykonywanych treningów sieci to klasyczny trening n
 Wykorzystywane są w nim dane z oznaczeniami aby nauczyć model rozwiązywania konkretnego problemu ---
 klasyfikacji akordów muzycznych. 
 
-% zbiory i epoki
-Pojedynczy trening nadzorowany (pojedynczy eksperyment) to jednokrotne nauczenie sieci na wszystkich
-dostępnych (lub tylko na wybranych podzbiorach --- parametr \emph{subset} w indeksie), oznaczonych
-przykładach uczących i ocena wyników wytrenowanego modelu. W eksperymencie zawsze wykorzystywane są
-wszystkie trzy części zbioru danych: część treningowa, walidacyjna i testowa. Treningowa służy do
-właściwej nauki i optymalizacji parametrów modelu. Zbiór walidacjny wykorzystuje się do sprawdzania
-w trakcie nauki, jak model radzi sobie z przykładami, na których nie był uczony (np. czy się
-przetrenowuje).  Zbiór testowy wykorzystywany jest po zakończeniu procesu nauki, aby uzyskać
-ostateczną ocenę jakości wytrenowanego modelu. Trening dzieli się na epoki, które z definicji
-oznaczają pojedyncze przejście przez wszystkie dostępne dane treningowe. Jak opisano w rozdziale
-\ref{sec:preprocessing}, w przypadku przeprowadzonych eksperymentów, pojedyncza epoka oznacza
-kilkukrotne przejście przez wszystkie utwory treningowe, ale dla każdego utworu przetwarzany jest
-jedynie jego losowy fragment (lub fragmenty).
+\subsubsection{Eksperymenty, treningi, epoki i pojedyncze kroki nauki}
+
+% walidacja krzyżowa, zbiory i epoki
+W ramach niniejszej pracy, do oceny jakości modeli wykorzystana została pięciokrotna walidacja
+krzyżowa. Oznacza to, że pojedynczy eksperyment, związany z pojedynczym zestawem hiperparametrów
+modelu, zbioru danych i treningu, składa się z pięciu treningów. W każdym z nich, jedna z pięciu
+części zbioru danych wykorzystana jest do walidacji, a pozostałe cztery do nauki. Możliwe jest, aby
+ograniczyć cały zbiór danych do wybranych zbiorów oznaczeń, co zupełnie nie zmienia zasady działania
+walidacji krzyżowej, ponieważ w ramach każdego zbioru oznaczeń zachowany jest podział na pięć
+równych części. Treningi dzieli się na epoki, które z definicji oznaczają pojedyncze przejście przez
+wszystkie dostępne dane treningowe (w tym przypadku cztery z pięciu części zbioru). Jak opisano w
+rozdziale \ref{sec:preprocessing}, w przypadku przeprowadzonych eksperymentów, pojedyncza epoka
+oznacza kilkukrotne przejście przez wszystkie utwory treningowe, ale dla każdego utworu przetwarzany
+jest jedynie jego losowy fragment (lub fragmenty).
 
 % kroki
 Na epokę składają się kroki, gdzie każdy krok oznacza jedną zmianę parametrów modelu. W ramach
@@ -386,31 +391,79 @@ tej funkcji kosztu po wszystkich parametrach modelu. Do optymalizacji parametró
 obliczonych pochodnych wykorzystany jest algorytm optymalizacyjny \emph{AdamW}. Współczynnik nauki
 (ang. \emph{learning rate}), przez pierwszych pięć epok ma jedynie dziesiątą część swojej docelowej
 wartości, aby zapewnić małe zmiany parametrów modelu na początku treningu. Transformery są bowiem
-podantne na to, że z powodu zbyt dużych kroków w początkowej fazie treningu, przestaną zbiegać do
+podatne na to, że z powodu zbyt dużych kroków w początkowej fazie treningu, przestaną zbiegać do
 konkretnego rozwiązania. Dodatkowo, na potrzeby późniejszej analizy, w każdym kroku zapisywane są
 wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha przykładów.
 
-% walidacja
-Pod koniec każdej epoki, po przejściu przez cały zbiór treningowy, następuje bieżąca ocena modelu na
-zbiorze walidacyjnym. Aby zapewnić stabilność wyników tej oceny, nie stosuje się w niej, tego samego
-co w treningu, mechanizmu losowania fragmentów utworów. Zamiast tego, dla każdego utworu ze zbioru
-walidacyjnego, wykonuje się predykcję klas dla wszystkich ramek. Szczegóły procedury predykcji klas
-akordów dla całego utworu zostały opisane poniżej. Mając dla danego utworu predykcję wszystkich
-akordów, oblicza się na tej podstawie wartość metryki \emph{accuracy}. Po przejściu przez cały zbiór
-walidacyjny, wartość tej metryki jest agregowana dla wszystkich utworów z tego zbioru i zapisywana
-do późniejszej analizy. Na podstawie tej metryki zapamiętywane są również numer epoki i wagi modelu,
-dla których wartość \emph{accuracy} była największa.
+\subsubsection{Walidacja i wczesne zatrzymanie treningu}
+
+% walidacja i wczesne zatrzymanie
+Pod koniec każdej epoki, po przejściu przez całą część treningową (cztery z pięciu części),
+następuje bieżąca ocena modelu na części walidacyjnej (ostatnia z pięciu części). Celem tego etapu
+jest zobaczyć, jak model radzi sobie z przykładami, na których nie był uczony. Można w ten sposób
+rozpoznać moment, kiedy sieć zaczyna się przetrenowywać i zatrzymać trening (ang. \emph{early
+stopping}). Aby zapewnić stabilność wyników tej oceny, nie stosuje się w niej, tego samego co
+podczas nauki, mechanizmu losowania fragmentów utworów. Nie stosuje się również augmentacji. Zamiast
+tego, dla każdego utworu wykonuje się po kolei predykcję klas dla wszystkich ramek. Szczegóły
+procedury predykcji klas akordów dla całego utworu zostały opisane poniżej. Mając dla danego utworu
+predykcję wszystkich akordów, oblicza się na tej podstawie wartość metryki \emph{accuracy}. Po
+przejściu przez całą część walidacyjną, wyniki te agregowane są do pojedynczej wartości. Podczas
+przechodzenia przez kolejne epoki, zapamiętywana jest najlepsza wartości \emph{accuracy}, wraz z
+numerem danej epoki i aktualnym stanem modelu. Jeżeli wartość \emph{accuracy} nie wzrasta przez
+zadaną liczbę epok, trening zostaje wstrzymany.
+
+\subsubsection{Ewaluacja modelu}
 
 % ewaluacja
-Po przejściu przez wszystkie epoki, na koniec pojedynczego treningu, wykonywana jest dogłębna
-ocena modelu. W tym celu wczytywane są wagi, dające najlepsze wyniki na zbiorze walidacyjnym i
-wykonywana jest procedura ewaluacji modelu, na każdym z trzech zbiorów danych. Szczegóły tej
-procedury zostały opisane poniżej. Warto tylko jeszcze wspomnieć, że takie podejście, chociaż
-pozwala uniknąć przetrenowania na zbiorze treningowym, prowadzi do potencjalnego przetrenowania pod
-zbiór walidacyjny. Oznacza to, że np. możliwe by były lepsze wyniki na zbiorze testowym, ale nie
-zostały osiągnięte, bo przypadkowa, najwyższa wartość na zbiorze walidacyjnym, pojawiła się
-stosunkowo wcześnie podczas treningu. Problemy te są oczywiście związane z rozmiarem zbioru
-walidacyjnego --- czym mniejszy, tym większa szansa na takie niekorzystne scenariusze.
+Po wstrzymaniu treningu z powodu przetrenowania modelu, lub po przejściu przez zadaną liczbę epok,
+model zostaje przywrócony do stanu, dającego najlepsze wyniki na części walidacyjnej. Następnie na
+tejże części wykonywana jest bardziej dogłębna ocena wytrenowanej sieci. Polega ona, podobnie jak
+podczas treningu, na wytworzeniu predykcji, na podstawie których, dla każdego utworu wyliczane
+są dodatkowo: 
+\begin{itemize}
+    \item ciąg wystąpień akordów (\code{ChordOccurence}), o określonym czasie rozpoczęcia i
+        zakończenia w sekundach (ciąg takich samych predykcji jest łączony w jedno wystąpienie
+        akordu)
+    \item wartość miary CSR na podstawie ciągu wystąpień akordów
+    \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana jak
+        pojedyncza predykcja:
+        \begin{itemize}
+            \item dokładność (ang. \emph{accuracy}) ($1$ wartość)
+            \item czułość (ang. \emph{recall}) per klasa ($25$ wartości)
+            \item precyzja (ang. \emph{precision}) per klasa ($25$ wartości)
+            \item macierz pomyłek (ang. \emph{confusion matrix})
+        \end{itemize}
+\end{itemize}
+Ciąg wystąpień akordów zapisywany jest w pliku \filetype{lab}, a wartości metryk CSR, dokładności,
+czułości, precyzji i macierz pomyłek w pliku \filetype{json}. Dodatkowo macierz pomyłek zapisywana
+jest jako obrazek w pliku \filetype{png}. Następnie wartości wszystkich tych miar są agregowane dla
+całego zbioru (CSR zamienia się na WCSR) i również zapisywane w plikach \filetype{json} i
+\filetype{png} (zapisywana na obrazku ,,globalna'' macierz pomyłek jest normalizowana wierszami,
+czyli wartości na głównej przekątnej są równoważne czułości modelu). Implementacja całej procedury
+ewaluacji modelu znajduje się w pliku \url{src/training/evaluate.py}.
+
+% problem podwójnego wykorzystania zbioru walidacyjnego + uzasadnienie wykorzystania walidacji krzyżowej
+Jak można zauważyć, część walidacyjna jest w pojedynczym treningu wykorzystywana na dwa sprzeczne
+sposoby. Po pierwsze służy do oceny jakości modelu na koniec procesu nauki. Jest to więc typowe
+zastosowanie, zgodne z zasadami walidacji krzyżowej. Z drugiej jednak strony, ten sam zbiór jest
+wykorzystywany do wykrycia przetrenowania i wczesnego zatrzymania treningu. Prowadzi to do swego
+rodzaju ,,przetrenowania'' pod część walidacyjną, ponieważ wybierany jest ten stan modelu, który
+wiadomo, że daje najlepsze wyniki dla danych przykładów. W takich sytuacjach, kiedy nie stosuje
+się walidacji krzyżowej, standardowo dzieli się zbiór na trzy części: treningową do nauki, testową
+do ostatecznej oceny i walidacyjną do oceny podczas treningu i uniknięcia przetrenowania. Technikę
+tę --- dzielenie zbioru na trzy części --- można zastosować również dla walidacji krzyżowej, jeżeli
+jest to konieczne. W przypadku tej pracy zostało to jednak uznana za zbędne, z tego powodu, że
+właściwym celem oceny modeli jest porównanie ich między sobą, a nie poznanie jak najlepszego
+przybliżenia ich rzeczywistej dokładności (rola zupełnie odrębnego zbioru testowego). Fakt, że każdy
+z nich daje nieznacznie zawyżone wyniki na części walidacyjnej, nie utrudnia porównania ich między
+sobą. Najważniejsze jest to, że walidacja krzyżowa pozwala uniknąć problemu obciążenia pojedynczego,
+niewielkiego zbioru testowego. Obciążenie takie, charakterystyczne dla zbyt małego,
+niereprezentatywnego zbioru, uniemożliwia rzetelne porównanie modeli między sobą. Łatwo może wtedy
+bowiem dojść do sytuacji, kiedy model wydaje się być lepszy od innych, bo przypadkowo daje lepsze
+wyniki na małym zbiorze testowym, choć dla przykładów z poza tego zbioru radzi sobie znacznie
+gorzej.
+
+\subsubsection{Implementacja i wykorzystana infrastruktura}
 
 % implementacja i sprzęt
 Pętla treningowa została zaimplementowana w pliku \url{src/training/training.py}. Została ona
@@ -419,8 +472,10 @@ przygotowana w taki sposób, aby można było trenować modele w sposób rozpros
 wykorzystano system \emph{MLflow}\footnote{\url{https://mlflow.org/}}. Treningi odbywały się na
 jednej lub kilku kartach graficznych NVIDIA GeForce RTX 3090.
 
+\subsubsection{Podsumowanie parametrów treningu}
+
 % podsumowanie parametrów treningu
-Wszystkie ustawienia pojedynczego treningu (eksperymentu) nadzorowanego, włączając w to parametry
+Wszystkie ustawienia pojedynczej serii pięciu treningów (eksperymentu), włączając w to parametry
 zbioru danych, hiperparametry modelu i hiperparametry samej pętli treningowej, zostały przedstawione
 w tabeli \ref{tab:sup_training_params}. Wartości parametrów z tej tabeli są wymieniane dla każdego
 udokumentowanego eksperymentu. W rzeczywistości, przygotowana implementacja umożliwia również zmianę
@@ -460,6 +515,7 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
 % X   n_epochs
 % X   batch_size
 % X   lr
+% X   early_stopping
 % T   ddp
 % T   num_workers
 
@@ -478,11 +534,13 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
         \code{model\_dim} & Liczba wymiarów pojedynczego tokena przechodzącego przez model \\
         \code{n\_heads} & Liczba równoległych operacji MSA \\
         \code{n\_blocks} & Liczba bloków w modelu \\
+        \code{block\_type} & Typ bloku: BTC lub zwykły transformer \\
         \code{dropout\_p} & Prawdopodobieństwo zerowania w warstwach \emph{dropout} \\ \hline
         \multicolumn{2}{|c|}{TRENING} \\ \hline
         \code{n\_epochs} & Liczba epok w treningu \\
         \code{batch\_size} & Liczba utworów przetwarzanych w jednym kroku \\
-        \code{lr} & Współczynnik uczenia \\ \hline
+        \code{lr} & Współczynnik uczenia \\
+        \code{early\_stopping} & Maksymalna liczba epok bez wzrostu dokładności na części walidacyjnej \\ \hline
     \end{tabular}
 \end{table}
 
@@ -526,32 +584,7 @@ analizy ani eksperymentów aby ustalić, jaki ma ona wpływ na jakość predykcj
 to, że bez nakładania na siebie fragmentów, predykcje nie byłyby w ogóle (lub znacząco) gorsze, jak
 i to, że zwiększenie długości kontekstu, poprawiłoby istotnie predykcje sieci.
 
-\subsubsection{Procedura ewaluacji modelu}
 
-Ewaluacja wytrenowanego modelu odbywa się na zadanym zbiorze danych. Jak wspomniano, na koniec
-każdego treningu jest ona wykonywana trzykrotnie: dla zbioru treningowego, walidacyjnego i
-testowego. Podstawą całej procedury jest wytworzenia predykcji dla każdego utworu ze zbioru. Na
-podstawie tych predykcji, dla każdego utworu wyliczane są:
-\begin{itemize}
-    \item ciąg wystąpień akordów (\code{ChordOccurence}), o określonym czasie rozpoczęcia i
-        zakończenia w sekundach (ciąg takich samych predykcji jest łączony w jedno wystąpienie
-        akordu)
-    \item wartość miary CSR na podstawie ciągu wystąpień akordów
-    \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana jak
-        pojedyncza predykcja:
-        \begin{itemize}
-            \item dokładność (ang. \emph{accuracy}) ($1$ wartość)
-            \item czułość (ang. \emph{recall}) per klasa ($25$ wartości)
-            \item precyzja (ang. \emph{precision}) per klasa ($25$ wartości)
-            \item macierz pomyłek (ang. \emph{confusion matrix})
-        \end{itemize}
-\end{itemize}
-Ciąg wystąpień akordów zapisywany jest w pliku \filetype{lab}, metryki CSR, dokładność, czułość i
-precyzja w pliku \filetype{json} a macierz pomyłek jako obrazek w pliku \filetype{png}. Po
-wytworzeniu predykcji i obliczeniu metryk dla każdego utworu, powyższe metryki (CSR, dokładność,
-czułość precyzja i macierz pomyłek) wyliczane są również dla całego zbioru (CSR zamienia się na
-WCSR) i również zapisywane w dwóch plikach \filetype{json} i \filetype{png}. Cała implementacja
-procedury ewaluacji modelu znajduje się w pliku \url{src/training/evaluate.py}.
 
 \subsection{Procedura samonadzorowanego treningu wstępnego}
 
@@ -572,7 +605,7 @@ Szczegółowe wyniki wszystkich treningów, zebrane zostały na końcu tego podr
 
 Bla bla bla dalszy wstęp o eksperymentach... % TODO
 
-\subsection{Etap 1. Reprodukcja wyników z pracy referencyjnej}
+\subsection{Etap 1: Reprodukcja wyników referencyjnych}
 
 Pierwszy ze wszystkich przeprowadzonych eksperymentów (\code{final-small-btc-reproduce}) miał na
 celu zreprodukować wyniki z \cite{park_bi-directional_2019}. W tym celu, z całego dostępnego zbioru
@@ -581,20 +614,3 @@ Model sieci neuronowej jest praktycznie identyczny, gdyż własna implemenacja b
 została na podstawie oryginalnej implementacji twórców tego modelu. Jeżeli chodzi i hiperparametry
 treningu, to \code{lr} został również wzięty taki sam jak u twórców tego rozwiązania. Rozmiar batcha
 i czas treningu wybrane zostały samodzielnie.
-% TODO: dalsze wyniki
-
-
-% strony z wynikami: powiększ, wklej, pomniejsz
-\newpage
-\addtolength{\voffset}{-2cm}
-\addtolength{\hoffset}{-2cm}
-\addtolength{\textwidth}{4cm}
-\addtolength{\textheight}{4cm}
-
-\input{results/results_final-small-btc-reproduce}
-% TODO: dalsze wyniki
-
-\addtolength{\voffset}{+2cm}
-\addtolength{\hoffset}{+2cm}
-\addtolength{\textwidth}{-4cm}
-\addtolength{\textheight}{-4cm}
