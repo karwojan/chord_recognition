@@ -1,42 +1,38 @@
 \chapter{Rozpoznawanie akordów muzycznych}
 
-% wstęp/skrót całego rozdziału
+% model (model.py), trening nadzorowany z ewaluacją (training.py, evaluate.py), trening
+% nienadzorowany (mae_training.py)
+
+% wstęp - model
 Rozpoznawanie akordów muzycznych zostało zrealizowane za pomocą sieci neuronowych. Wykorzystana
 została popularna ostatnio w wielu obszarach architektura transformera
 \cite{vaswani_attention_2017}. Modele tego typu były wykorzystywane w najnowszych pracach związanych
 z rozpoznawaniem akordów, w tym w pracy \cite{park_bi-directional_2019} stanowiącej główny punkt
 odniesienie dla niniejszych badań.
 
-Podczas realizacji zadania rozpoznawania akordów, w pierwszej kolejności zreprodukowane zostały
-wyniki z pracy referencyjnej. W tym celu wykonany został zwykły trening nadzorowany, z
-wykorzystaniem zbliżonego zbioru danych, zbliżonej procedury i identycznego modelu, jak w
-oryginalnych badaniach.
+% wstęp - metoda: self-supervised -> supervised
+Zaproponowany sposób nauczenia sieci neuronowej zadania rozpoznawania akordów składa się z dwóch
+części: nienadzorowanego treningu wstępnego i nadzorowanego treningu właściwego. W praktyce, sam
+trening nadzorowany, czyli oparty o oznaczone wcześniej przykłady uczące (pary nagrań muzycznych i
+plików z symbolami akordów), pozwala nauczyć sieć realizować to zadanie. Wymaga jednak odpowiednio
+dużej liczby przygotowanych przez człowieka przykładów uczących. Od liczby tych przykładów zależy
+ostateczna jakość modelu i jego zdolność do generalizacji. Co więcej, taki trening wymaga
+odpowiednio dużo czasu. Aby rozwiązać obie te trudności wykonywany jest wpierw wstępny trening
+nienadzorowany, w wyniku którego model uczy się ,,rozumieć'' utwory muzyczne --- poznaje ich
+strukturę, występujące tam wzorce i zależności. Dopiero po wykonaniu treningu wstępnego, mając
+działający ekstraktor wysokopoziomowych cech, dotrenowuje się go dla zadania rozpoznawania akordów.
+Metoda ta pozwala osiągnąć lepsze wyniki i wymaga mniej czasu, niż samodzielny trening nadzorowany.
 
-W następnej kolejności model został uproszczony i pozbawiony specjalnych usprawnień, po czym wykonana
-została seria eksperymentów, mająca na celu uzyskać tym modelem jak najlepsze wyniki. Celem tego
-etapu było przygotowanie punktu odniesienia dla późniejszych eksperymentów z uczeniem
-nienadzorowanym. Model został uproszczony, aby nie zaciemniać właściwego tematu pracy, jakim jest
-wykorzystanie uczenia nienadzorowanego.
-
-Mając przygotowany działający i stosunkowo prosty model, który uzyskuje wyniki zbliżone do
-najlepszych w literaturze, można było przejść do treningów nienadzorowanych, a dokładnie
-samonadzorowanych (ang. \emph{self-supervised}). Wykonana została seria czasochłonnych i
-zasobożernych eksperymentów, wykorzystujących jedynie dane bez oznaczeń, dzięki którym uzyskano
-pretrenowane (ang. \emph{pre-trained}) sieci. Na końcu te pretrenowane modele zostały dotrenowane do
-zadania rozpoznawania akordów i wyniki porównano z tymi, uzyskanymi bez uczenia wstępnego.
-
-% co zawiera rozdział
+% wstęp - co zawiera rozdział
 W niniejszym rozdziale opisana została szczegółowo wykorzystana architektura sieci neuronowej.
 Następnie przedstawione zostały procedury i zasady treningów nadzorowanego i nienadzorowanego oraz
-reguły oceny wytrenowanego modelu. Na końcu opisane zostały wszystkie wykonane eksperymenty i
-przeprowadzona została dyskusja otrzymanych wyników.
+reguły oceny wytrenowanego modelu.
 
-% model (model.py), trening nadzorowany (training.py), trening nienadzorowany (mae_training.py) i
-% ewaluacja (evaluate.py)
-\section{Algorytm rozpoznawania akordów muzycznych}
 
-% wstęp - dyskusja na temat podejścia do rozpoznawania akordów (TODO: czy to dobry wstęp i w ogóle
-% dobry tytuł tej pierwszej z dwóch części rozdziału, może ta dyskusja powinna być gdzieś indziej)
+
+\section{Problematyka}
+
+% dyskusja na temat podejścia do rozpoznawania akordów (TODO: czy to tutaj?)
 Jak wspomniano powyżej, do rozpoznawania akordów muzycznych wykorzystano sieci neuronowe. Modele te
 są jednak bardzo ogólne i wykorzystując je, wciąż można podejść do zadania rozpoznawania akordów na
 bardzo wiele różnych sposobów. Samo zadanie polega właściwie na podzieleniu wejściowego nagrania
@@ -74,8 +70,9 @@ naturalnym pomysłem zastosowano go również w niniejszej pracy.
 
 
 
-\subsection{Opis wykorzystanego modelu sieci neuronowej}
+\section{Model sieci neuronowej}
 
+% wstęp
 Do rozpoznawani akordów, podobnie jak w \cite{park_bi-directional_2019}, wykorzystany został
 popularny w ostatnim latach model sieci neuronowej, o nazwie \emph{Transformer}. W niniejszej pracy,
 poza fazą reprodukcją wyników z \cite{park_bi-directional_2019}, wykorzystana została jak
@@ -83,7 +80,9 @@ najprostsza i jak najbardziej zbliżona do oryginału wersja tego modelu. Implem
 przygotowana samodzielnie (plik \url{src/training/model.py}) na bazie literatury i innych
 implementacji.
 
-\subsubsection{Krótka historia transformerów}
+% TODO: parę słów o sieciach neuronowych
+
+\subsection{Krótka historia transformerów}
 
 % krótka historia transformera (TODO: czy to do przeglądu literatury czy tutaj)
 Model transformera został oryginalnie wprowadzony jako model do przetwarzania języka naturalnego, w
@@ -105,7 +104,7 @@ tym do klasyfikacji dźwięków \cite{gong_ast_2021} i do rozpoznawania mowy
 \cite{kim_squeezeformer_2022}. Transformery są więc dziś bardzo popularnymi modelami, które znajdują
 zastosowanie praktycznie w każdej dziedzinie, wykorzystującej uczenie maszynowe.
 
-\subsubsection{Ogólny opis architektury}
+\subsection{Ogólny opis architektury}
 
 \begin{figure}
     \centering
@@ -204,7 +203,7 @@ składający się z $N$ ramek i $F$ cech, a na wyjściu jest $N$ rozkładów pra
 klas, dla każdej z ramek spektrogramu. Wszystkie ramki spektrogramu są więc klasyfikowane
 jednocześnie, ale z uwzględnieniem kontekstu, jaki tworzą razem.
 
-\subsubsection{Kodowanie pozycji tokenów}
+\subsection{Kodowanie pozycji tokenów}
 
 % positional encoding
 Jak widać na rysunku \ref{fig:transformer}, pomiędzy projekcją tokenów wejściowych a wejściem do
@@ -240,7 +239,7 @@ nich to 256 (kolumny).
     \label{fig:positional_encoding}
 \end{figure}
 
-\subsubsection{Multi-Head Self-Attention}
+\subsection{Multi-Head Self-Attention}
 
 % mutli-head self-attention - wstęp
 Najważniejszą część transformera stanowi warstwa atencyjna MSA. Jako jedyna w całym modelu
@@ -328,7 +327,7 @@ hiperparametry transformera zostały zebrane w tabeli \ref{tab:transformer_param
     \end{tabular}
 \end{table}
 
-\subsubsection{Dwukierunkowy transformer do rozpoznawania akordów --- BTC}
+\subsection{Dwukierunkowy transformer do rozpoznawania akordów --- BTC}
 
 W pracy referencyjnej \cite{park_bi-directional_2019} autorzy postanowili wprowadzić drobne
 modyfikacje w stosunku do oryginalnego bloku transformera tworząc swój autorski model nazwany
@@ -347,14 +346,16 @@ wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy kla
 
 
 
-\subsection{Procedura treningu nadzorowanego}
+\section{Treningi nadzorowane}
 
 % wstęp
 Pierwszy z dwóch rodzajów wykonywanych treningów sieci to klasyczny trening nadzorowany.
 Wykorzystywane są w nim dane z oznaczeniami aby nauczyć model rozwiązywania konkretnego problemu ---
 klasyfikacji akordów muzycznych. 
 
-\subsubsection{Eksperymenty, treningi, epoki i pojedyncze kroki nauki}
+% TODO: parę słów o koncepcji treningów nadzorowanych
+
+\subsection{Procedura treningu}
 
 % walidacja krzyżowa, zbiory i epoki
 W ramach niniejszej pracy, do oceny jakości modeli wykorzystana została pięciokrotna walidacja
@@ -395,7 +396,7 @@ podatne na to, że z powodu zbyt dużych kroków w początkowej fazie treningu, 
 konkretnego rozwiązania. Dodatkowo, na potrzeby późniejszej analizy, w każdym kroku zapisywane są
 wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha przykładów.
 
-\subsubsection{Walidacja i wczesne zatrzymanie treningu}
+\subsection{Walidacja i wczesne zatrzymanie treningu}
 
 % walidacja i wczesne zatrzymanie
 Pod koniec każdej epoki, po przejściu przez całą część treningową (cztery z pięciu części),
@@ -412,7 +413,7 @@ przechodzenia przez kolejne epoki, zapamiętywana jest najlepsza wartości \emph
 numerem danej epoki i aktualnym stanem modelu. Jeżeli wartość \emph{accuracy} nie wzrasta przez
 zadaną liczbę epok, trening zostaje wstrzymany.
 
-\subsubsection{Ewaluacja modelu}
+\subsection{Ewaluacja modelu}
 
 % ewaluacja
 Po wstrzymaniu treningu z powodu przetrenowania modelu, lub po przejściu przez zadaną liczbę epok,
@@ -463,7 +464,7 @@ bowiem dojść do sytuacji, kiedy model wydaje się być lepszy od innych, bo p
 wyniki na małym zbiorze testowym, choć dla przykładów z poza tego zbioru radzi sobie znacznie
 gorzej.
 
-\subsubsection{Implementacja i wykorzystana infrastruktura}
+\subsection{Implementacja i wykorzystana infrastruktura}
 
 % implementacja i sprzęt
 Pętla treningowa została zaimplementowana w pliku \url{src/training/training.py}. Została ona
@@ -472,7 +473,7 @@ przygotowana w taki sposób, aby można było trenować modele w sposób rozpros
 wykorzystano system \emph{MLflow}\footnote{\url{https://mlflow.org/}}. Treningi odbywały się na
 jednej lub kilku kartach graficznych NVIDIA GeForce RTX 3090.
 
-\subsubsection{Podsumowanie parametrów treningu}
+\subsection{Podsumowanie parametrów treningu}
 
 % podsumowanie parametrów treningu
 Wszystkie ustawienia pojedynczej serii pięciu treningów (eksperymentu), włączając w to parametry
@@ -544,7 +545,7 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
     \end{tabular}
 \end{table}
 
-\subsubsection{Zasady predykcji akordów dla całego utworu}
+\subsection{Zasady predykcji akordów dla całego utworu}
 
 Najprostszym sposobem, aby uzyskać predykcję dla całego utworu, który zazwyczaj składa się z kilku
 tysięcy ramek, jest podanie wszystkich ramek jednocześnie na wejście sieci neuronowej. O ile
@@ -586,31 +587,260 @@ i to, że zwiększenie długości kontekstu, poprawiłoby istotnie predykcje sie
 
 
 
-\subsection{Procedura samonadzorowanego treningu wstępnego}
+\section{Samonadzorowane treningi wstępne}
 
-Nienadzorowany, a dokładnie samonadzorowany trening wstępny, stanowi kluczową część niniejszej
-pracy. Zastosowany algorytm stanowi autorską adaptację algorytmu MAE \cite{he_masked_2021},
-pochodzącego z obszaru przetwarzania obrazów. Algorytm MAE ma naturę bardzo ogólną i sam jest
-właściwie adaptacją oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stosowanego w dziedzinie
-przetwarzania języka naturalnego.
-% TODO
+% wstęp - co to self-supervised - ogólna koncepcja (TODO: czy to tutaj czy nie?)
+Nienadzorowany, a dokładnie samonadzorowany (ang. \emph{self-supervised}) trening wstępny, stanowi
+kluczową część niniejszej pracy. Algorytmy tego typu polegają na wykonywaniu przez sieć specjalnego,
+dodatkowego zadania pomocniczego (ang. \emph{pretext task}), w wyniku którego model uczy się
+ekstrachować wysokopoziomowe, abstrakcyjne, bogate semantycznie cechy. Treningi takie zbudowane
+są dokładnie tak samo jak treningi nadzorowane, ale samo zadanie (wraz z oznaczeniami) jest
+wytworzone sztucznie i nie wymaga oznaczeń przygotowanych przez człowieka. Przykładem może być
+układanie przez sieć neuronową puzzli \cite{noroozi_unsupervised_2017}, dorysowywanie brakującego
+fragmentu rysunku \cite{pathak_context_2016}, czy też uzupełnianie słów w zdaniach
+\cite{devlin_bert_2019}. Algorytmów tych jest bardzo wiele i można podzielić je na wiele różnych
+rodzajów, które wykorzystywane są dla różnych typów danych (czasami kilku jednocześnie
+\cite{jia_scaling_2021}). Ze względu na ogromną dostępność danych nieoznaczonych (Internet), metody
+tego typu zyskują bardzo na popularności w ostatnich latach. W dziedzinach przetwarzania języka
+naturalnego i rozpoznawania mowy są już właściwie standardem. Wytrenowany za pomocą takich metod
+model, może być później dotrenowany (ang. \emph{finetuning}) w sposób nadzorowany, na zbiorze
+danych związanym z konkretnym zadaniem. Jeżeli trening wstępny się udał, może przynieść on różnego
+rodzaju zysk dla zadania docelowego, w porównaniu do treningu od zera. Przykładami są:
+\begin{itemize}
+    \item krótszy wymagany czas treningu nadzorowanego
+    \item mniejszy wymagany zbiór danych oznaczonych
+    \item mniejsza podatność na przetrenowanie
+    \item lepsza generalizacja i w ogóle lepsza ostateczna jakość modelu
+\end{itemize}
 
+% wstęp - jaki zastosowano algorytm - ogólna idea, że na podstawie MAE, BERT, wav2vec
+Zastosowany w ramach niniejszej pracy algorytm uczenia samonadzorowanego, stanowi autorską adaptację
+algorytmu MAE (ang. \emph{Masked Auto-Encoders}) \cite{he_masked_2021}, pochodzącego z obszaru
+przetwarzania obrazów. Algorytm MAE ma naturę bardzo ogólną i sam jest właściwie adaptacją
+oryginalnego algorytmu BERT \cite{devlin_bert_2019}, stosowanego w dziedzinie przetwarzania języka
+naturalnego. Bardzo podobnym rozwiązaniem z dziedziny rozpoznawania mowy jest również
+\cite{baevski_wav2vec_2020}. Wszystkie te rozwiązania opierają się na tej samej, bardzo prostej
+koncepcji: maskowaniu (wycinaniu) fragmentu danych wejściowych (obrazka, zdania, nagrania) i uczeniu
+sieci uzupełniania tych danych. Aby poprawnie uzupełnić brakujące fragmenty, model musi nauczyć się
+interpretować i ,,rozumieć'' pozostałą, widoczną część danych wejściowych. Zaproponowana adaptacja
+tychże algorytmów dla nagrań muzycznych, co do zasady, polega więc na maskowaniu fragmentów
+spektrogramu wejściowego i uczeniu modelu uzupełniania tychże, wyciętych fragmentów.
 
-% eksperymenty
-\section{Eksperymenty}
+\subsection{Architektura autoenkodera uzupełniającego fragmenty spektrogramu}
 
-Niniejszy podrozdział zawiera opis wszystkich przeprowadzonych eksperymentów (treningów) i dyskusję
-ich wyników.  Eksperymenty zostały tematycznie pogrupowane w etapy, które są opisane poniżej.
-Szczegółowe wyniki wszystkich treningów, zebrane zostały na końcu tego podrozdziału.
+% opis modelu - propozycja uproszczona
+Do uzupełniania zamaskowanych fragmentów spektrogramu wykorzystany jest nieznacznie bardziej
+skomplikowany model, niż stosowany w treningach nadzorowanych. W praktyce można oczywiście
+wykorzystać do tego celu czysty transformer. Maskowanie polegałoby wtedy na wypełnieniu części
+tokenów wejściowych jakąś stałą wartością. Na wyjściu sieci trzeba by oczekiwać, poprzez przyłożenie
+odpowiedniej funkcji kosztu, że na pozycjach zamaskowanych tokenów model wydedukuje rzeczywiste,
+oryginalne wartości tychże tokenów, z przed operacji maskowania. Podejście to, choć proste, niesie
+za sobą pewne konsekwencje, jak potrzeba przetwarzania wielu takich samych, zamaskowanych tokenów,
+czy też poświęcenie części modelu (końcowych warstw) na realizację zadania zamiany abstrakcyjnej
+reprezentacji danych na format spektrogramu. W praktyce, ważne jest bowiem jedynie to, aby uzyskać
+dobry ekstraktor cech, a nie zrealizować jak najlepiej samo zadanie wstępne.
 
-Bla bla bla dalszy wstęp o eksperymentach... % TODO
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./images/mae_transformer.png}
+    \caption{Schemat autoenkodera uzupełniającego fragmenty spektrogramu}
+    \label{fig:mae_transformer}
+\end{figure}
 
-\subsection{Etap 1: Reprodukcja wyników referencyjnych}
+% opis modelu - dokładny opis na podstawie rysunku
+Idąc za pomysłem twórców algorytmu MAE, zastosowana została architektura składająca się z dwóch
+części --- enkodera i dekodera --- które razem tworzą autoenkoder. Każdy z nich jest po prostu
+osobnym transformerem, ale dekoder powinien być zdecydowanie mniejszy. Cały model zaprezentowany
+jest na rysunku \ref{fig:mae_transformer}. Na wejściu do modelu znajduje się spektrogram. Następnie,
+zgodnie z opisaną już wcześniej zasadą działania transformera, ramki są rzutowane na odpowiednią dla
+enkodera liczbę wymiarów i dodawane jest do nich kodowanie pozycji. Następuje później kluczowa
+operacja maskowania, która odbywa się na poziomie sekwencji tokenów. Polega ona na usunięciu losowej
+części sekwencji, zgodnie z odpowiednimi, opisanymi poniżej założeniami. Enkoder przetwarza
+następnie jedynie niezamaskowane tokeny, dzięki czemu dla dużych proporcji maskowania zmniejsza
+się znacząco złożoność wymaganych obliczeń. Jest to jeden z głównych atutów wspomnianego algrytmu
+MAE. Po przejściu przez wszystkie bloki eknodera, niezamaskowana część sekwencji powinna być
+docelowo przedstawiana w postaci wektorów bogatych semantycznie cech. Przed wejściem do dekodera,
+skrócona sekwencja jest z powrotem rozszerzana do oryginalnej długości. Wykorzystuje się w tym celu
+specjalny, trenowalny wektor odpowiedniej długości, który jest wstawiany w miejsce wszystkich
+zamaskowanych tokenów. Cała sekwencja przechodzi później przez dekoder, którego zadaniem jest
+wytworzyć spektrogram, jak najbardziej zbliżony do oryginalnego. Aby to zrobić, musi uzupełnić
+zamaskowane tokeny na podstawie informacji, jaką w niezamaskowanej części sekwencji umieścił
+enkoder. Mały rozmiar dekodera wymusza wyciągnięcie jak najwięcej informacji z widocznych tokenów
+przez enkoder. Dodatkowo, ponieważ dekoder przetwarza już pełną sekwencję tokenów, to jego rozmiar
+wpływa bardzo na złożoność obliczeń.
 
-Pierwszy ze wszystkich przeprowadzonych eksperymentów (\code{final-small-btc-reproduce}) miał na
-celu zreprodukować wyniki z \cite{park_bi-directional_2019}. W tym celu, z całego dostępnego zbioru
-danych, wybrane zostały jedynie trzy podzbiory, które wykorzystane zostały w pracy referencyjnej.
-Model sieci neuronowej jest praktycznie identyczny, gdyż własna implemenacja bloku BTC, przygotowana
-została na podstawie oryginalnej implementacji twórców tego modelu. Jeżeli chodzi i hiperparametry
-treningu, to \code{lr} został również wzięty taki sam jak u twórców tego rozwiązania. Rozmiar batcha
-i czas treningu wybrane zostały samodzielnie.
+\subsection{Zasady maskowania spektrogramów}
+
+% maskowanie spektrogramów - wstęp
+Operacja maskowania spektrogramów, jak już wspomniano, odbywa się na poziomie całej sekwencji ---
+maskowane są zawsze całe tokeny a nie ich fragmenty. Jest to oczywiście jedno z możliwych podejść,
+można bowiem próbować maskować również fragmenty tokenów. Zastosowane podejście pozwala jednak
+bardzo łatwo na optymalizację, polegającą na przetwarzaniu przez enkoder jedynie niezamaskowanej
+części sekwencji.
+
+% maskowanie spektrogramów - kwestia proporcji
+Indeksy wycinanych tokenów są losowane, a proporcja między ich liczbą a liczbą pozostawionych
+tokenów jest hiperparametrem danego treningu samonadzorowanego. W przypadku maskowania słów w
+zdaniach \cite{devlin_bert_2019}, wycinana jest jedynie niewielka część ($15\%$) sekwencji, ponieważ
+każdy pojedynczy token (słowo), ma już w sobie bardzo dużo informacji --- bardzo bogate i szerokie,
+abstrakcyjne znaczenie. W przypadku maskowania obrazów \cite{he_masked_2021} jest dokładnie
+odwrotnie --- wycinana jest spora część obrazu ($75\%$), ponieważ pojedyncze piksele mają w sobie
+niewiele informacji i mogą być skutecznie uzupełnione przez zwykłą interpolację liniową. W przypadku
+spektrogramów sytuacja jest bardziej zbliżona do obrazów, ponieważ uzupełnienie pojedynczych ramek
+również można zrealizować poprzez nieskomplikowaną interpolację. Co więcej, charakter spektrogramów
+dla utworów muzycznych jest taki, że często ich długie, trwające ułamek sekundy lub nawet kilka
+sekund fragmenty są stałe. Zależy to oczywiście od gatunku i od tego, które fragmenty spektrogramu
+są brane pod uwagę. Jeżeli chodzi natomiast o częstość zmian akordów w zachodniej muzyce popularnej,
+to w $10$-sekundowych fragmentach będą się one często zmieniać zaledwia kilka razy. Z tego powodu,
+aby zadanie uzupełniania spektrogramów było dość wymagające, maskowana część musi najprawdopodobniej
+zajmować przynajmniej kilkadziesiąt procent dlugości całej sekwencji.
+
+% maskowanie spektrogramów - kwestia wielkości dziur
+Poza proporcją maskowania, istotne jest również to, czy wycinane ramki będą tworzyły dłuższe, ciągłe
+fragmenty. Wynika to z faktu, że uzupełnienie co drugiej ramki, choć proporcja maskowania wynosi
+$50\%$, wciąż pozostaje stosunkowo łatwym zadaniem. Natomiast uzupełnienie trwającego $2$ sekundy
+ciągłego fragmentu, chociaż jest to tylko piąta część całej sekwencji, stanowi zadanie znacznie
+trudniejsze i wymaga głębszej interpretacji widocznych fragmentów nagrania. Dlatego też drugim
+hiperparametrem treningu samonadzorowanego jest liczba ciągłych bloków, na które dzielona jest cała
+sekwencja. Kiedy następuje operacja maskowania, tokeny są wycinane lub pozostawiane jedynie w
+ciągłych grupach, tworzących te bloki. Za pomocą tego parametru i proporcji maskowania można
+modyfikować trudność zadania między samonadzorowanymi treningami wstępnymi.
+
+% maskowanie spektrogramów - łatwa implementacja
+Omawiając zasady maskowania spektrogramów warto wspomnieć o jeszcze jednej zalecie tego algorytmu
+--- jest on bardzo łatwy w implementacji. Maskowanie można zrealizować jako wykonanie permutacji
+sewkencji tokenów i odcięcie odpowiedniej ich liczby. Aby po przejściu przez bloki enkodera uzyskać
+sekwencję oryginalnej długości i kolejności, wystarczy dokleić odpowiednią liczbę razy wektor
+oznaczający zamaskowane tokeny i wykonać permutację odwrotną. Podejście to można stosować również
+wtedy, kiedy chce się zachować zadaną liczbę ciągłych bloków w ramach sekwnecji.
+
+\subsection{Procedura treningu}
+
+% eksperymenty, treningi, zbiory i epoki
+W przypadku treningów samonadzorowanych, na pojedynczy eksperyment składa się tylko jeden trening,
+ponieważ nie stosowano tutaj metod takich jak walidacja krzyżowa. Sama nauka odbywa się na podstawie
+wszystkich danych nieoznaczonych ($10000$ utworów), które tworzą zbiór treningowy. Dane te,
+pomijając fakt, że nie mają oznaczeń, przetwarzane są do postaci $10$-sekundowych spektrogramów
+dokładnie w taki sam sposób, jak w treningach nadzorowanych. Stosowane są również te same
+augmentacje. We wszystkich wykonanych eksperymentach nienadzorowanych wykorzystany jest pełny zbiór
+treningowy. Mimo braku oznaczeń, wciąż konieczne jest jednak aby sprawdzać, czy zbiór nie uczy
+się danych treningowych na pamięć. W tym celu pierwsza z pięciu części danych oznaczonych (same
+nagrania, bez augmentacji) wykorzystana jest jako zbiór walidacyjny. Dokładnie tak jak w
+eksperymentach nadzorowanych, trening dzieli się na epoki, gdzie pojedyncza epoka oznacza
+kilkukrotnie przejście przez wszystkie nagrania treningowe, ale dla każdego z nich losowany jest
+zawsze jeden $10$-sekundowy fragment.
+
+% kroki, maskowanie, predykcja i funkcja kosztu
+Epoki dzielą się na kroki, gdzie każdy krok to równoległe przetworzenie całego batcha
+$10$-sekundowych fragmentów i jednokrotna modyfikacja parametrów modelu. W ramach danego kroku
+generowana jest pojedyncza maska (lista numerów tokenów), stosowana dla wszystkich fragmentów w
+batchu. Dla pojedynczej ramki wyjściowej $f' \in \mathbb{R}^F$ i pojedynczej ramki wejściowej $f \in
+\mathbb{R}^F$, wyliczany jest błąd średniokwadratowy (ang. \emph{mean squared error}) pełniący rolę
+funkcji kosztu, zgodnie ze wzorem:
+\begin{equation}
+    \textrm{MSE} = \frac{1}{F} \sum_{i=1}^{F} (f'_{i} - f_{i})^2
+\end{equation}
+Wartość ta jest wyliczana tylko dla tych ramek, które były zamaskowane (wycięte) i uśredniana między
+nimi, oraz między sekwencjami. Ma to zmusić model do skupienia się na zadaniu rekonstrukcji, a nie
+kopiowaniu wartości wejściowych.  Następnie, w standardowy sposób, parametry całego autoenkodera są
+optymalizowane na podstawie gradientu błędu średniokwadratowego.  Wartość funkcji kosztu jest
+logowana dla każdego batcha.
+
+% walidacja
+Po przejściu przez wszystkie przykłady treningowe z epoki następuje etap bieżącej walidacji modelu,
+mający na celu uniknięcie przetrenowania. Dokładnie tak samo jak dla danych uczących, wyliczane są
+predykcje na fragmentach ze zbioru walidacyjnego i obliczana jest wartość tej samej funkcji kosztu.
+Wartość ta jest logowana i służy jedynie porównaniu z wartością na zbiorze treningowym --- nie
+wylicza się na jej podstawie pochodnej i nie optymalizuje parametrów modelu. W przeciwieństwie do
+treningów nadzorowanych, zbiór walidacyjny jest przetwarzany tak samo jak zbiór treningowy, poprzez
+losowanie $10$-sekundowych fragmentów dla kolejnych utworów. Podejście to jest zdecydowanie
+wystarczające aby ocenić, czy model zaczyna się uczyć na pamięć.
+
+% po walidacji
+Na koniec każdej epoki, stan enkodera jest zapisywany, aby umożliwić późniejsze wykorzystanie go do
+rozpoznawania akordów (treningów nadzorowanych). Dodatkowo aby ułatwić ocenę stanu autoenkodera,
+która jest dość trudna na podstawie samej wartości błędu średnikowadratowego, wybierane są trzy
+losowe przykłady ze zbioru walidacyjnego. Każdy z nich zapisywany jest w postaci obrazka z trzema
+spektrogramami: wejściowy z przed operacji maskowania, zamaskowany przed wejściem do sieci i
+predykcja sieci. Ocena konkretnych predykcji modelu pozwala ocenić na ile rzeczywiście model nauczył
+się rozumieć strukturę nagrań muzycznych.
+
+\subsection{Implementacja i wykorzystana infrastruktura}
+
+% implementacja i sprzęt
+Cała procedura treningu samonadzorowanego wraz konstrukcją autoenkodera została zaimplementowana w
+pliku \url{src/training/mae_training.py}. Podobnie jak trening nadzorowany, przygotowana zostala
+możliwość treningu rozproszonego, a wszystkie hiperparametry i metryki są logowane do systemu
+\emph{MLflow}. Treningi odbywały się na jednej lub kilku kartach graficznych NVIDIA GeForce RTX
+3090.
+
+\subsection{Podsumowanie parametrów treningu}
+
+% podsumowanie parametrów treningu
+Wszystkie ustawienia pojedynczego treningu samonadzorowanego, włączając w to parametry zbioru
+danych i hiperparametry autoenkodera zostały przedstawione w tabeli \ref{tab:mae_training_params}.
+Wartości parametrów z tej tabeli są wymieniane dla każdego udokumentowanego eksperymentu. Tak samo
+jak dla treningów nadzorowanych, pominięte zostały niektóre stałe lub techniczne ustawienia,
+opisane w poprzednich rozdziałach. 
+
+% wszystkie parametry wynikające z argparse (F-fixed, T-technical, X-changed between experiments)
+% DATASET
+% F   sample_rate=22050
+% F   frame_size=2048
+% F   hop_size=2048
+% F   frames_per_item=100
+% X   item_multiplier
+% X   song_multiplier
+% F   audio_preprocessing (cqt, raw)=CQT
+% F   standardize_audio=YES
+% X   pitch_shift_augment
+% F   labels_vocabulary=MAJ_MIN
+% T   subsets=None
+% F   dataset_fraction=1.0
+% T   use_ram_cache
+% ENKODER
+% X   encoder_dim
+% X   encoder_n_heads
+% X   encoder_n_blocks
+% T   encoder_extra_features_dim=NO
+% T   pretrained_encoder_path
+% T   pretrained_encoder_run_name
+% DEKODER
+% X   decoder_dim
+% X   decoder_n_heads
+% X   decoder_n_blocks
+% TRENING
+% X   masking_ration
+% X   chunks_per_item
+% T   experiment_name
+% T   run_name
+% X   n_epochs
+% X   batch_size
+% X   lr
+% T   ddp
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry pojedynczego samonadzorowanego treningu wstępnego}
+    \label{tab:mae_training_params}
+    \begin{tabular}{|l|p{0.6\linewidth}|}
+        \hline \multicolumn{2}{|c|}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier} & Liczba przykładów zwracanych dla jednego utworu \\
+        \code{song\_multiplier} & Liczba przejść przez wszystkie utwory w jednej epoce \\
+        \code{augment} & Czy zastosowano augmentacje \\
+        \hline \multicolumn{2}{|c|}{ENKODER} \\ \hline
+        \code{encoder\_dim} & Liczba wymiarów pojedynczego tokena przechodzącego przez enkoder \\
+        \code{encoder\_n\_heads} & Liczba równoległych operacji MSA w enkoderze\\
+        \code{encoder\_n\_blocks} & Liczba bloków w enkoderze \\
+        \hline \multicolumn{2}{|c|}{DEKODER} \\ \hline
+        \code{decoder\_dim} & Liczba wymiarów pojedynczego tokena przechodzącego przez dekoder \\
+        \code{decoder\_n\_heads} & Liczba równoległych operacji MSA w dekoderze\\
+        \code{decoder\_n\_blocks} & Liczba bloków w dekoderze \\
+        \hline \multicolumn{2}{|c|}{TRENING} \\ \hline
+        \code{masking\_ratio} & Proporcja maskowania --- jaka część sekwencji tokenów jest wycinana \\
+        \code{chunks\_per\_item} & Liczba ciągłych, niepodzielnych bloków w sekwencji \\
+        \code{n\_epochs} & Liczba epok w treningu \\
+        \code{batch\_size} & Liczba utworów przetwarzanych w jednym kroku \\
+        \code{lr} & Współczynnik uczenia \\ \hline
+    \end{tabular}
+\end{table}
