@@ -12,16 +12,16 @@ odniesienie dla niniejszych badań.
 
 % wstęp - metoda: self-supervised -> supervised
 Zaproponowany sposób nauczenia sieci neuronowej zadania rozpoznawania akordów składa się z dwóch
-części: nienadzorowanego treningu wstępnego i nadzorowanego treningu właściwego. W praktyce, sam
+części: nienadzorowanego treningu wstępnego i nadzorowanego treningu właściwego. W praktyce sam
 trening nadzorowany, czyli oparty o oznaczone wcześniej przykłady uczące (pary nagrań muzycznych i
 plików z symbolami akordów), pozwala nauczyć sieć realizować to zadanie. Wymaga jednak odpowiednio
 dużej liczby przygotowanych przez człowieka przykładów uczących. Od liczby tych przykładów zależy
 ostateczna jakość modelu i jego zdolność do generalizacji. Co więcej, taki trening wymaga
-odpowiednio dużo czasu. Aby rozwiązać obie te trudności wykonywany jest wpierw wstępny trening
+odpowiednio dużo czasu. Aby rozwiązać obie te trudności, wykonywany jest wpierw wstępny trening
 nienadzorowany, w wyniku którego model uczy się ,,rozumieć'' utwory muzyczne --- poznaje ich
 strukturę, występujące tam wzorce i zależności. Dopiero po wykonaniu treningu wstępnego, mając
-działający ekstraktor wysokopoziomowych cech, dotrenowuje się go dla zadania rozpoznawania akordów.
-Metoda ta pozwala osiągnąć lepsze wyniki i wymaga mniej czasu, niż samodzielny trening nadzorowany.
+działający ekstraktor wysokopoziomowych cech, dotrenowywuje się go dla zadania rozpoznawania akordów.
+Metoda ta pozwala osiągnąć lepsze wyniki i wymaga mniej czasu niż samodzielny trening nadzorowany.
 
 % wstęp - co zawiera rozdział
 W niniejszym rozdziale opisana została szczegółowo wykorzystana architektura sieci neuronowej.
@@ -37,19 +37,19 @@ Jak wspomniano powyżej, do rozpoznawania akordów muzycznych wykorzystano sieci
 są jednak bardzo ogólne i wykorzystując je, wciąż można podejść do zadania rozpoznawania akordów na
 bardzo wiele różnych sposobów. Samo zadanie polega właściwie na podzieleniu wejściowego nagrania
 muzycznego na logiczne części, w których wybrzmiewają pojedyncze, rozpoznane przez algorytm akordy.
-Można więc potraktować to zadanie jako dwa podzadania, albo przeformułować je tak, aby było prostsze
-ale dawało takie same rezultaty. 
+Można więc potraktować to zadanie jako dwa oddzielne zadania albo przeformułować je tak, aby było
+prostsze, ale dawało takie same rezultaty. 
 
 Po pierwsze należy więc zadać sobie pytanie, z jaką dokładnością mają być rozpoznawane chwile
 rozpoczęcia i zakończenia trwania akordów. Sygnał dźwiękowy jest sygnałem ciągłym, ale zapisany jest
 w postaci cyfrowej z określoną częstotliwością próbkowania. Można zatem próbować rozpoznawać akordy
 z największą możliwą dokładnością, czyli co do pojedynczej próbki. Jest to jednak dokładność
 zdecydowanie nadmiarowa w kontekście tego zadania. Zakładając z kolei, że dane wejściowe nie
-będą miały postaci surowych próbek ale postać spektrogramu, dokładność rozpoznawania można
+będą miały postaci surowych próbek, ale postać spektrogramu, dokładność rozpoznawania można
 ograniczyć do pojedynczych ramek czasowych tworzących spektrogram. Podejście takie jest o tyle
 proste, że zadanie rozpoznawania akordów staje się stricte zadaniem klasyfikacji ramek spektrogramu,
 które są po prostu wektorami pewnych cech. Uzyskana dokładność czasowa, rzędu dziesiątych części
-sekundy, wydaje się być jak najbardziej wystarczająca. Takie też podejście zostało zastosowane w
+sekundy, wydaje się jak najbardziej wystarczająca. Takie też podejście zostało zastosowane w
 niniejszej pracy, co jasno widać po opisanym w poprzednim rozdziale wstępnym przetwarzaniu danych.
 
 Kolejnym tematem jest sposób przetwarzania ramek spektrogram przez sieć neuronową. Teoretycznie
@@ -61,8 +61,8 @@ Można np.  podawać na wejście sieci dłuższy (trwający więcej niż sekund�
 jedynie akord brzmiący na samym środku tego fragmentu, jak to zostało zrobione w
 \cite{korzeniowski_fully_2016}.  Wciąż można później zaaplikować algorytm uwzględniający szerszy
 kontekst, czyli np. konkretne progresje akordów. Najlepiej by jednak było, gdyby model rozpoznający
-akordy był jeden i łączył w sobie zarówno informacje lokalne (brzmiące w danym ułamu sekndy
-częstotliwości) jak i informacje globalne (progresje akordów). Można więc podawać na wejście sieci
+akordy był jeden i łączył w sobie zarówno informacje lokalne (brzmiące w danym ułamku sekundy
+częstotliwości), jak i informacje globalne (progresje akordów). Można więc podawać na wejście sieci
 od razu dłuższy fragment utworu i z dokładnością do ramek czasowych dokonywać swego rodzaju
 segmentacji semantycznej, czyli przypisywać klasę dla każdej ramki. Takie podejście zostało właśnie
 zastosowane w \cite{park_bi-directional_2019}. Idąc za tym najprostszym i być może najbardziej
@@ -87,9 +87,9 @@ implementacji.
 % krótka historia transformera (TODO: czy to do przeglądu literatury czy tutaj)
 Model transformera został oryginalnie wprowadzony jako model do przetwarzania języka naturalnego, w
 pracy \cite{vaswani_attention_2017}. Była to architektura typu \emph{enkoder-dekoder}, służąca np.
-do tłumacznie z jednego języka na drugi. Wcześniej do zadań związanych z językiem naturalnym były
+do tłumaczenia z jednego języka na drugi. Wcześniej do zadań związanych z językiem naturalnym były
 głównie wykorzystywane sieci rekurencyjne, które miały problem, aby dobrze radzić sobie z długimi
-sekwencjami słów --- zapominały kontekst jeżeli przetwarzany tekst nie był dość krótki. W celu
+sekwencjami słów --- zapominały kontekst, jeżeli przetwarzany tekst nie był dość krótki. W celu
 rozwiązania tego problemu wprowadzono mechanizm atencji (ang. \emph{attention}), który pozwalał
 uwzględnić dalszy kontekst zdania \cite{bahdanau_neural_2016}. Pomysł twórców transformera polega na
 tym, aby zrezygnować z sieci rekurencyjnych i pozostawić jedynie mechanizm atencji, w połączeniu z
@@ -97,7 +97,7 @@ warstwami liniowymi i funkcjami aktywacji (MLP). Transformer nie jest więc ani 
 ani siecią splotową. Po odniesieniu ogromnego sukcesu w NLP (dziś praktycznie wszystkie modele do
 NLP są budowane na bazie transformerów), architektura ta została wykorzystana również w
 przetwarzaniu obrazów \cite{dosovitskiy_image_2021}. Na potrzeby klasyfikacji zdjęć została nieco
-uproszczona ponieważ pozostawiony został sam enkoder. Na tym polu transformery również odniosły
+uproszczona, ponieważ pozostawiony został sam enkoder. Na tym polu transformery również odniosły
 sukces, chociaż nie wyparły sieci splotowych \cite{liu_convnet_2022}, tak jak wyparły sieci
 rekurencyjne. Ostatecznie modele tego typu zostały wykorzystane również do przetwarzania dźwięku, w
 tym do klasyfikacji dźwięków \cite{gong_ast_2021} i do rozpoznawania mowy
@@ -109,7 +109,7 @@ zastosowanie praktycznie w każdej dziedzinie, wykorzystującej uczenie maszynow
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{./images/transformer.png}
-    \caption{Schemat modelu transformera do rozpoznawania akordów muzycznych}
+    \caption{Schemat modelu transformera do rozpoznawania akordów muzycznych.}
     \label{fig:transformer}
 \end{figure}
 
@@ -117,13 +117,13 @@ zastosowanie praktycznie w każdej dziedzinie, wykorzystującej uczenie maszynow
 Rysunek \ref{fig:transformer} prezentuje wykorzystany do treningów model sieci neuronowej ---
 transformer. Architektura tego modelu jest bardzo prosta. Na wejście sieci podawany jest składający
 się z $N$ ramek spektrogram $\defmatrix{S}{N}{F}$, który następnie dzielony jest (tylko ideowo, w
-praktyce to wciąż pojedyncza macierz) na ramki (wektory $\vec s_i \in \mathbb{R}^F$). Ramki pełnią
+praktyce to wciąż pojedyncza macierz) na ramki (wektory $\vec s_i \in \mathbb{R}^F$). Ramki odgrywają
 rolę tokenów, czyli np. kolejnych słów w przypadku przetwarzania języka naturalnego. Transformer
 przetwarza cały ciąg tokenów równolegle, co jest jego podstawową przewagą nad sieciami
 rekurencyjnymi, które przetwarzają ciąg tokenów w sposób sekwencyjny. W praktyce jednocześnie przez
 sieć może przejść kilka ciągów tokenów, czyli cały \emph{batch} sekwencji. Długość sekwencji tokenów
 jest zupełnie arbitralna, ten sam model może przetwarzać sekwencje różnej długości, zarówno w
-treningu jak i później, podczas inferencji.
+treningu, jak i później, podczas inferencji.
 
 % ogólny opis architektury - input embedding i positional encodding
 W pierwszej kolejności sekwencja ramek (macierz $\matrix{S}$) przechodzi przez pojedynczą warstwę
@@ -147,7 +147,7 @@ zostały opisane poniżej.
 Centralną część transformera stanowi ciąg identycznych bloków BLK. Liczba tych bloków ($B$), w
 połączeniu z wymiarowością tokenów ($d_{\mathrm{model}}$), stanowią główne hiperparametry modelu i
 decydują o jego rozmiarze. Każdy blok składa się z dwóch głównych warstw: warstwy atencyjnej MSA
-(ang. \emph{Mulit-Head Self-Attention}) i niewielkiego perceptrona wielowarstwowego MLP (ang.
+(ang. \emph{Mulit-Head Self-Attention}) i niewielkiego perceptronu wielowarstwowego MLP (ang.
 \emph{Mulitlayer Perceptron}). Każdą z tych warstw poprzedza normalizacja Norm typu \emph{Layer
 Normalization} \cite{ba_layer_2016}, a kończy połączenie rezydualne \cite{he_deep_2015}, czyli
 dodanie do wartości na wyjściu nieznormalizowanej wartości z wejścia. Operacje realizowane przez
@@ -157,7 +157,7 @@ pojedynczy blok dla ciągu tokenów $\defmatrix{T}{N}{d_{\mathrm{model}}}$ możn
      \textrm{MLP}'(\matrix{T}) = \textrm{MLP}(\textrm{Norm}(\matrix{T})) + \matrix{T} \\
      \textrm{BLK}(\matrix{T}) = \textrm{MLP}'(\textrm{MSA}'(\matrix{T}))
 \end{eqnarray}
-Zastosowana nomalizacja aplikowana jest niezależnie (choć równolegle) dla każdego tokena $t \in
+Zastosowana normalizacja aplikowana jest niezależnie (choć równolegle) dla każdego tokena $t \in
 \mathbb{R}^{d_{\mathrm{model}}}$ z sekwencji $\matrix{T}$. Polega ona na odjęciu wartości średniej
 tokena oraz podzieleniu przez jego odchylenie standardowe. Przedstawia to wzór:
 \begin{equation}
@@ -173,7 +173,7 @@ gdzie wejściem jest sekwencja tokenów $\defmatrix{T}{N}{d_{\mathrm{model}}}$, 
 $\defmatrix{W_1}{d_{\mathrm{model}}}{4d_{\mathrm{model}}}$,
 $\defmatrix{W_2}{4d_{\mathrm{model}}}{d_{\mathrm{model}}}$ oraz wektory (dodawane do każdego wiersza
 odpowiedniej macierzy) $b_1 \in \mathbb{R}^{4d_{\mathrm{model}}}$ i $b_2 \in
-\mathbb{R}^{d_{\mathrm{model}}}$ to parametry dwóch warstw ukrytych perceptrona wielowarstwowego.
+\mathbb{R}^{d_{\mathrm{model}}}$ to parametry dwóch warstw ukrytych perceptronu wielowarstwowego.
 
 % ogólny opis architetury - dropout
 W rzeczywistości pojedynczy blok zawiera jeszcze jeden opcjonalny element, jakim są warstwy
@@ -207,16 +207,16 @@ jednocześnie, ale z uwzględnieniem kontekstu, jaki tworzą razem.
 
 % positional encoding
 Jak widać na rysunku \ref{fig:transformer}, pomiędzy projekcją tokenów wejściowych a wejściem do
-serii bloków, jest jeszcze etap kodowania pozycji każdego z tokenów. Etap ten jest niezbędny aby
+serii bloków, jest jeszcze etap kodowania pozycji każdego z tokenów. Etap ten jest niezbędny, aby
 zawrzeć w każdym z tokenów informację o tym, jaka jest jego pozycja w sekwencji. W przypadku sieci
-rekurencyjnych, informacja ta jest zawarta niejawnie, poprzez przetwarzanie tokenów jeden po drugim,
+rekurencyjnych informacja ta jest zawarta niejawnie, poprzez przetwarzanie tokenów jeden po drugim,
 w odpowiedniej kolejności. W przypadku transformerów, gdzie tokeny są przetwarzane równolegle,
 informacja ta musi być dodana jawnie.  Istnieje wiele sposobów, według których można zakodować
 pozycję tokenów, głównie dzielących się na wykorzystanie wartości wyuczonych (parametry modelu) i
 stałych (odpowiednia funkcja).  W niniejszej pracy wykorzystane zostało podejście oryginalnych
 twórców transformera, oparte o wartości funkcji sinus i kosinus. Polega ono na tym, że dla każdego
 tokena (dla każdej pozycji) generuje się wektor, który ma tę samą liczbę wymiarów co token, dzięki
-czemu może być do niego dodany. Wartości tych wektorów zdefinowane są wzorami:
+czemu może być do niego dodany. Wartości tych wektorów zdefiniowane są wzorami:
 \begin{equation}
     PE_{(\textrm{pos},2i)} = \sin(\textrm{pos}/10000^{2i/d_{\textrm{\tiny model}}})
 \end{equation}
@@ -235,7 +235,7 @@ nich to 256 (kolumny).
 \begin{figure}
     \centering
     \includegraphics[width=1.0\textwidth]{./images/positional_encoding.png}
-    \caption{Przykład wektorów kodujących pozycję dla sekwencji 100 tokenów o wymiarowości 256}
+    \caption{Przykład wektorów kodujących pozycję dla sekwencji 100 tokenów o wymiarowości 256.}
     \label{fig:positional_encoding}
 \end{figure}
 
@@ -252,9 +252,9 @@ zapytanie (ang. \emph{query}) i mając zbiór par klucz-wartość (ang. \emph{ke
 innym (lub tym samym) ciągiem tokenów, wylicza się nową reprezentację tokena jako ważoną sumę tych
 wartości, gdzie wagi są wyliczane na podstawie dopasowania zapytania do kluczy. Wagi te informują
 więc o tym, jak dużo uwagi powinno poświęcić się danej wartości, tworząc nową reprezentację danego
-tokena. W przypadku zadania tłumaczenia maszynowego, mechanizm ten pozwala skupić się na
+tokena. W przypadku zadania tłumaczenia maszynowego mechanizm ten pozwala skupić się na
 odpowiednich częściach sekwencji wejściowej, podczas tworzenia sekwencji wyjściowej. Jeżeli zarówno
-zapytania jak i pary klucz-wartość pochodzą z tej samej sekwencji tokenów, mamy do czynienia z
+zapytania, jak i pary klucz-wartość pochodzą z tej samej sekwencji tokenów, mamy do czynienia z
 \emph{Self-Attention}. Warstwa tego typu wyznacza więc dla każdego tokena w sekwencji zapytanie,
 klucz i wartość, a następnie tworzy jego nową reprezentację jako ważoną sumę wartości pozostałych
 tokenów. Informacje zakodowane w poszczególnych tokenach mieszają się zatem między sobą. W praktyce
@@ -279,7 +279,7 @@ gdzie macierze $\defmatrix{W_i^Q}{d_{\mathrm{model}}}{d_k}$,
 $\defmatrix{W_i^K}{d_{\mathrm{model}}}{d_k}$ oraz $\defmatrix{W_i^V}{d_{\mathrm{model}}}{d_v}$ to
 macierze parametrów warstw liniowych tworzących $i$-tą trójkę: zapytanie, klucz i wartość.
 
-Dla pojedynczej trójki macierzy $\matrix{Q}$, $\matrix{K}$ i $\matrix{V}$, operacja
+Dla pojedynczej trójki macierzy $\matrix{Q}$, $\matrix{K}$ i $\matrix{V}$ operacja
 \emph{Self-Attention} wygląda następująco:
 \begin{equation} \label{eq:sa}
     \textrm{SA}(\matrix{Q}, \matrix{K}, \matrix{V}) = \textrm{softmax}(\frac{\matrix{Q}\matrix{K^T}}{\sqrt{d_k}})\matrix{V}
@@ -292,7 +292,7 @@ Wartości w uzyskanej macierzy atencji pełnią rolę wag, które następnie są
 nowej reprezentacji wszystkich tokenów, za pomocą średniej ważonej wektorów z macierzy $\matrix{V}$.
 Wynik operacji SA jest więc macierzą, o wymiarach $N \times d_v$.
 
-Cała opracja \emph{Multi-Head Self-Attention} polega na $H$-krotnym wykonaniu operacji
+Cała operacja \emph{Multi-Head Self-Attention} polega na $H$-krotnym wykonaniu operacji
 \emph{Self-Attention}, których wektory wynikowe są łączone i ostatecznie rzutowane z powrotem na
 $d_{\mathrm{model}}$ wymiarów. Przedstawiają to poniższe wzory:
 \begin{equation}
@@ -314,7 +314,7 @@ hiperparametry transformera zostały zebrane w tabeli \ref{tab:transformer_param
 
 \begin{table}
     \centering
-    \caption{Hiperparametry transformera}
+    \caption{Hiperparametry transformera.}
     \label{tab:transformer_params}
     \begin{tabular}{|c|l|} \hline
         Symbol & Znaczenie \\ \hline
@@ -340,9 +340,9 @@ wyjściowe są łączone za pomocą dodatkowej warstwy liniowej. Bloki te różn
 Została w nich zastosowana technika maskowania, polegająca na modyfikacji macierzy atencji (wzór
 \ref{eq:sa}) w ten sposób, że dla danego tokena, wagi wszystkich wcześniejszych lub późniejszych
 tokenów są zerowane. Oznacza to, że tworząc nową reprezentację danego tokena wykorzystuje
-się jedynie tokeny poprzedzające, lub następujące po nim. W modelu BTC, każdy z dwóch bloków
+się jedynie tokeny poprzedzające, lub następujące po nim. W modelu BTC każdy z dwóch bloków
 tworzących moduł MSA ma inny kierunek maskowania. Technika ta ma zmusić model do pełnego
-wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy klasyfikacji danej ramki.
+wykorzystywania zarówno wcześniejszego, jak i późniejszego kontekstu przy klasyfikacji danej ramki.
 
 
 
@@ -350,7 +350,7 @@ wykorzystywania zarówno wcześniejszego jak i późniejszego kontekstu przy kla
 
 % wstęp
 Pierwszy z dwóch rodzajów wykonywanych treningów sieci to klasyczny trening nadzorowany.
-Wykorzystywane są w nim dane z oznaczeniami aby nauczyć model rozwiązywania konkretnego problemu ---
+Wykorzystywane są w nim dane z oznaczeniami, aby nauczyć model rozwiązywania konkretnego problemu ---
 klasyfikacji akordów muzycznych. 
 
 % TODO: parę słów o koncepcji treningów nadzorowanych
@@ -360,7 +360,7 @@ klasyfikacji akordów muzycznych.
 % walidacja krzyżowa, zbiory i epoki
 W ramach niniejszej pracy, do oceny jakości modeli wykorzystana została pięciokrotna walidacja
 krzyżowa. Oznacza to, że pojedynczy eksperyment, związany z pojedynczym zestawem hiperparametrów
-modelu, zbioru danych i treningu, składa się z pięciu treningów. W każdym z nich, jedna z pięciu
+modelu, zbioru danych i treningu, składa się z pięciu treningów. W każdym z nich jedna z pięciu
 części zbioru danych wykorzystana jest do walidacji, a pozostałe cztery do nauki. Możliwe jest, aby
 ograniczyć cały zbiór danych do wybranych zbiorów oznaczeń, co zupełnie nie zmienia zasady działania
 walidacji krzyżowej, ponieważ w ramach każdego zbioru oznaczeń zachowany jest podział na pięć
@@ -393,7 +393,7 @@ obliczonych pochodnych wykorzystany jest algorytm optymalizacyjny \emph{AdamW}. 
 (ang. \emph{learning rate}), przez pierwszych pięć epok ma jedynie dziesiątą część swojej docelowej
 wartości, aby zapewnić małe zmiany parametrów modelu na początku treningu. Transformery są bowiem
 podatne na to, że z powodu zbyt dużych kroków w początkowej fazie treningu, przestaną zbiegać do
-konkretnego rozwiązania. Dodatkowo, na potrzeby późniejszej analizy, w każdym kroku zapisywane są
+konkretnego rozwiązania. Co więcej, na potrzeby późniejszej analizy, w każdym kroku zapisywane są
 wartości funkcji kosztu i metryki \emph{accuracy} dla obecnego batcha przykładów.
 
 \subsection{Walidacja i wczesne zatrzymanie treningu}
@@ -416,7 +416,7 @@ zadaną liczbę epok, trening zostaje wstrzymany.
 \subsection{Ewaluacja modelu}
 
 % ewaluacja
-Po wstrzymaniu treningu z powodu przetrenowania modelu, lub po przejściu przez zadaną liczbę epok,
+Po wstrzymaniu treningu z powodu przetrenowania modelu lub po przejściu przez zadaną liczbę epok,
 model zostaje przywrócony do stanu, dającego najlepsze wyniki na części walidacyjnej. Następnie na
 tejże części wykonywana jest bardziej dogłębna ocena wytrenowanej sieci. Polega ona, podobnie jak
 podczas treningu, na wytworzeniu predykcji, na podstawie których, dla każdego utworu wyliczane
@@ -426,10 +426,10 @@ są dodatkowo:
         zakończenia w sekundach (ciąg takich samych predykcji jest łączony w jedno wystąpienie
         akordu)
     \item wartość miary CSR na podstawie ciągu wystąpień akordów
-    \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana jak
+    \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana, jak
         pojedyncza predykcja:
         \begin{itemize}
-            \item dokładność (ang. \emph{accuracy}) ($1$ wartość)
+            \item dokładność (ang. \emph{accuracy}; $1$ wartość)
             \item czułość (ang. \emph{recall}) per klasa ($25$ wartości)
             \item precyzja (ang. \emph{precision}) per klasa ($25$ wartości)
             \item macierz pomyłek (ang. \emph{confusion matrix})
@@ -460,8 +460,8 @@ z nich daje nieznacznie zawyżone wyniki na części walidacyjnej, nie utrudnia 
 sobą. Najważniejsze jest to, że walidacja krzyżowa pozwala uniknąć problemu obciążenia pojedynczego,
 niewielkiego zbioru testowego. Obciążenie takie, charakterystyczne dla zbyt małego,
 niereprezentatywnego zbioru, uniemożliwia rzetelne porównanie modeli między sobą. Łatwo może wtedy
-bowiem dojść do sytuacji, kiedy model wydaje się być lepszy od innych, bo przypadkowo daje lepsze
-wyniki na małym zbiorze testowym, choć dla przykładów z poza tego zbioru radzi sobie znacznie
+bowiem dojść do sytuacji, kiedy model wydaje się lepszy od innych, bo przypadkowo daje lepsze
+wyniki na małym zbiorze testowym, choć dla przykładów spoza tego zbioru radzi sobie znacznie
 gorzej.
 
 \subsection{Implementacja i wykorzystana infrastruktura}
@@ -479,12 +479,12 @@ jednej lub kilku kartach graficznych NVIDIA GeForce RTX 3090.
 Wszystkie ustawienia pojedynczej serii pięciu treningów (eksperymentu), włączając w to parametry
 zbioru danych, hiperparametry modelu i hiperparametry samej pętli treningowej, zostały przedstawione
 w tabeli \ref{tab:sup_training_params}. Wartości parametrów z tej tabeli są wymieniane dla każdego
-udokumentowanego eksperymentu. W rzeczywistości, przygotowana implementacja umożliwia również zmianę
+udokumentowanego eksperymentu. W rzeczywistości przygotowana implementacja umożliwia również zmianę
 parametrów, które zostały wybrane jako niezmienne dla niniejszej pracy i opisane w rozdziale
 \ref{sec:preprocessing}, takich jak długość przetwarzanego przez model fragmentu (100 ramek). Te
 parametry nie zostały wymienione w tabeli, ponieważ nie różnią się między eksperymentami. Pominięte
 również zostały parametry o charakterze ściśle technicznym, takie jak wykorzystanie pamięci
-podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
+podręcznej w RAM-ie, czy wykorzystanie treningu rozproszonego.
 
 % wszystkie parametry wynikające z argparse (F-fixed, T-technical, X-changed between experiments)
 % DATASET
@@ -522,7 +522,7 @@ podręcznej w RAM'ie, czy wykorzystanie treningu rozproszonego.
 
 \begin{table}
     \centering
-    \caption{Hiperparametry pojedynczego treningu nadzorowanego}
+    \caption{Hiperparametry pojedynczego treningu nadzorowanego.}
     \label{tab:sup_training_params}
     \begin{tabular}{|l|p{0.6\linewidth}|} \hline
         \multicolumn{2}{|c|}{ZBIÓR DANYCH} \\ \hline
@@ -554,17 +554,17 @@ oczywiście pamięć), to w przypadku sekwencji dłuższych niż w treningu, wym
 generalizacji. Jest to więc podejście ryzykowne i mało praktyczne, ze względu na ograniczenie
 pamięci, które w praktyce może spowodować, że i tak będzie trzeba dzielić utwór na kilka części.
 
-Najbezpieczniej podawać więc na wejście modelu fragmenty takiej długości, jak w treningu, czyli po
+Najbezpieczniej podawać więc na wejście modelu fragmenty takiej długości jak w treningu, czyli po
 $100$ ramek na raz. Pozostaje zdecydować, czy fragmenty mają się na siebie nakładać i jeśli tak, to
 w jaki sposób agregować kilka możliwych predykcji dla jednej ramki. W niniejszej pracy zdecydowano
 się na takie podejście, zgodnie z którym z każdej $100$-elementowej sekwencji, jedynie środkowe $50$
-brane jest do ostatecznego wyniku. Pozostałe $25$ ramek z początku i $25$ ramek z końca traktowane
+branych jest do ostatecznego wyniku. Pozostałe $25$ ramek z początku i $25$ ramek z końca traktowane
 są jako kontekst. Wynika to z niezweryfikowanej hipotezy, że predykcje dla ramek z szerszym
 kontekstem przed nimi i po nich, są precyzyjniejsze, niż dla ramek na brzegu fragmentu, dla których
 nie wiadomo dobrze, co działo się przed nimi lub po nich. Oznacza to w praktyce, że kolejne
 fragmenty nakładają się na siebie w połowie. 
 
-Cała procedura wytwarzania predykcji dla pojedynczego nagrania, polega więc na:
+Cała procedura wytwarzania predykcji dla pojedynczego nagrania polega więc na:
 \begin{itemize}
     \item podzieleniu nagrania na rozłączne fragmenty po $50$ ramek
     \item dodaniu do każdego fragmentu po $25$ ramek z fragmentów wcześniejszego i późniejszego, w
@@ -579,9 +579,9 @@ Mechanizm ten, w ogólnej postaci, zaimplementowany został w funkcji \code{part
 \url{src/training/evaluate.py}. W rzeczywistości, wszystkie nakładające się na siebie fragmenty, są
 przetwarzane przez model równolegle, jako jeden batch przykładów.
 
-Proporcja między długością pojedynczego fragmentu ($100$ ramek), a długością kontekstu (po $25$
+Proporcja między długością pojedynczego fragmentu ($100$ ramek) a długością kontekstu (po $25$
 ramek przed i po), została ustalona na podstawie intuicji. Nie przeprowadzono żadnej dokładnej
-analizy ani eksperymentów aby ustalić, jaki ma ona wpływ na jakość predykcji. Możliwe jest zarówno
+analizy ani eksperymentów, aby ustalić, jaki ma ona wpływ na jakość predykcji. Możliwe jest zarówno
 to, że bez nakładania na siebie fragmentów, predykcje nie byłyby w ogóle (lub znacząco) gorsze, jak
 i to, że zwiększenie długości kontekstu, poprawiłoby istotnie predykcje sieci.
 
@@ -593,7 +593,7 @@ i to, że zwiększenie długości kontekstu, poprawiłoby istotnie predykcje sie
 Nienadzorowany, a dokładnie samonadzorowany (ang. \emph{self-supervised}) trening wstępny, stanowi
 kluczową część niniejszej pracy. Algorytmy tego typu polegają na wykonywaniu przez sieć specjalnego,
 dodatkowego zadania pomocniczego (ang. \emph{pretext task}), w wyniku którego model uczy się
-ekstrachować wysokopoziomowe, abstrakcyjne, bogate semantycznie cechy. Treningi takie zbudowane
+ekstrahować wysokopoziomowe, abstrakcyjne, bogate semantycznie cechy. Treningi takie zbudowane
 są dokładnie tak samo jak treningi nadzorowane, ale samo zadanie (wraz z oznaczeniami) jest
 wytworzone sztucznie i nie wymaga oznaczeń przygotowanych przez człowieka. Przykładem może być
 układanie przez sieć neuronową puzzli \cite{noroozi_unsupervised_2017}, dorysowywanie brakującego
@@ -630,20 +630,20 @@ spektrogramu wejściowego i uczeniu modelu uzupełniania tychże, wyciętych fra
 
 % opis modelu - propozycja uproszczona
 Do uzupełniania zamaskowanych fragmentów spektrogramu wykorzystany jest nieznacznie bardziej
-skomplikowany model, niż stosowany w treningach nadzorowanych. W praktyce można oczywiście
+skomplikowany model niż stosowany w treningach nadzorowanych. W praktyce można oczywiście
 wykorzystać do tego celu czysty transformer. Maskowanie polegałoby wtedy na wypełnieniu części
 tokenów wejściowych jakąś stałą wartością. Na wyjściu sieci trzeba by oczekiwać, poprzez przyłożenie
 odpowiedniej funkcji kosztu, że na pozycjach zamaskowanych tokenów model wydedukuje rzeczywiste,
-oryginalne wartości tychże tokenów, z przed operacji maskowania. Podejście to, choć proste, niesie
+oryginalne wartości tychże tokenów, sprzed operacji maskowania. Podejście to, choć proste, niesie
 za sobą pewne konsekwencje, jak potrzeba przetwarzania wielu takich samych, zamaskowanych tokenów,
 czy też poświęcenie części modelu (końcowych warstw) na realizację zadania zamiany abstrakcyjnej
-reprezentacji danych na format spektrogramu. W praktyce, ważne jest bowiem jedynie to, aby uzyskać
+reprezentacji danych na format spektrogramu. W praktyce ważne jest bowiem jedynie to, aby uzyskać
 dobry ekstraktor cech, a nie zrealizować jak najlepiej samo zadanie wstępne.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{./images/mae_transformer.png}
-    \caption{Schemat autoenkodera uzupełniającego fragmenty spektrogramu}
+    \caption{Schemat autoenkodera uzupełniającego fragmenty spektrogramu.}
     \label{fig:mae_transformer}
 \end{figure}
 
@@ -657,8 +657,8 @@ enkodera liczbę wymiarów i dodawane jest do nich kodowanie pozycji. Następuje
 operacja maskowania, która odbywa się na poziomie sekwencji tokenów. Polega ona na usunięciu losowej
 części sekwencji, zgodnie z odpowiednimi, opisanymi poniżej założeniami. Enkoder przetwarza
 następnie jedynie niezamaskowane tokeny, dzięki czemu dla dużych proporcji maskowania zmniejsza
-się znacząco złożoność wymaganych obliczeń. Jest to jeden z głównych atutów wspomnianego algrytmu
-MAE. Po przejściu przez wszystkie bloki eknodera, niezamaskowana część sekwencji powinna być
+się znacząco złożoność wymaganych obliczeń. Jest to jeden z głównych atutów wspomnianego algorytmu
+MAE. Po przejściu przez wszystkie bloki eknodera niezamaskowana część sekwencji powinna być
 docelowo przedstawiana w postaci wektorów bogatych semantycznie cech. Przed wejściem do dekodera,
 skrócona sekwencja jest z powrotem rozszerzana do oryginalnej długości. Wykorzystuje się w tym celu
 specjalny, trenowalny wektor odpowiedniej długości, który jest wstawiany w miejsce wszystkich
@@ -666,14 +666,14 @@ zamaskowanych tokenów. Cała sekwencja przechodzi później przez dekoder, któ
 wytworzyć spektrogram, jak najbardziej zbliżony do oryginalnego. Aby to zrobić, musi uzupełnić
 zamaskowane tokeny na podstawie informacji, jaką w niezamaskowanej części sekwencji umieścił
 enkoder. Mały rozmiar dekodera wymusza wyciągnięcie jak najwięcej informacji z widocznych tokenów
-przez enkoder. Dodatkowo, ponieważ dekoder przetwarza już pełną sekwencję tokenów, to jego rozmiar
+przez enkoder. Co więcej, ponieważ dekoder przetwarza już pełną sekwencję tokenów, to jego rozmiar
 wpływa bardzo na złożoność obliczeń.
 
 \subsection{Zasady maskowania spektrogramów}
 
 % maskowanie spektrogramów - wstęp
 Operacja maskowania spektrogramów, jak już wspomniano, odbywa się na poziomie całej sekwencji ---
-maskowane są zawsze całe tokeny a nie ich fragmenty. Jest to oczywiście jedno z możliwych podejść,
+maskowane są zawsze całe tokeny, a nie ich fragmenty. Jest to oczywiście jedno z możliwych podejść,
 można bowiem próbować maskować również fragmenty tokenów. Zastosowane podejście pozwala jednak
 bardzo łatwo na optymalizację, polegającą na przetwarzaniu przez enkoder jedynie niezamaskowanej
 części sekwencji.
@@ -681,7 +681,7 @@ części sekwencji.
 % maskowanie spektrogramów - kwestia proporcji
 Indeksy wycinanych tokenów są losowane, a proporcja między ich liczbą a liczbą pozostawionych
 tokenów jest hiperparametrem danego treningu samonadzorowanego. W przypadku maskowania słów w
-zdaniach \cite{devlin_bert_2019}, wycinana jest jedynie niewielka część ($15\%$) sekwencji, ponieważ
+zdaniach \cite{devlin_bert_2019} wycinana jest jedynie niewielka część ($15\%$) sekwencji, ponieważ
 każdy pojedynczy token (słowo), ma już w sobie bardzo dużo informacji --- bardzo bogate i szerokie,
 abstrakcyjne znaczenie. W przypadku maskowania obrazów \cite{he_masked_2021} jest dokładnie
 odwrotnie --- wycinana jest spora część obrazu ($75\%$), ponieważ pojedyncze piksele mają w sobie
@@ -691,9 +691,9 @@ również można zrealizować poprzez nieskomplikowaną interpolację. Co więce
 dla utworów muzycznych jest taki, że często ich długie, trwające ułamek sekundy lub nawet kilka
 sekund fragmenty są stałe. Zależy to oczywiście od gatunku i od tego, które fragmenty spektrogramu
 są brane pod uwagę. Jeżeli chodzi natomiast o częstość zmian akordów w zachodniej muzyce popularnej,
-to w $10$-sekundowych fragmentach będą się one często zmieniać zaledwia kilka razy. Z tego powodu,
+to w $10$-sekundowych fragmentach będą się one często zmieniać zaledwie kilka razy. Z tego powodu,
 aby zadanie uzupełniania spektrogramów było dość wymagające, maskowana część musi najprawdopodobniej
-zajmować przynajmniej kilkadziesiąt procent dlugości całej sekwencji.
+zajmować przynajmniej kilkadziesiąt procent długości całej sekwencji.
 
 % maskowanie spektrogramów - kwestia wielkości dziur
 Poza proporcją maskowania, istotne jest również to, czy wycinane ramki będą tworzyły dłuższe, ciągłe
@@ -707,12 +707,12 @@ ciągłych grupach, tworzących te bloki. Za pomocą tego parametru i proporcji 
 modyfikować trudność zadania między samonadzorowanymi treningami wstępnymi.
 
 % maskowanie spektrogramów - łatwa implementacja
-Omawiając zasady maskowania spektrogramów warto wspomnieć o jeszcze jednej zalecie tego algorytmu
+Omawiając zasady maskowania spektrogramów, warto wspomnieć o jeszcze jednej zalecie tego algorytmu
 --- jest on bardzo łatwy w implementacji. Maskowanie można zrealizować jako wykonanie permutacji
-sewkencji tokenów i odcięcie odpowiedniej ich liczby. Aby po przejściu przez bloki enkodera uzyskać
+sekwencji tokenów i odcięcie odpowiedniej ich liczby. Aby po przejściu przez bloki enkodera uzyskać
 sekwencję oryginalnej długości i kolejności, wystarczy dokleić odpowiednią liczbę razy wektor
 oznaczający zamaskowane tokeny i wykonać permutację odwrotną. Podejście to można stosować również
-wtedy, kiedy chce się zachować zadaną liczbę ciągłych bloków w ramach sekwnecji.
+wtedy, kiedy chce się zachować zadaną liczbę ciągłych bloków w ramach sekwencji.
 
 \subsection{Procedura treningu}
 
@@ -723,7 +723,7 @@ wszystkich danych nieoznaczonych ($10000$ utworów), które tworzą zbiór treni
 pomijając fakt, że nie mają oznaczeń, przetwarzane są do postaci $10$-sekundowych spektrogramów
 dokładnie w taki sam sposób, jak w treningach nadzorowanych. Stosowane są również te same
 augmentacje. We wszystkich wykonanych eksperymentach nienadzorowanych wykorzystany jest pełny zbiór
-treningowy. Mimo braku oznaczeń, wciąż konieczne jest jednak aby sprawdzać, czy zbiór nie uczy
+treningowy. Mimo braku oznaczeń wciąż konieczne jest jednak aby sprawdzać, czy zbiór nie uczy
 się danych treningowych na pamięć. W tym celu pierwsza z pięciu części danych oznaczonych (same
 nagrania, bez augmentacji) wykorzystana jest jako zbiór walidacyjny. Dokładnie tak jak w
 eksperymentach nadzorowanych, trening dzieli się na epoki, gdzie pojedyncza epoka oznacza
@@ -821,7 +821,7 @@ opisane w poprzednich rozdziałach.
 
 \begin{table}
     \centering
-    \caption{Hiperparametry pojedynczego samonadzorowanego treningu wstępnego}
+    \caption{Hiperparametry pojedynczego samonadzorowanego treningu wstępnego.}
     \label{tab:mae_training_params}
     \begin{tabular}{|l|p{0.6\linewidth}|}
         \hline \multicolumn{2}{|c|}{ZBIÓR DANYCH} \\ \hline
