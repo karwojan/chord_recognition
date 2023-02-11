@@ -36,6 +36,7 @@ template = template.replace("!dropout_p!", run["params.dropout_p"])
 template = template.replace("!n_epochs!", run["params.n_epochs"])
 template = template.replace("!batch_size!", run["params.batch_size"])
 template = template.replace("!lr!", run["params.lr"])
+template = template.replace("!early_stopping!", run["params.early_stopping"])
 
 # download metrics
 metrics = {}
@@ -60,12 +61,8 @@ for fold in range(5):
     best_epoch_list.append(run[f"metrics.validate / epoch / best_epoch_{fold}"])
     template = template.replace(f"!wcsr_{fold}!", str(round(wcsr_list[-1], 3)))
     template = template.replace(f"!best_epoch_{fold}!", str(round(best_epoch_list[-1])))
-wcsr_mean = np.mean(wcsr_list)
-wcsr_var = np.max(np.abs(np.array(wcsr_list) - wcsr_mean))
-best_epoch_mean = np.mean(best_epoch_list)
-best_epoch_var = np.max(np.abs(np.array(best_epoch_list) - best_epoch_mean))
-template = template.replace("!wcsr_mean!", str(round(wcsr_mean, 3)) + r" \pm " + str(round(wcsr_var, 3)))
-template = template.replace("!best_epoch_mean!", str(round(best_epoch_mean)) + r" \pm " + str(round(best_epoch_var)))
+template = template.replace("!wcsr_mean!", str(round(np.mean(wcsr_list), 3)) + r" \pm " + str(round(np.std(wcsr_list), 3)))
+template = template.replace("!best_epoch_mean!", str(round(np.mean(best_epoch_list))) + r" \pm " + str(round(np.std(best_epoch_list))))
 
 # print template
 print(template)

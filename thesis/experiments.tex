@@ -1,0 +1,252 @@
+\chapter{Eksperymenty}
+
+% wstęp
+Niniejszy rozdział zawiera opis, wyniki i interpretację wszystkich przeprowadzonych eksperymentów. Eksperymenty zostały pogrupowane w etapy w ten sposób, że eksperymenty w danym etapie mają jeden, wspólny kontekst lub cel. Wykonywane były dwa typy eksperymentów: pierwszy to zestaw pięciu treningów nadzorowanych (walidacja krzyżowa) a drugi to pojedynczy trening nienadzorowany. Każdy eksperyment ma swoją nazwę i dla każdego z nich prezentowana jest tabela wartości hiperparametrów, odpowiednio na podstawie tabeli \ref{tab:sup_training_params} lub tabeli \ref{tab:mae_training_params}.
+
+Pierwszy etap dotyczy reprodukcji wyników z pracy referencyjnej \cite{park_bi-directional_2019}. Jego celem było sprawdzić, czy zgromadzone dane i przygotowany zestaw skryptów nie zawierają żadnych, krytycznych błędów. Przeprowadzony został więc pojedynczy trening z możliwie zbliżonymi do oryginału zbiorem danych, hiperparametrami modelu i ustawieniami treningu.
+
+Kolejny etap to już zestaw kilku eksperymentów nadzorowanych, podczas których wykorzystany został pełny dostępny zbiór danych oznaczonych. Właściwym celem tego etapu było wytrenować uproszczony model w stosunku do BTC z poprzedniego etapu. Uproszczenie modelu ma służyć skupieniu się na późniejszej ocenie zysku z treningów nienadzorowanych.
+
+W ramach etapu trzeciego uproszczony model został nieznacznie powiększony. Motywacją do zwiększenia liczby parametrów jest fakt, że większe modele więcej zyskują dla większych zbiorów danych. Przekłada się to bezpośrenio na potencjalny zysk z treningu nienadzorowanego, który co do zasady odbywa się na większym zbiorze danych. Wytrenowane w tym etapie model służyły jako główny punkt odniesienia przy ocenie zysków z samonadzorowanego treningu wstępnego.
+
+Etap czwarty jest kluczowy dla niniejszej pracy. Wykonane są w nim dwa czasochłonne treningi nienadzorowane. Do tego przeprowadzono również dwa eksperymenty nadzorowane, wykorzystujące dwa uzyskane wcześniej, pretrenowane modele. Wyniki otrzymane w tym etapie były porównane z wynikami z etapu drugiego, aby odpowiedzieć na kluczowe w niniejszej pracy pytanie o korzyści z treningu nienadzorowanego.
+
+Ostatni etap również związany jest z oceną zysku z nienadzorowanych treningów. Składa się on z serii eksperymentów nadzorowanych, podczas których zbiory treningowe są w różnym stopni zmniejszane. Celeme jest zbadać dokładniej, jaki wpływ ma pretrening w przypadku trochę mniejszej i znacznie mniejszej dostępności danych uczących.
+
+
+
+\section{Etap 1: Reprodukcja wyników referencyjnych}
+
+Pierwszy ze wszystkich przeprowadzonych eksperymentów (\code{btc-reproduce}) miał na celu sprawdzić, czy zgromadzony zbiór danych i przygotowana procedura treningu nie zawiera żadnych krytycznych błędów. W tym celu podjęta została próba zreprodukowania wyników z \cite{park_bi-directional_2019}. W związku z tym, z całego dostępnego zbioru danych, wybrane zostały jedynie trzy podzbiory, które wykorzystane zostały w pracy referencyjnej. Model sieci neuronowej jest praktycznie identyczny, gdyż własna implementacja bloku BTC, przygotowana została na podstawie oryginalnej implementacji twórców tego modelu. Jeżeli chodzi o hiperparametry treningu, to jedynie \code{lr} został wzięty taki sam jak u twórców tego rozwiązania. Rozmiar batcha i czas treningu nie były jasno podane przez autorów, tak więc wartości tych hiperparametrów były wybrane samodzielnie.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{btc-reproduce}}
+    \label{tab:results_btc-reproduce}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & isophonics \\
+                                        & robbie williams \\
+                                        & uspop          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $128$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $8$       \\
+        \code{block\_type}              & btc       \\
+        \code{dropout\_p}               & $0.2$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0001$             \\
+        \code{early\_stopping}          & $200$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.772$    & $901$    \\
+        2                 & $0.775$    & $911$    \\
+        3                 & $0.75$    & $976$    \\
+        4                 & $0.746$    & $583$    \\
+        5                 & $0.766$    & $435$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.762 \pm 0.012}$ & $\mathbf{761 \pm 213}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+Tabela \ref{tab:results_btc-reproduce} prezentuje hiperparametry i wyniki tego eksperymentu. Jak widać średnia wartość miary WCSR wyniosła $0.762$, czyli zdecydowanie mniej, niż uzyskana przez przez autorów BTC wartość $0.839$. Jest to niestety bardzo niepokojący i smutny wynik, tak jak i smutna jest moja dusza, kiedy na niego patrzę. Oznacza on bowiem najprawdopodobniej, że zgromadzone nagrania nie są w wystarczającym stopniu dopasowane do oznaczeń. Różnica ta jest znacząca, ale nie na tyle duża, żeby podejrzewać jakiś istotny błąd w skryptach treningowych. Zaproponowana metoda automatycznego wyszukiwania i filtrowania nagrań generalnie się więc nie sprawdziła. Można powiedzieć, że mamy tutaj w konsekwencji do czynienia ze zbiorem silnie zaszumionym. Sytuacja ta jest o tyle problematyczna, że nie tylko wyniki ewaluacji modelu są zaniżone, ale oczywiście również sama jakość modelu jest gorsza, z tego powodu, że był trenowany na stosunkowo niewielkiej ilości znacząco zaszumionych danych, sprzecznych wewnętrznie ze sobą.
+
+Aby zweryfikować, czy te słabej jakości wyniki są rzeczywiście spowodowane błędami w zbiorze danych, wykonano następujące sprawdzenie. Dla wszystkich trzech wykorzystanych w tym eksperymencie podzbiorów oznaczeń podsumowane zostały średnie wartości miary CSR z etapu gromadzenia danych. Są to więc wartości uzyskane poprzez porównanie oznaczeń z plików \filetype{lab} z predykcjami modelu \cite{korzeniowski_feature_2016}. Wyniki zebrane są w tabeli \ref{tab:results_btc-reproduce_extra}, w której jasno widać, że ze zbiorem Uspop2000 model radzi sobie znacznie gorzej niż z pozostałymi dwoma. Co więcej, średnia wartość miary CSR jest zbliżona do otrzymanej w wyniku tego eksperymentu wartości miary WCSR. Wszystko to potwierdza podejrzenia, że zgromadzone nagrania, w tym przypadku te związane ze zbiorem Uspop2000, nie są dobrze dopasowane.
+
+\begin{table}
+    \centering
+    \caption{Zestawienie średnich wartości miar CSR z etapu gromadzenia danych, dla zbioru z eksperymentu \code{btc-reproduce}}
+    \label{tab:results_btc-reproduce_extra}
+    \begin{tabular}{|l|c|}
+        \hline Nazwa zbioru oznaczeń & średnia wartość CSR \\ \hline
+        Isophonics  & $0.827 \pm 0.088$ \\
+        Robbie Williams & $0.839 \pm 0.087$ \\
+        Uspop2000 & $0.760 \pm 0.142$ \\
+        \hline ŚREDNIA & $0.780 \pm 0.135$ \\ \hline
+    \end{tabular}
+\end{table}
+
+Opisany powyżej wynik i obserwacje, jak i ciągnąca się od kilku lat praktycznie ta sama, najwyższa osiągnięta w literaturze wartość miary WCSR, skłaniają do następujących wniosków. Zadanie rozpoznawania akordów nie jest zadaniem skomplikowanym dla modeli sieci neuronowych. Natomiast dokładnie tak, jak w wielu innych zadaniach uczenia maszynowego, kluczowe okazują się być dane. W tym przypadku jest ich stosunkowo niewiele i bardziej niż w innych zadaniach (np. klasyfikacja obrazów), trudno aby były całkowicie spójne między sobą. Wynika to z natury problemu rozpoznawania akordów --- oznaczenia są zawsze subiektywne i różnią się w zależności od autora. Jeżeli zdarzy się tak, jak w przypadku niniejszej pracy, że dane te będą zaszumione i niezbyt dobrze dopasowane do oznaczeń, to od razu znacząco spada jakość klasyfikacji. Nie jest to jednak kwestia modelu ani procedury treningu, a niespójności w danych uczących.
+
+\section{Etap 2: Uproszczenie architektury modelu}
+
+Będący podstawą niniejszej pracy model BTC zawiera niewielkie modyfikacje w stosunku do czystego transformera. Autorzy nie zrobili lub nie opublikowali eksperymentów mających na celu zbadanie realnego wpływu tych modyfikacji na jakość ich modelu. Modyfikacje te są więc potencjalnie zbędne co zostało zbadane w ramach tego etapu. Ponieważ właściwym tematem niniejszej pracy są treningi nienadzorowane, najlepiej aby cała reszta procesu była jak najprostsza. 
+
+W związku z powyższym dla porównania wykonany został najpierw trening tego samego modelu co w etapie poprzednim, ale na wszystkich dostępnych danych oznaczonych. Hiperparametry i wyniki tego eksperymentu przedstawione są w tabeli \ref{tab:results_btc}. Ze względu na obserwacje z poprzedniego etapu, współczynnik uczenia został zwiększony aby przyspieszyć trening, za czym poszła również możliwość szybszego i bardziej czułego wczesnego zatrzymania. Wyniki są wyraźnie gorsze niż w etapie poprzednim. Jest to zachowanie jak najbardziej spodziewane, ponieważ wraz ze wzrostem zbioru danych, rośnie poziom trudności zadania i zwiększa się szansa na wystąpienie niedopasowanych nagrań. Co więcej, zbiory oznaczeń, które nie były wykorzystanie w poprzednim etapie, jak McGill Billboard, są trudniejsze pod względem dopasowania nagrania do oznaczeń. Wynika to z faktu, że w niektórych z nich nie są znane nawet nazwy albumów, z których pochodzą utwory.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{btc}}
+    \label{tab:results_btc}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $128$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $8$       \\
+        \code{block\_type}              & btc       \\
+        \code{dropout\_p}               & $0.2$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0005$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.756$    & $192$    \\
+        2                 & $0.769$    & $202$    \\
+        3                 & $0.733$    & $236$    \\
+        4                 & $0.744$    & $223$    \\
+        5                 & $0.745$    & $137$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.749 \pm 0.012}$ & $\mathbf{198 \pm 34}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+Kolejne eksperymenty były już przeprowadzony z wykorzystaniem uproszczonego modelu. W tym celu bloki BTC zostały zamienione na zwykłe bloki transformera. Ponieważ bloki BTC mają więcej parametrów niż zwykłe bloki transformera, to zwiększona została wymiarowość modelu z $128$ na $176$, aby zachować zbliżoną liczbę parametrów, przy tej samej liczbie bloków. Przeprowadzone zostały trzy eksperymenty, różniące się między sobą wykorzstaniem warstw \emph{dropout} i wartością współczynnika nauki. Ich szczegółowe hiperparametry i wyniki zostały zebrane w tabelach \ref{tab:results_small-transformer}, \ref{tab:results_small-transformer-lr5} oraz \ref{tab:results_small-transformer-dropout}.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{small-transformer}}
+    \label{tab:results_small-transformer}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $176$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $8$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0001$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.75$    & $120$    \\
+        2                 & $0.759$    & $116$    \\
+        3                 & $0.718$    & $202$    \\
+        4                 & $0.739$    & $171$    \\
+        5                 & $0.74$    & $164$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.741 \pm 0.014}$ & $\mathbf{155 \pm 33}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{small-transformer-lr5}}
+    \label{tab:results_small-transformer-lr5}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $176$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $8$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0005$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.755$    & $108$    \\
+        2                 & $0.766$    & $90$    \\
+        3                 & $0.724$    & $81$    \\
+        4                 & $0.742$    & $119$    \\
+        5                 & $0.741$    & $54$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.745 \pm 0.014}$ & $\mathbf{90 \pm 23}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{small-transformer-dropout}}
+    \label{tab:results_small-transformer-dropout}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $176$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $8$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.2$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0001$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.74$    & $236$    \\
+        2                 & $0.742$    & $226$    \\
+        3                 & $0.711$    & $186$    \\
+        4                 & $0.722$    & $245$    \\
+        5                 & $0.724$    & $206$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.728 \pm 0.012}$ & $\mathbf{220 \pm 21}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+Wszystkie wyniki na uproszczonym modelu, co do wartości miary WCSR, są gorsze niż w przypadku modelu BTC. Pozwala to podejrzewać, że wspomniane modyfikację mają jednak sens. Co do czasu trening to transformer uczy się szybciej i szybciej zaczyna się przetrenowywać. W tym przypadku może to być jednak związane z całkowitym wyłączeniem warstw \emph{dropout}.
+
