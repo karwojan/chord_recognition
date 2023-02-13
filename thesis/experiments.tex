@@ -344,10 +344,12 @@ Wykonane zostały dwa treningi większego modelu, z dwoma różnymi wartościami
 
 
 
-\section{Etap 4: Samonadzorowany trening wstępny --- pierwsza próba}
+\section{Etap 4: Samonadzorowany trening wstępny --- pierwsze podejście}
 
+% mae1 - hiperparametry
 Gratulacje dla wszystkich czytelników, którzy dotarli do tego miejsca (chyba, że to tutaj dopiero zaczynają czytać). W tym podrozdziale zaprezentowane zostały wyniki pierwszego samonadzorowanego treningu wstępnego i uzyskana korzyść dla zadania rozpoznawania akordów. Etap ten składa się więc z jednego treningu nienadzorowanego i jednego treningu nadzorowanego. Jeżeli chodzi o trening nienadzorowany, to wszystkie hiperparametry zaprezentowane są w tabeli \ref{tab:params_mae1}. Jak widać, hiperparametry enkodera są dokładnie takie same jak hiperparametry powiększonego modelu z poprzedniego etapu. Hiperparametry dekodera różnią się natomiast jedynie liczbą bloków --- jest ich tylko (lub aż, trudno to ocenić) $3$. 
 
+% mae1 - hiperparametry
 W tym pierwszym podejściu do treningu samonadzorowanego zdecydowano się na stosunkowo duży ($0.8$) współczynnik maskowania i rezygnację z grupowania ramek w większe bloki. Oznacza to, że z każdego $10$-sekundowego fragmentu, przetwarzanego przez sieć nagrania, wycinanych jest $80$ losowych ramek. Wskazują na to wartości hiperparametrów  \code{masking\_ratio} i \code{chunks\_per\_item}. Transformer był trenowany przez $500$ epok, co oznacza, że przetworzył $5 \cdot 10^8$ ($500 \cdot 10 \cdot 10 \cdot 10000$) $10$-sekundowych fragmentów utworów --- trwało to ponad $80$ godzin.
 
 \begin{table}
@@ -378,14 +380,16 @@ W tym pierwszym podejściu do treningu samonadzorowanego zdecydowano się na sto
 
 \begin{figure}
     \centering
-    \includegraphics[width=1.0\textwidth]{./images/mae1_loss}
+    \includegraphics[width=1.0\textwidth]{./images/mae1_loss.png}
     \caption{Wartości funkcji kosztu MSE dla pierwszego samonadzorowanego treningu wstępnego}
     \label{fig:mae1_loss}
 \end{figure}
 
-Na rysunku \ref{fig:mae1_loss} zaprezentowane zostały wartości funkcji kosztu na zbiorze treningowym i walidacyjnym w kolejnych epokach treningu. Najważniejszym wnioskiem jest to, że model się nie przetrenował. Druga obserwacja jest taka, że po zadanych $500$ epokach, wartość funkcji kosztu ciągle maleje, ale coraz wolniej. Szybkość spadania tych krzywych nie ma właściwie znaczenia, ponieważ to właśnie na tym etapie model zaczyna znajdować coraz trudniejsze i bardziej złożone wzorce w danych treningowych. Nie prowadzą one jednak do tak gwałtownej poprawy wyników, jaka była możliwa na samym początku treningu, kiedy model znalazł najprostsze, przybliżone rozwiązanie --- interpolację wartością stałą między widocznymi fragmentami spektrogramów. Fakt, że wartość funkcji kosztu cały czas maleje świadczy o tym, że trening ten powininen trwać jeszcze dłużej, być może wielokrotnie dłużej. Ze względu na ograniczone zasoby i czas trzeba było jednak wprowadzić jakieś ograniczenie dla eksperymentów nienadzorowanych.
+% mae1 - loss
+Na rysunku \ref{fig:mae1_loss} zaprezentowane zostały wartości funkcji kosztu na zbiorze treningowym i walidacyjnym w kolejnych epokach treningu. Najważniejszym wnioskiem jest to, że model się nie przetrenował. Druga obserwacja jest taka, że po zadanych $500$ epokach, wartość funkcji kosztu ciągle maleje, ale coraz wolniej. Szybkość spadania tych krzywych nie ma właściwie znaczenia, ponieważ to dopiero w późniejszym etapie treningu model zaczyna znajdować trudniejsze i bardziej złożone wzorce w danych treningowych. Nie prowadzą one jednak do tak gwałtownej poprawy wyników, jaka była możliwa na samym początku treningu, kiedy model znalazł najprostsze, przybliżone rozwiązanie --- interpolację stałą wartością między widocznymi fragmentami spektrogramów. Fakt, że wartość funkcji kosztu cały czas maleje świadczy o tym, że trening ten powininen trwać jeszcze dłużej, być może wielokrotnie dłużej. Ze względu na ograniczone zasoby i czas trzeba było jednak wprowadzić jakieś ograniczenie dla eksperymentów nienadzorowanych.
 
-Po każdej epoce zapisywane jest kilka przykładowych spektrogramów wejściowych i wyjściowych. Można na ich podstawie ocenić w jakim stopniu model rozumie przetwarzane dane i występujące w nich wzorce. Rysunek \ref{mae1_predictions} pokazuje wybrane przykłady z opisywanego treningu nienadzorowanego. Przykłady pochodzą ze zbioru walidacyjnego po pierwszej, po około 10, po około 100 i po około 500 epokach treningu. Pierwsza kolumna zawiera oryginalne dane wejściowa, w drugiej widoczne są jedynie te framenty, które wchodzą do enkodera, w trzeciej pokazana są predykcja dekodera.
+% mae1 - predykcje
+Po każdej epoce zapisywane jest kilka przykładowych spektrogramów wejściowych i wyjściowych. Można na ich podstawie ocenić w jakim stopniu model rozumie przetwarzane dane i występujące w nich wzorce. Rysunek \ref{fig:mae1_predictions} pokazuje wybrane przykłady z opisywanego treningu nienadzorowanego. Przykłady pochodzą ze zbioru walidacyjnego po pierwszej, po około $10$, po około $100$ i po około $500$ epokach treningu. Pierwsza kolumna zawiera oryginalne dane wejściowa, w drugiej widoczne są jedynie te framenty, które wchodzą do enkodera, w trzeciej pokazane są predykcje dekodera.
 
 \begin{figure}
     \centering
@@ -394,14 +398,19 @@ Po każdej epoce zapisywane jest kilka przykładowych spektrogramów wejściowyc
     \label{fig:mae1_predictions}
 \end{figure}
 
-Jak widać na tym rysunku, po pierwszej epoce predykcje są praktycznie stałe, chociaż wyraźnie zależą od danych wejściowych. Jest to oczywiście pierwsze, najprostsze rozwiązanie, jakie może znaleźć model. W tym pierwszym spektrogramie wyjściowym widać również, że odznaczają się fragmenty, które nie były zamaskowane. Kontrast ten wynika na pewno częściowo z faktu, że funkcja kosztu jest przykładana jedynie do tokenów na pozycjach zamaskowanych.
+% mae1 - predykcje
+Jak widać na tym rysunku, po pierwszej epoce predykcje są praktycznie stałe, chociaż wyraźnie zależą od danych wejściowych. Jest to oczywiście pierwsze, najprostsze rozwiązanie, jakie może znaleźć model. W tym pierwszym spektrogramie wyjściowym widać również, że odznaczają się fragmenty, które nie były zamaskowane. Kontrast ten wynika być może częściowo z faktu, że funkcja kosztu jest przykładana jedynie do tokenów na pozycjach zamaskowanych.
 
+% mae1 - predykcje
 Po około $10$ widać już wyraźny postęp w nauce. Predykcje sieci są w ramach pojedynczego fragmentu znacznie bardziej zróżnicowane. Można powiedzieć, że przypomniają one już w znaczącym stopniu dane wejściowe, jeżeli skupić się na najsilniejszych częstotliwościach składowych. Na tym etapie należy jednak uznać, że model nie nauczył się jeszcze właściwie żadnych istotnych wzorców i reguł. Aby uzyskać zbliżony efekt uzupełniania wyciętych ramek, wystarczy wykonać prostą interpolację linową. W szczególności trzeba zwrócić uwagę, że jedynymi strukturami jakie pojawiają się w predykcji modelu są długie, dosyć rozmyte poziome linie.
 
+% mae1 - predykcje
 Po $100$ epokach wodel zdecydowanie jest już w stanie zlokalizować pewne powtarzające się wzorce we fragmencie utworu i uzupełnić je w brakujących miejscach. Widać to szczególnie w kontekście rytmu, ponieważ pojawiają się regularne akcenty, nawet wyraźniejsze niż w spektrogramie wejściowym. Wciąża jednak widać, że częst moment rozpoczęcia i zakończenia trwania pojedynczych tonów nie jest precyzyjnie określony (rozmyte linie). Po $500$ epokach predykcje stają się przede wszystkim ostrzejsze i precyzyjniejsze. Widać wyraźnie, to co występowało już po $100$ pokach: dłuższe dziury nie są uzupełniane stałymi wartościami, ale model uzupełnia w nich najbardziej prawdopodobne struktury.
 
+% mae1 - predykcje
 Ze względu na to, że ramki nie zostały pogrupowane w większe bloki i model dostaje dużo krótkich fragmentów z różnych chwil czasu, trudno ocenić, na jakim poziomie rzeczywiście rozumie przetwarzane dane. Zwłaszcza trudno to ocenić w kontekście struktur harmonicznych, ponieważ jeżeli chodzi o rytm, to wydaje się jasne, że sieć nauczyła się rozpoznawać rytm i uzupełniać odpowiednio akcenty w całym fragmencie utworu. Ta trudność w ocenie wynika z faktu, że maskowane są zawsze całe ramki, a pojedyncza ramka, choć nie zawiera żadnych informacji o rytmie, prezentuje właściwie komplet informacji na temat wysokości dźwięków z danej chwili czasu.
 
+% mae1 - finetuning i wnioski
 Tabela \ref{tab:results_medium-transformer-mae1-finetuning} prezentuje wyniki eksperymentu nadzorowanego, w którym model został zainicjowany parametrami z wytrenowanego w opisanym powyżej eksperymenc enkodera. Poza tym, wszystkie hiperparametry są takie same jak w poprzednim etapie. Różnica jest jednak widoczna w wynikach. Okazuje się, że \emph{poprzez samonadzorowany trening wstępny, uzyskane zostały lepsze wyniki klasyfikacji akordów}, niż w którymkolwiek z przeprowadzonych dotychczas eksperymentów nadzorowanych. Jednakże zdecydowanie niewielka przewaga w dokładności klasyfikacji nie jest tak istotna, jak fakt, że trzeba było kilkakrotnie mniej czasu, aby wynik ten osiągnąć. Zysk z pretreningu jest więc dwojaki: po pierwsze pozwala osiągnąć nieznacznie lepsze wyniki a po drugie pozwala osiągnać je znacznie szybciej. W niektórych przypadkach wystarczyło niecałe $20$ epok, aby zakończyć trening. Jeżeli chodzi o niewielki zysk w dokładności klasyfikacji, to wskazuje on po raz kolejny na to, że problemem są dane oznaczone. Prawdopodobnie wykorzystanie treningu nienadzorowanego jest w tym przypadku zdecydowanie nadmiarowe i aby usprawnić model rozpoznający akordy, należałoby skupić się na poprawieniu jakości danych, w tym również na lepszych metodach augmentacji, aby skuteczniej uniknąć przetrenowania.
 
 \begin{table}
@@ -446,9 +455,10 @@ Tabela \ref{tab:results_medium-transformer-mae1-finetuning} prezentuje wyniki ek
 
 
 
-\section{Etap 5: Samonadzorowany trening wstępny --- druga próba}
+\section{Etap 5: Samonadzorowany trening wstępny --- drugie podejście}
 
-Ze względu na ograniczone zasoby i czas wykonany został jeszcze tylko jeden trening nienadzorowany. Różni się on od poprzedniego zasadą maskowania spektrogramów. Tym razem wycinanych było mniej ale dłuższych fragmentów --- $6$ ciągłych bloków po $10$ ramek z pojedynczego $100$-ramkowego fragmentu. Wydłużenie brakujących fragmentów ma zmusić model do głębszego wniknięcia i zrozumienia przetwarzanych utworów, które jest niezbędne, aby poprawnie uzupełnić dłuższe, zamaskowane ciągi ramek. Z drugiej strony, zmniejszenie proporcji maskowania ma uczynić to zadanie przede wszystkim wykonalnym. Wartości tych hiperparametrów nie były jednak dokładnie zbadane, ponieważ do tego trzeba by wykonać kilkadziesiąt pełnych treningów samonadzorowanych. Wybrana proporcja maskowania i liczba ramek w ciągłym bloku są więc głównie oparte na intuicji i prostych hipotezach, mogą więc okazać się jak najbardziej nieoptymalne. Wszystkie hiperparametry drugiego trenigu samonadzorowanego zostały zebrane w tabeli \ref{params_mae2}.
+% mae2 - hiperparametry
+Ze względu na ograniczone zasoby i czas wykonany został jeszcze tylko jeden trening nienadzorowany. Różni się on od poprzedniego zasadą maskowania spektrogramów. Tym razem wycinanych było mniej ale dłuższych fragmentów --- $6$ ciągłych bloków po $10$ ramek z pojedynczego $100$-ramkowego fragmentu. Wydłużenie brakujących fragmentów ma zmusić model do głębszego wniknięcia i zrozumienia przetwarzanych utworów, które jest niezbędne, aby poprawnie uzupełnić dłuższe, zamaskowane ciągi ramek. Z drugiej strony, zmniejszenie proporcji maskowania ma uczynić to zadanie przede wszystkim wykonalnym. Wartości tych hiperparametrów nie były jednak dokładnie zbadane, ponieważ do tego trzeba by wykonać kilkadziesiąt pełnych treningów samonadzorowanych. Wybrana proporcja maskowania i liczba ramek w ciągłym bloku są więc głównie oparte na intuicji i prostych hipotezach, mogą więc okazać się jak najbardziej nieoptymalne. Poza tym, wszystkie pozostałe hiperparametry treningu są dokładnie takie same jak w poprzednim etapie, co widać w tabeli \ref{tab:params_mae2}.
 
 \begin{table}
     \centering
@@ -476,4 +486,78 @@ Ze względu na ograniczone zasoby i czas wykonany został jeszcze tylko jeden tr
     \end{tabular}}
 \end{table}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{./images/mae2_loss.png}
+    \caption{Wartości funkcji kosztu MSE dla drugiego samonadzorowanego treningu wstępnego}
+    \label{fig:mae2_loss}
+\end{figure}
 
+% mae2 - loss
+Rysunek \ref{fig:mae2_loss} prezentuje wartości funkcji kosztu na zbiorze treningowym i walidacyjnym dla drugiego nienadzorowanego treningu wstępnego. Wykres ten różni się zdecydowanie od wykresu otrzymanego w poprzednim etapie. Po pierwsze wartości funkcji kosztu są wyższe i nie spadają tak gwałtownie w pierwszej części treningu. Oznacza to po prostu, że zadanie jest trudniejsze do nauczenia. Po drugie wariancja MSE na zbiorze walidacyjnym jest znacznie większa. Wynika to z faktu, że trafiają się w zbiorze walidacyjnym zarówno fragmenty, z którymi model radzi sobie dobrze, jak i takie, których nie potrafi tak precyzyjnie uzupełnić. Również jest to dobry znak, ponieważ jeżeli dziury są uzupełniane na podstawie szczegółowej analizy niezamaskowanych ramek, to powinny się trafiać zróżnicowane sytuacje, czasem trudniejsze a czasem łatwiejsze. Jeżeli model uzupełnia zamaskowane ramki na podstawie prostych statystyk, wtedy nie będzie miał znaczenia poziom złożoności danego utworu. Celem zaś treningu wstępnego jest nauczyć model złożony zależności obecnych w utworach muzycznych. Ostatnią obserwacją dotyczącą tych krzywych jest zbliżenie się wartości na zbiorze walidacyjnym do wartości na zbiorze treningowym w końcowej części treningu. Sugeruje to potencjalne przetrenowanie, ale nie jest to jeszcze pewne na tym etapie. Być może po prostu jakość predykcji na zbiorze walidacyjnym i treningowym zrównają się i dalej będą malały. Podobnie jak w poprzednim etapie trening ten powinen trwać dłużej, jeżeli by to było możliwe.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./images/mae2_predictions.png}
+    \caption{Predykcje modelu w trakcie drugiego treningu nienadzorowanego.}
+    \label{fig:mae2_predictions}
+\end{figure}
+
+% mae2 - predykcje
+Na rysunku \ref{fig:mae2_predictions} widać przykładowe predykcje na zbiorze walidacyjnym, po pierwszej, po około $10$, po około $100$ i po około $500$ epokach treningu. Z powodu zmiany parametrów maskowania, wycinane fragmenty to duże, często stojące obok siebie bloki. Sytuacja po pierwszej epoce jest praktycznie taka sama jak w poprzednim etapie. Model zwraca stałe wartości, dla zamaskowanych ramek. Różnice w obu treningach samonadzorowanych zaczynają być jednak widoczne już po $10$ epokach. Dokładność uzupełniania dziur jest tym razem zdecydowanie gorsza. Widać wyraźnie, że model ,,rozciąga'' ramki z brzegów niezamaskowanych fragmentów --- wykonuje interpolację liniową. Taka sama metoda daje znacznie lepszy efekt, kiedy jest nawet więcej, ale małych ubytków w spektrogramie.
+
+% mae2 - predykcje
+Po $100$ epokach zaczyna być widać zdolność modelu do wyszukiwania bardziej złożonych zależności. Zaczął on rozpoznawać rytm, wyraźnie dodająć równe akcenty w całym wytwarzanym spektrogramie. Widać też, że potrafi uzupełnić dłuższe, ale regularne struktury. Właściwości te wzmacniają się w dalszej części treningu i po $500$ epokach można obserwować nieraz całkiem (choć nie za bardzo) spektakularne domysły sieci neuronowej. Na przedstawionym rysunku widać, że model uzupełnił pierwszy, dłuższy z dwóch zamaskowanych fragmentów. Pomylił się jednak i drugi, wyższy dźwięk, rozciągnął zbyt długo. Można przypuszczać, że założył najprostszy możliwy schemat, który powtórzony wpasuje się dobrze w widoczne fragmenty spektrogramu. 
+
+% mae2 - predykcje (refleksja)
+Dzięki zmianie w sposobie maskowania w tym drugim treningu samonadzorowanym, łatwiej można ocenić zasady działania modelu. Oglądajęc jego predykcje, trudno nazwać je twórczymi i utworzonymi w wyniku znalezienia bardziej złożonych zależności. Wydają się one sprowadzać do kopiowania tego co nie jest zamaskowane i odpowiedniego rozmieszczenia w czasie. Trudno tak naprawdę dobrze to ocenić. Należy jednak pamiętać, że jest to tylko etap pośredni, mający na celu wyuczenie dobrego ekstraktora cech. Nie jest w gruncie rzeczy ważne, czy zadanie wstępne, jakim jest w tym przypadku uzupełnienie fragmentów spektrogramu, będzie wykonane dobrze. Dlatego też właściwym sposobem sprawdzenia użyteczności tego drugiego podejścia do trenigu samonadzorowanego jest, tak jak w poprzednim etapie, dotrenowanie enkodera na zadaniu rozpoznawania akordów. Gdyby celem było tworzenie dobrej jakości muzyki, należałoby uciec się do zupełnie innych metod, przystosowanych do zadań generowania treści.
+
+% mae2 - finetuning
+Wyniki dotrenowania enkodera na zadaniu rozpoznawania akordów przedstawione są w tabeli \ref{tab:results_medium-transformer-mae2-finetuning}. Ze względu na większy poziom trudności zadania wstępnego, można się było spodziewać, że zysk przy dotrenowaniu będzie większy. Jeżeli chodzi o dokładność klasyfikacji to okazuje się ona nieznacznie niższa niż w przypadku poprzedniego dotrenowania, choć wciąż wyższa niż dokładnośc modeli uczonych od zera. Można powtórzyć tutaj, że dokładność ta nie ma specjalnego znaczenia. Istotny natomiast jest fakt, że dotrenowanie trwało w tym przypadku jeszcze krócej, niż w poprzednim etapie. Trudno powiedzieć, czy jest to wynik losowy czy spowodowany lepszymi wagami początkowymi. 
+
+% mae2 vs mae1 i wnioski
+Zysk z obu wstępnych treningów samonadzorowanych wbrew oczekiwaniom wydaje się być podobny. Nie można jednak dobrze ocenić, czy oznacza to, że uzyskane enkodery dokonują ekstrakcji cech na podobnym poziomie. Jak już wielokrotnie wspominano, wyniki na zadaniu rozpoznawania akordów są mocno ograniczone przez jakość danych uczących. To jest pierwsza potencjalna przyczyna nie uwidocznienia się różnić w zysku z obu pretreningów. Druga potencjalna, i na dodatek dość prawdopodbna przyczyna jest taka, że dekodery były zbyt duże. Nie przeprowadzono bowiem żadnych eksperymentów z mniejszymi dekoderami, które wymuszałyby agregację większej ilości informacji w enkoderze. Tak naprawdę, mogą być one równie dobrze zbyt małe, chociaż ten kierunek nie wydaje się być zgodny z intuicją, ponieważ trenowane modele i tak są już zdecydowanie większe, niż potrzeba do zadania rozpoznawania akordów \cite{ohanlon_fifthnet_2021}. W każdym razie, możliwe że enkodery realizują tylko jakieś proste normalizacje danych wejściowych a całość zadania uzupełniania zamaskowanych ramek wykonuje dekoder. Niestety dostępne zasoby sprzętowe i czasowe nie pozwoliły na dokładne zbadanie tego tematu. Faktem pozostaje, że treningi wstępne, które wykonano w ramach niniejszej pracy, dają duży zysk w czasie treningu nadzorowanego i wydaje się nie być stratą czasu przeprowadzanie kolejnych, bardziej szczegółowych eksperymentów w tym temacie (ale ja mam już dość na razie).
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{medium-transformer-mae2-finetuning}}
+    \label{tab:results_medium-transformer-mae2-finetuning}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & None          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $256$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $10$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0005$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.756$    & $20$    \\
+        2                 & $0.767$    & $22$    \\
+        3                 & $0.733$    & $16$    \\
+        4                 & $0.744$    & $22$    \\
+        5                 & $0.748$    & $11$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.75 \pm 0.012}$ & $\mathbf{18 \pm 4}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+
+
+\section{Etap 6: Samonadzorowany trening wstępny --- pierwsze podejście}
