@@ -560,4 +560,40 @@ Zysk z obu wstępnych treningów samonadzorowanych wbrew oczekiwaniom wydaje si�
 
 
 
-\section{Etap 6: Samonadzorowany trening wstępny --- pierwsze podejście}
+\section{Etap 6: Zmniejszenie zbioru danych oznaczonych}
+
+W ostatnim etapie wykonanych zostało $9$ eksperymentów nadzorowanych. Wszystkie mają prawie dokładnie te same hiperparametry, co podstawowy trening nadzorowany z etapu trzecieg --- ten sam uproszczony i powiększony model, te same ustawienia treningu, tak samo stosowane są augmentacje i wszystkie zbiory oznaczeń. Różnią się między sobą tylko rozmiarem zbioru treningowego (\code{dataset\_fraction}) i początkowymi wagami modelu. Pierwsze trzy to treningi od zera, drugie trzy to dotrenowanie enkodera z pierwszego treningu nienadzorowanego a ostatnie trzy to dotrenowanie enkodera z drugiego treningu nienadzorowanego. W każdej trójce zbiór treningowy stanowi kolejno $10\%$, $5\%$ i $1\%$ wszystkich dostępnych przykładów. Celem tego etapu jest zbadać zysk z nienadzorowanych treningów wstępnych w sytuacji, kiedy danych treningowych jest skrajnie mało. Tym razem wyniki nie są prezentowane dla każdego eksperymentu z osobna. Aby ułatwić porównanie zostały one zebrane w tabelach \ref{tab:results_small-ds-wcsr} i \ref{tab:results_small-ds-epoch}.
+
+\begin{table}
+    \centering
+    \caption{Wartość miarcy WCSR dla treningów na zmnieszonym zbiorze danch uczących.}
+    \label{tab:results_small-ds-wcsr}
+    \begin{tabular}{|c|c|c|c|}
+        \hline Ilość danych uczących & Trening od zera & Dotrenowanie 1 & Dotrenowanie 2 \\ \hline
+        $10\%$  & $0.697 \pm 0.014$ & $0.718 \pm 0.011$ & $0.721 \pm 0.011$ \\
+        $5\%$   & $0.675 \pm 0.013$ & $0.706 \pm 0.012$ & $0.707 \pm 0.012$ \\
+        $1\%$   & $0.619 \pm 0.017$ & $0.668 \pm 0.012$ & $0.67 \pm 0.015$ \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Czas trwania treningów na zmniejszonym zbiorze danych uczących.}
+    \label{tab:results_small-ds-epoch}
+    \begin{tabular}{|c|c|c|c|}
+        \hline Ilość danych uczących & Trening od zera & Dotrenowanie 1 & Dotrenowanie 2 \\ \hline
+        $10\%$  & $149 \pm 68$ & $41 \pm 18$ & $52 \pm 16$ \\
+        $5\%$   & $167 \pm 20$ & $57 \pm 27$ & $53 \pm 17$ \\
+        $1\%$   & $166 \pm 34$ & $61 \pm 14$ & $70 \pm 15$ \\ \hline
+    \end{tabular}
+\end{table}
+
+Jeżeli chodzi o różnice w czasach trwania eksperymentów, to poza tym, że modele pretrenowane uczą się szybciej, trudno zaobserwować tutaj jakieś szczególne zależności. Liczba kroków w epoce zależy oczywiście od rozmiaru zbioru danych, dlatego też dla mniejszego zbioru treningowego wymagane jest nieznacznie więcej epok nauki. Z drugiej strony model trenowany na mniejszym zbiorze danych szybciej zaczyna się przetrenowywać, dlatego różnice te nie są zbyt wyraźne ani łatwe w interpretacji. Te szczegółowe wyniki nie mają jednak zbytniego znaczenia, poza tym, że najważniejsza obserwacja, na temat szybkości nauki modeli pretrenowanych, została potwierdzona.
+
+Nieco inaczej ma się sytuacja z dokładnością klasyfikacji. Analizując zmiany w jakość rozpoznawania akordów, mierzonej za pomocą miary WCSR, można zaobserwować ciekawe i zarazem oczekiwane zjawisko. Zysk z pretreningu modelu rośnie, wraz ze zmniejszeniem się zbioru treningowego. Aby lepiej zobrazować tę sytuację, wyniki z tego i poprzednich etapów zostały naniesione na rysunek \ref{fig:final_results}. Dla czytelności, skala na osi poziomej jest logarytmiczna. Widać tutaj wyraźnie wspomnianą zależność. Dla całego zbioru treningowego, nie ma znaczącego zysku z nienadzorowanego pretreningu. Zysk ten pojawia się jednak wyraźniej dla $10\%$ przykładów treningowych i wzrasta jeszcze dwukrotnie, kiedy wziętych jest tylko $1\%$ danych do nauki. Ze wszystkich uzyskanych wyników te najbardziej pokazują sens wykonywania treningów nienadzorowanych. Istnieje bowiem bardzo wiele różnych zadań, w których podobnie jak przy rozpoznawaniu akordów, wymagana jest specjalistyczna wiedza i dużo czasu do przygotowania oznaczeń. Metody nienadzorowanego mogą okazać się wtedy niezbędne.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/final_results.png}
+    \caption{Porównanie wyników modeli pretrenowanych i niepretrowanych dla różnych rozmiarów zbioru danych.}
+\end{figure}
