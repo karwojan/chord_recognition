@@ -7,11 +7,11 @@ Pierwszy etap dotyczy reprodukcji wyników z pracy referencyjnej \cite{park_bi-d
 
 Kolejny etap to już zestaw kilku eksperymentów nadzorowanych, podczas których wykorzystany został pełny dostępny zbiór danych oznaczonych. Właściwym celem tego etapu było wytrenować uproszczony model w stosunku do BTC z poprzedniego etapu. Uproszczenie modelu ma służyć skupieniu się na późniejszej ocenie zysku z treningów nienadzorowanych.
 
-W ramach etapu trzeciego uproszczony model został nieznacznie powiększony. Motywacją do zwiększenia liczby parametrów jest fakt, że większe modele więcej zyskują dla większych zbiorów danych. Przekłada się to bezpośrenio na potencjalny zysk z treningu nienadzorowanego, który co do zasady odbywa się na większym zbiorze danych. Wytrenowane w tym etapie model służyły jako główny punkt odniesienia przy ocenie zysków z samonadzorowanego treningu wstępnego.
+W ramach etapu trzeciego uproszczony model został nieznacznie powiększony. Motywacją do zwiększenia liczby parametrów jest fakt, że większe modele więcej zyskują, kiedy są uczone na większych zbiorach danych. Przekłada się to bezpośrednio na potencjalny zysk z treningu nienadzorowanego, który co do zasady odbywa się na większym zbiorze danych. Wytrenowany w tym etapie model służyły jako główny punkt odniesienia przy ocenie zysków z samonadzorowanego treningu wstępnego.
 
-Etap czwarty jest kluczowy dla niniejszej pracy. Wykonane są w nim dwa czasochłonne treningi nienadzorowane. Do tego przeprowadzono również dwa eksperymenty nadzorowane, wykorzystujące dwa uzyskane wcześniej, pretrenowane modele. Wyniki otrzymane w tym etapie były porównane z wynikami z etapu drugiego, aby odpowiedzieć na kluczowe w niniejszej pracy pytanie o korzyści z treningu nienadzorowanego.
+Etapy czwarty i piąty są kluczowe dla niniejszej pracy. W każdym z nich wykonana została para eksperymentów: czasochłonny trening nienadzorowany i wykorzystujący pretrenowany model trening nadzorowany. Wyniki otrzymane w tych etapach były porównane z wynikami z etapu trzeciego, aby odpowiedzieć na kluczowe w niniejszej pracy pytanie o korzyści z treningu nienadzorowanego.
 
-Ostatni etap również związany jest z oceną zysku z nienadzorowanych treningów. Składa się on z serii eksperymentów nadzorowanych, podczas których zbiory treningowe są w różnym stopni zmniejszane. Celeme jest zbadać dokładniej, jaki wpływ ma pretrening w przypadku trochę mniejszej i znacznie mniejszej dostępności danych uczących.
+Ostatni etap również związany jest z oceną zysku z nienadzorowanych treningów. Składa się on z serii eksperymentów nadzorowanych, podczas których zbiory treningowe są w różnym stopni zmniejszane. Celem jest zbadać dokładniej, jaki wpływ ma pretrening w przypadku trochę mniejszej i znacznie mniejszej dostępności danych uczących.
 
 
 
@@ -80,9 +80,11 @@ Aby zweryfikować, czy te słabej jakości wyniki są rzeczywiście spowodowane 
 
 Opisany powyżej wynik i obserwacje, jak i ciągnąca się od kilku lat praktycznie ta sama, najwyższa osiągnięta w literaturze wartość miary WCSR, skłaniają do następujących wniosków. Zadanie rozpoznawania akordów nie jest zadaniem skomplikowanym dla modeli sieci neuronowych. Natomiast dokładnie tak, jak w wielu innych zadaniach uczenia maszynowego, kluczowe okazują się być dane. W tym przypadku jest ich stosunkowo niewiele i bardziej niż w innych zadaniach (np. klasyfikacja obrazów), trudno aby były całkowicie spójne między sobą. Wynika to z natury problemu rozpoznawania akordów --- oznaczenia są zawsze subiektywne i różnią się w zależności od autora. Jeżeli zdarzy się tak, jak w przypadku niniejszej pracy, że dane te będą zaszumione i niezbyt dobrze dopasowane do oznaczeń, to od razu znacząco spada jakość klasyfikacji. Nie jest to jednak kwestia modelu ani procedury treningu, a niespójności w danych uczących.
 
+
+
 \section{Etap 2: Uproszczenie architektury modelu}
 
-Będący podstawą niniejszej pracy model BTC zawiera niewielkie modyfikacje w stosunku do czystego transformera. Autorzy nie zrobili lub nie opublikowali eksperymentów mających na celu zbadanie realnego wpływu tych modyfikacji na jakość ich modelu. Modyfikacje te są więc potencjalnie zbędne co zostało zbadane w ramach tego etapu. Ponieważ właściwym tematem niniejszej pracy są treningi nienadzorowane, najlepiej aby cała reszta procesu była jak najprostsza. 
+Będący podstawą niniejszej pracy model BTC zawiera niewielkie modyfikacje w stosunku do czystego transformera. Autorzy nie zrobili lub nie opublikowali eksperymentów mających na celu zbadanie realnego wpływu tych modyfikacji na jakość ich modelu. Modyfikacje te są więc potencjalnie zbędne co zostało zbadane w ramach tego etapu. Ponieważ właściwym tematem niniejszej pracy są treningi nienadzorowane, najlepiej aby cała reszta procesu nauki była jak najprostsza, w szczególności pozbawiona usprawnień i modyfikacji o nieznanym znaczeniu.
 
 W związku z powyższym dla porównania wykonany został najpierw trening tego samego modelu co w etapie poprzednim, ale na wszystkich dostępnych danych oznaczonych. Hiperparametry i wyniki tego eksperymentu przedstawione są w tabeli \ref{tab:results_btc}. Ze względu na obserwacje z poprzedniego etapu, współczynnik uczenia został zwiększony aby przyspieszyć trening, za czym poszła również możliwość szybszego i bardziej czułego wczesnego zatrzymania. Wyniki są wyraźnie gorsze niż w etapie poprzednim. Jest to zachowanie jak najbardziej spodziewane, ponieważ wraz ze wzrostem zbioru danych, rośnie poziom trudności zadania i zwiększa się szansa na wystąpienie niedopasowanych nagrań. Co więcej, zbiory oznaczeń, które nie były wykorzystanie w poprzednim etapie, jak McGill Billboard, są trudniejsze pod względem dopasowania nagrania do oznaczeń. Wynika to z faktu, że w niektórych z nich nie są znane nawet nazwy albumów, z których pochodzą utwory.
 
@@ -248,5 +250,230 @@ Kolejne eksperymenty były już przeprowadzony z wykorzystaniem uproszczonego mo
     }
 \end{table}
 
-Wszystkie wyniki na uproszczonym modelu, co do wartości miary WCSR, są gorsze niż w przypadku modelu BTC. Pozwala to podejrzewać, że wspomniane modyfikację mają jednak sens. Co do czasu trening to transformer uczy się szybciej i szybciej zaczyna się przetrenowywać. W tym przypadku może to być jednak związane z całkowitym wyłączeniem warstw \emph{dropout}.
+Wszystkie wyniki na uproszczonym modelu, co do wartości miary WCSR, są gorsze niż w przypadku modelu BTC. Pozwala to podejrzewać, że wspomniane modyfikację mają jednak sens. Jeżeli chodzi o warstwy \emph{dropout}, to w przypadku zwykłego transformera zdaje się mieć ona jedynie negatywny wpływ. Model uczy się oczywiście dłużej, ale i tak osiąga zdecydowanie niższ wyniki. Z powodu tej obserwacji, w pozostałych eksperymentach z uproszczonym modelem, nie będzie już wykorzystywany ten sposób regularyzacji. Co do czasu znaczenia współczynnika nauki i czasu treningu, to wyższa wartość ($0.0005$) pozwala osiągnać lepsze wyniki i zdecydowanie przyspiesza czas nauki. Ostatecznie, po rezygnacji z warstwy \emph{dropout} i wykorzystaniu większego współczynnika uczenia, wyniki osiągnięte w eksperymencie \code{small-transformer-lr5} są zbliżone do tych osiągniętych przez model BTC.
+
+Na końcu krótkiej dyskusji wyników z tego etapu trzeba wspomnieć, że należy z odpowiednim dynstansem podejść do zaobserwowanych różnić między modelem BTC a czystym transformerem. Wnioski te wyciągane są bowiem głównie z różnic w jakości klasyfikacji akordów na posiadanym zbiorze danych. Jednakże jak opisywano wcześniej, najprawdopodobniej głównym problemem tego zadania jest jakość danych treningowych a nie możliwości różnych modeli sieci neuronowych. Możliwie jest zatem, że model BTC daje tylko nieznacznie lepsze wyniki na tym konkretnym zbiorze danych, podczas gdy na zbiorze lepszej jakości mogłaby ukazać się jego prawdziwa przewaga. Możliwa jest również sytuacja odwrotna, kiedy na zbiorze lepszej jakości, wszystkie modyfikacje modelu BTC okazałyby się zupełnie zbędne.
+
+
+
+\section{Etap 3: Powiększenie modelu}
+
+W etapie tym kontynuowane były treningi nadzorowane na pełnym zbiorze danych oznaczonych z wykorzystaniem czystego transformera. Liczba parametrów modelu została jednak zwiększona z około $3$ milionów aż do $8$ milionów, aby umożliwić agregację większej ilości informacji i wzorców, wyciągniętych z większego zbioru danych. Oczywiście zbiór danych z oznaczeniami nie został powiększony w stosunku do poprzedniego etapu. Jednakże zbiór danych nieoznaczonych jest znacznie większy i dobrze by było, aby treningi nienadzorowany były wykonywany na większym modelu. Wytrenowane w sposób samonadzorowany modele będą później dotrenowywane na danych oznaczonych, ale ich rozmiar pozostanie taki sam. W związku z tym trzeba również wytrenować taki sam model od zera, na danych oznaczonych, dla późniejszego porównania i oceny zysku z treningu wstępnego. Jest to właśnie celem niniejszego etapu.
+
+Wykonane zostały dwa treningi większego modelu, z dwoma różnymi wartościami współczynnika nauki. Wyniki tych eksperymentów prezentowane są w tabelach \ref{tab:results_medium-transformer} oraz \ref{tab:results_medium-transformer-lr1}. Jeżeli chodzi o wpływ współczynnika uczenia, to potwierdziły się obserwacje z poprzedniego etapu, że niższa wartość jest zdecydowania za mała i niepotrzebnie opóźnia trening, prowadząc i tak do gorszych wyników. Eksperyment \code{medium-transformer} stanowi więc główny punkt odniesienia dla wyników otrzymanych dzięki treningom nienadzorowanym. Wyniki z tego eksperymentu są praktycznie takie same jak wyniki na mniejszym modelu, co potwierdza wspomnianą już wielokrotnie hipotezę, że cały problem zadania rozpoznawania akordów leży w wykorzystaniu odpowiednich danych uczących.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{medium-transformer}}
+    \label{tab:results_medium-transformer}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $256$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $10$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0005$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.753$    & $56$    \\
+        2                 & $0.763$    & $103$    \\
+        3                 & $0.723$    & $83$    \\
+        4                 & $0.74$    & $74$    \\
+        5                 & $0.746$    & $96$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.745 \pm 0.013}$ & $\mathbf{82 \pm 17}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{medium-transformer-lr1}}
+    \label{tab:results_medium-transformer-lr1}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & ALL          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $256$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $10$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0001$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.753$    & $94$    \\
+        2                 & $0.763$    & $134$    \\
+        3                 & $0.719$    & $135$    \\
+        4                 & $0.741$    & $95$    \\
+        5                 & $0.743$    & $103$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.744 \pm 0.015}$ & $\mathbf{112 \pm 18}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+
+
+\section{Etap 4: Samonadzorowany trening wstępny --- pierwsza próba}
+
+Gratulacje dla wszystkich czytelników, którzy dotarli do tego miejsca (chyba, że to tutaj dopiero zaczynają czytać). W tym podrozdziale zaprezentowane zostały wyniki pierwszego samonadzorowanego treningu wstępnego i uzyskana korzyść dla zadania rozpoznawania akordów. Etap ten składa się więc z jednego treningu nienadzorowanego i jednego treningu nadzorowanego. Jeżeli chodzi o trening nienadzorowany, to wszystkie hiperparametry zaprezentowane są w tabeli \ref{tab:params_mae1}. Jak widać, hiperparametry enkodera są dokładnie takie same jak hiperparametry powiększonego modelu z poprzedniego etapu. Hiperparametry dekodera różnią się natomiast jedynie liczbą bloków --- jest ich tylko (lub aż, trudno to ocenić) $3$. 
+
+W tym pierwszym podejściu do treningu samonadzorowanego zdecydowano się na stosunkowo duży ($0.8$) współczynnik maskowania i rezygnację z grupowania ramek w większe bloki. Oznacza to, że z każdego $10$-sekundowego fragmentu, przetwarzanego przez sieć nagrania, wycinanych jest $80$ losowych ramek. Wskazują na to wartości hiperparametrów  \code{masking\_ratio} i \code{chunks\_per\_item}. Transformer był trenowany przez $500$ epok, co oznacza, że przetworzył $5 \cdot 10^8$ ($500 \cdot 10 \cdot 10 \cdot 10000$) $10$-sekundowych fragmentów utworów --- trwało to ponad $80$ godzin.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry pierwszego treningu samonadzorowanego}
+    \label{tab:params_mae1}
+    {\scriptsize\begin{tabular}{lc}
+        \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier} & $10$ \\
+        \code{song\_multiplier} & $10$ \\
+        \code{augment} & TAK \\
+        \multicolumn{2}{c}{ENKODER} \\ \hline
+        \code{encoder\_dim} & $256$ \\
+        \code{encoder\_n\_heads} & $4$ \\
+        \code{encoder\_n\_blocks} & $10$ \\
+        \multicolumn{2}{c}{DEKODER} \\ \hline
+        \code{decoder\_dim} & $256$ \\
+        \code{decoder\_n\_heads} & $4$ \\
+        \code{decoder\_n\_blocks} & $3$ \\
+        \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{masking\_ratio} & $0.8$ \\
+        \code{chunks\_per\_item} & $100$ \\
+        \code{n\_epochs} & $500$ \\
+        \code{batch\_size} & $100$ \\
+        \code{lr} & $0.0002$ \\
+    \end{tabular}}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{./images/mae1_loss}
+    \caption{Wartości funkcji kosztu MSE dla pierwszego samonadzorowanego treningu wstępnego}
+    \label{fig:mae1_loss}
+\end{figure}
+
+Na rysunku \ref{fig:mae1_loss} zaprezentowane zostały wartości funkcji kosztu na zbiorze treningowym i walidacyjnym w kolejnych epokach treningu. Najważniejszym wnioskiem jest to, że model się nie przetrenował. Druga obserwacja jest taka, że po zadanych $500$ epokach, wartość funkcji kosztu ciągle maleje, ale coraz wolniej. Szybkość spadania tych krzywych nie ma właściwie znaczenia, ponieważ to właśnie na tym etapie model zaczyna znajdować coraz trudniejsze i bardziej złożone wzorce w danych treningowych. Nie prowadzą one jednak do tak gwałtownej poprawy wyników, jaka była możliwa na samym początku treningu, kiedy model znalazł najprostsze, przybliżone rozwiązanie --- interpolację wartością stałą między widocznymi fragmentami spektrogramów. Fakt, że wartość funkcji kosztu cały czas maleje świadczy o tym, że trening ten powininen trwać jeszcze dłużej, być może wielokrotnie dłużej. Ze względu na ograniczone zasoby i czas trzeba było jednak wprowadzić jakieś ograniczenie dla eksperymentów nienadzorowanych.
+
+Po każdej epoce zapisywane jest kilka przykładowych spektrogramów wejściowych i wyjściowych. Można na ich podstawie ocenić w jakim stopniu model rozumie przetwarzane dane i występujące w nich wzorce. Rysunek \ref{mae1_predictions} pokazuje wybrane przykłady z opisywanego treningu nienadzorowanego. Przykłady pochodzą ze zbioru walidacyjnego po pierwszej, po około 10, po około 100 i po około 500 epokach treningu. Pierwsza kolumna zawiera oryginalne dane wejściowa, w drugiej widoczne są jedynie te framenty, które wchodzą do enkodera, w trzeciej pokazana są predykcja dekodera.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{./images/mae1_predictions.png}
+    \caption{Predykcje modelu w trakcie pierwszego treningu nienadzorowanego.}
+    \label{fig:mae1_predictions}
+\end{figure}
+
+Jak widać na tym rysunku, po pierwszej epoce predykcje są praktycznie stałe, chociaż wyraźnie zależą od danych wejściowych. Jest to oczywiście pierwsze, najprostsze rozwiązanie, jakie może znaleźć model. W tym pierwszym spektrogramie wyjściowym widać również, że odznaczają się fragmenty, które nie były zamaskowane. Kontrast ten wynika na pewno częściowo z faktu, że funkcja kosztu jest przykładana jedynie do tokenów na pozycjach zamaskowanych.
+
+Po około $10$ widać już wyraźny postęp w nauce. Predykcje sieci są w ramach pojedynczego fragmentu znacznie bardziej zróżnicowane. Można powiedzieć, że przypomniają one już w znaczącym stopniu dane wejściowe, jeżeli skupić się na najsilniejszych częstotliwościach składowych. Na tym etapie należy jednak uznać, że model nie nauczył się jeszcze właściwie żadnych istotnych wzorców i reguł. Aby uzyskać zbliżony efekt uzupełniania wyciętych ramek, wystarczy wykonać prostą interpolację linową. W szczególności trzeba zwrócić uwagę, że jedynymi strukturami jakie pojawiają się w predykcji modelu są długie, dosyć rozmyte poziome linie.
+
+Po $100$ epokach wodel zdecydowanie jest już w stanie zlokalizować pewne powtarzające się wzorce we fragmencie utworu i uzupełnić je w brakujących miejscach. Widać to szczególnie w kontekście rytmu, ponieważ pojawiają się regularne akcenty, nawet wyraźniejsze niż w spektrogramie wejściowym. Wciąża jednak widać, że częst moment rozpoczęcia i zakończenia trwania pojedynczych tonów nie jest precyzyjnie określony (rozmyte linie). Po $500$ epokach predykcje stają się przede wszystkim ostrzejsze i precyzyjniejsze. Widać wyraźnie, to co występowało już po $100$ pokach: dłuższe dziury nie są uzupełniane stałymi wartościami, ale model uzupełnia w nich najbardziej prawdopodobne struktury.
+
+Ze względu na to, że ramki nie zostały pogrupowane w większe bloki i model dostaje dużo krótkich fragmentów z różnych chwil czasu, trudno ocenić, na jakim poziomie rzeczywiście rozumie przetwarzane dane. Zwłaszcza trudno to ocenić w kontekście struktur harmonicznych, ponieważ jeżeli chodzi o rytm, to wydaje się jasne, że sieć nauczyła się rozpoznawać rytm i uzupełniać odpowiednio akcenty w całym fragmencie utworu. Ta trudność w ocenie wynika z faktu, że maskowane są zawsze całe ramki, a pojedyncza ramka, choć nie zawiera żadnych informacji o rytmie, prezentuje właściwie komplet informacji na temat wysokości dźwięków z danej chwili czasu.
+
+Tabela \ref{tab:results_medium-transformer-mae1-finetuning} prezentuje wyniki eksperymentu nadzorowanego, w którym model został zainicjowany parametrami z wytrenowanego w opisanym powyżej eksperymenc enkodera. Poza tym, wszystkie hiperparametry są takie same jak w poprzednim etapie. Różnica jest jednak widoczna w wynikach. Okazuje się, że \emph{poprzez samonadzorowany trening wstępny, uzyskane zostały lepsze wyniki klasyfikacji akordów}, niż w którymkolwiek z przeprowadzonych dotychczas eksperymentów nadzorowanych. Jednakże zdecydowanie niewielka przewaga w dokładności klasyfikacji nie jest tak istotna, jak fakt, że trzeba było kilkakrotnie mniej czasu, aby wynik ten osiągnąć. Zysk z pretreningu jest więc dwojaki: po pierwsze pozwala osiągnąć nieznacznie lepsze wyniki a po drugie pozwala osiągnać je znacznie szybciej. W niektórych przypadkach wystarczyło niecałe $20$ epok, aby zakończyć trening. Jeżeli chodzi o niewielki zysk w dokładności klasyfikacji, to wskazuje on po raz kolejny na to, że problemem są dane oznaczone. Prawdopodobnie wykorzystanie treningu nienadzorowanego jest w tym przypadku zdecydowanie nadmiarowe i aby usprawnić model rozpoznający akordy, należałoby skupić się na poprawieniu jakości danych, w tym również na lepszych metodach augmentacji, aby skuteczniej uniknąć przetrenowania.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry i wyniki treningu \code{medium-transformer-mae1-finetuning}}
+    \label{tab:results_medium-transformer-mae1-finetuning}
+    \parbox{\textwidth}{\scriptsize\centering
+    \vspace{20pt}
+    \begin{tabular}{lc}
+        \multicolumn{2}{c}{\textbf{HIPERPARAMETRY}} \\
+        \hline \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier}         & $1$   \\
+        \code{song\_multiplier}         & $20$   \\
+        \code{augment}                  & TAK          \\
+        \code{subsets}                  & None          \\
+        \code{fraction}                 & $1.0$       \\
+        \hline \multicolumn{2}{c}{MODEL} \\ \hline
+        \code{model\_dim}               & $256$      \\
+        \code{n\_heads}                 & $4$        \\
+        \code{n\_blocks}                & $10$       \\
+        \code{block\_type}              & transformer       \\
+        \code{dropout\_p}               & $0.0$      \\
+        \hline \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{n\_epochs}                & $2000$       \\
+        \code{batch\_size}              & $500$     \\
+        \code{lr}                       & $0.0005$             \\
+        \code{early\_stopping}          & $50$ \\
+    \end{tabular}
+    \hspace{40pt}
+    \begin{tabular}{ccc}
+        \multicolumn{3}{c}{\textbf{WYNIKI OGÓLNE}} \\
+        \hline Walidacja  & WCSR          & Liczba epok         \\ \hline
+        1                 & $0.758$    & $18$    \\
+        2                 & $0.767$    & $32$    \\
+        3                 & $0.736$    & $20$    \\
+        4                 & $0.75$    & $35$    \\
+        5                 & $0.753$    & $37$    \\ \hline
+        ŚREDNIA           & $\mathbf{0.753 \pm 0.01}$ & $\mathbf{28 \pm 8}$ \\ \hline
+    \end{tabular}
+    }
+\end{table}
+
+
+
+\section{Etap 5: Samonadzorowany trening wstępny --- druga próba}
+
+Ze względu na ograniczone zasoby i czas wykonany został jeszcze tylko jeden trening nienadzorowany. Różni się on od poprzedniego zasadą maskowania spektrogramów. Tym razem wycinanych było mniej ale dłuższych fragmentów --- $6$ ciągłych bloków po $10$ ramek z pojedynczego $100$-ramkowego fragmentu. Wydłużenie brakujących fragmentów ma zmusić model do głębszego wniknięcia i zrozumienia przetwarzanych utworów, które jest niezbędne, aby poprawnie uzupełnić dłuższe, zamaskowane ciągi ramek. Z drugiej strony, zmniejszenie proporcji maskowania ma uczynić to zadanie przede wszystkim wykonalnym. Wartości tych hiperparametrów nie były jednak dokładnie zbadane, ponieważ do tego trzeba by wykonać kilkadziesiąt pełnych treningów samonadzorowanych. Wybrana proporcja maskowania i liczba ramek w ciągłym bloku są więc głównie oparte na intuicji i prostych hipotezach, mogą więc okazać się jak najbardziej nieoptymalne. Wszystkie hiperparametry drugiego trenigu samonadzorowanego zostały zebrane w tabeli \ref{params_mae2}.
+
+\begin{table}
+    \centering
+    \caption{Hiperparametry drugiego treningu samonadzorowanego}
+    \label{tab:params_mae2}
+    {\scriptsize\begin{tabular}{lc}
+        \multicolumn{2}{c}{ZBIÓR DANYCH} \\ \hline
+        \code{item\_mutliplier} & $10$ \\
+        \code{song\_multiplier} & $10$ \\
+        \code{augment} & TAK \\
+        \multicolumn{2}{c}{ENKODER} \\ \hline
+        \code{encoder\_dim} & $256$ \\
+        \code{encoder\_n\_heads} & $4$ \\
+        \code{encoder\_n\_blocks} & $10$ \\
+        \multicolumn{2}{c}{DEKODER} \\ \hline
+        \code{decoder\_dim} & $256$ \\
+        \code{decoder\_n\_heads} & $4$ \\
+        \code{decoder\_n\_blocks} & $3$ \\
+        \multicolumn{2}{c}{TRENING} \\ \hline
+        \code{masking\_ratio} & $0.6$ \\
+        \code{chunks\_per\_item} & $10$ \\
+        \code{n\_epochs} & $500$ \\
+        \code{batch\_size} & $100$ \\
+        \code{lr} & $0.0002$ \\
+    \end{tabular}}
+\end{table}
+
 
