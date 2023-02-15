@@ -425,7 +425,13 @@ są dodatkowo:
     \item ciąg wystąpień akordów (\code{ChordOccurence}), o określonym czasie rozpoczęcia i
         zakończenia w sekundach (ciąg takich samych predykcji jest łączony w jedno wystąpienie
         akordu)
-    \item wartość miary CSR na podstawie ciągu wystąpień akordów
+    \item wartość miary CSR (ang. \emph{Chord Symbol Recall}) na podstawie
+        ciągu wystąpień akordów, która ma postać
+        \begin{displaymath}
+            \textrm{CSR} = \frac
+                        {\textrm{całkowity czas trwania poprawnie zaklasyfikowanych fragmentów}}
+                        {\textrm{całkowity czas trwania utworów}}
+        \end{displaymath}
     \item wartości miar klasyfikacyjnych, liczonych tak, że pojedyncza ramka jest traktowana, jak
         pojedyncza predykcja:
         \begin{itemize}
@@ -435,13 +441,7 @@ są dodatkowo:
             \item macierz pomyłek (ang. \emph{confusion matrix})
         \end{itemize}
 \end{itemize}
-Ciąg wystąpień akordów zapisywany jest w pliku \filetype{lab}, a wartości metryk CSR, dokładności,
-czułości, precyzji i macierz pomyłek w pliku \filetype{json}. Dodatkowo macierz pomyłek zapisywana
-jest jako obrazek w pliku \filetype{png}. Następnie wartości wszystkich tych miar są agregowane dla
-całego zbioru (CSR zamienia się na WCSR) i również zapisywane w plikach \filetype{json} i
-\filetype{png} (zapisywana na obrazku ,,globalna'' macierz pomyłek jest normalizowana wierszami,
-czyli wartości na głównej przekątnej są równoważne czułości modelu). Implementacja całej procedury
-ewaluacji modelu znajduje się w pliku \url{src/training/evaluate.py}.
+Ciąg wystąpień akordów zapisywany jest w pliku \filetype{lab}, a wartości metryk CSR, dokładności, czułości, precyzji i macierz pomyłek w pliku \filetype{json}. Dodatkowo macierz pomyłek zapisywana jest jako obrazek w pliku \filetype{png}. Następnie wartości wszystkich tych miar są agregowane dla całego zbioru i również zapisywane w plikach \filetype{json} i \filetype{png}. Jeżeli chodzi o wartości miary CSR, to aby zagregować ją dla wszystkich utworów liczy się średnią ważoną, gdzie wagą jest długość trwania utworu --- miara ta nazywa się wtedy WCSR (ang. \emph{Weighted Chord Symboll Recall}). Co do zapisywanej na obrazku ,,globalnej'' macierzy pomyłek, to jest ona normalizowana wierszami, czyli wartości na głównej przekątnej są równoważne czułości modelu dla danej klasy. Implementacja całej procedury ewaluacji modelu znajduje się w pliku \url{src/training/evaluate.py}.
 
 % problem podwójnego wykorzystania zbioru walidacyjnego + uzasadnienie wykorzystania walidacji krzyżowej
 Jak można zauważyć, część walidacyjna jest w pojedynczym treningu wykorzystywana na dwa sprzeczne
