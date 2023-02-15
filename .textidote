@@ -1,0 +1,4 @@
+--dict .textidote_dict.txt
+--replace .textidote_replacements.txt
+--ignore sh:stacked,sh:secskip,sh:seclen
+--remove-macros tableofcontents,listoffigures,listoftables
