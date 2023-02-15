@@ -1,0 +1,5 @@
+pomysły i usprawnienia na przyszłość dotyczące pretreningu:
+- po prostu MAE a la ViT
+- maskowanie w latentnej
+- contrastive (rozróżnianie utworów - utwór to klasa)
+- działanie na surowych danych zamiast na CQT
