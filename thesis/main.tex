@@ -7,6 +7,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage{musicography}
 
 \author{Jan Karwowski}
 \title{Nienadzorowane uczenie sieci neuronowych w zadaniu rozpoznawania akordów muzycznych}
@@ -19,6 +20,11 @@
 \newcommand{\filetype}[1]{\texttt{#1}}
 \renewcommand{\matrix}[1]{\ensuremath{\boldsymbol{#1}}}
 \newcommand{\defmatrix}[3]{\ensuremath{\matrix{#1} \in \mathbb{R}^{#2 \times #3}}}
+
+\AtBeginDocument{%
+  \renewcommand\tablename{Tabela}
+}
+
 
 \begin{document}
 
