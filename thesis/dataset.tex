@@ -14,6 +14,7 @@ W ramach niniejszej pracy, ze względu na ograniczoną ilość danych oznaczonyc
 
 % od początku do uzyskania wszystkich oznaczeń ('data/chordlab') oraz pierwszego indeksu (skrypt 01)
 \section{Pozyskanie zbiorów danych z oznaczeniami akordów}
+\sectionmark{Pozyskanie oznaczeń akordów}
 
 % trudno o dane oznaczone w ACR
 Ze względu na powszechną dostępność dużej ilości danych w Internecie, zgromadzenie zbioru danych nieoznaczonych nie stanowiło szczególnego problemu. Znacznie trudniejsze okazało się zgromadzenie zbioru danych oznaczonych. Zadanie rozpoznawania akordów muzycznych, mimo iż będące jednym z głównych zadań z dziedziny MIR, jest jednak bardzo mało popularne w stosunku do takich zadań jak klasyfikacja, czy segmentacja obrazów. Jest to również po prostu znacznie mniej przydatne w życiu codziennym i znacznie mniej się w tę dziedzinę inwestuje. Ponadto przygotowanie oznaczeń akordów do utworów muzycznych wymaga specjalistycznej wiedzy muzycznej, praktyki muzycznej i dużo czasu. Oznaczenia powstałe w ten sposób nadal pozostają subiektywne i będą się często różnić, w zależności od osoby, która utwory oznaczała. Wszystkie wymienione powody są przyczyną tego, że nie przygotowano więcej niż kilka publicznie dostępnych zbiorów oznaczeń akordów muzycznych, które mogą zostać wykorzystane do treningu modeli uczenia maszynowego.
@@ -145,6 +146,7 @@ W sumie wszystkich plików z oznaczeniami udało się zgromadzić 1380. Po etapi
 
 % annotation parser i implementacja WCSR
 \section{Model akordów muzycznych i parsowanie plików z oznaczeniami} \label{section:chord_model}
+\sectionmark{Model akordów muzycznych}
 
 % potrzeba parsowania - wstęp
 Po zgromadzeniu, oczyszczeniu i zindeksowaniu zbiorów z oznaczeniami akordów, należało przygotować skrypty parsujące pliki z tymi oznaczeniami. Wszystkie znalezione zbiory oznaczeń, z wyjątkiem jednego, są w formacie \filetype{lab}, który to format został opracowany w \cite{harte_towards_nodate}.  Jest to format bardzo przemyślany i dopracowany, którego użycie przez wielu niezależnych badaczy potwierdza, że sprawdza się on jako standard. Drugi format, znacznie mniej usystematyzowany, opracowany został na potrzeby zbioru RS200, gdzie autorzy przygotowali własny sposób oznaczania akordów. Aby na końcu wykorzystać zarówno oznaczenia, jak i nagrania muzyczne do treningu sieci neuronowych, trzeba przetłumaczyć pliki tekstowe z oznaczeniami, na odpowiednią, zrozumiałą dla komputera strukturę danych. W ramach tego podrozdziału opisana zostanie najpierw ta struktura, a następnie algorytm parsowania obu dostępnych formatów oznaczeń akordów. Skrypty pythonowe, które realizują zadanie tłumaczenia oznaczeń w formacie plików tekstowych na odpowiednią strukturę danych, umieszczone zostały w module \url{src/annotation_parser}.
@@ -230,6 +232,7 @@ Jeżeli chodzi o parsowanie plików z oznaczeniami dla zbioru RS200, to równie�
 
 % skrypt evaluation, downloading, 02, 03 i 05 - znalezienie i pobranie najlepiej pasujących nagrań muzycznych
 \section{Pozyskanie plików z nagraniami muzycznymi pasującymi do oznaczeń}
+\sectionmark{Pozyskanie nagrań muzycznych}
 
 % to jest problem generalnie
 Znalezienie odpowiednich plików z nagraniami muzycznymi stanowiło jeden z głównych problemów, rozwiązywanych w ramach niniejszej pracy. Jest to problem, z którym mierzyli się również twórcy poprzednich rozwiązań, ponieważ tak jak wspomniano wcześniej, nieliczne zbiory oznaczeń akordów dostarczane są zazwyczaj bez nagrań muzycznych, ze względu na prawa autorskie muzyków (wyjątkiem jest oczyszczony z praw autorskich zbiór RWC POP).
@@ -367,6 +370,7 @@ Mając już wybrane, które konkretnie utwory będą wykorzystywane do eksperyme
 
 
 \section{Wyszukiwanie utworów bez oznaczeń z rankingów magazynu Billboard}
+\sectionmark{Wyszukiwanie utworów bez oznaczeń}
 
 % TODO: statystyki o zbiorze nieoznaczonym
 % wstęp

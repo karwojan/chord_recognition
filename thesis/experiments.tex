@@ -345,6 +345,7 @@ Wykonane zostały dwa treningi większego modelu, z dwoma różnymi wartościami
 
 
 \section{Etap 4: Samonadzorowany trening wstępny --- pierwsze podejście}
+\sectionmark{Etap 4: Samonadzorowany trening wstępny}
 
 % mae1 - hiperparametry
 Gratulacje dla wszystkich czytelników, którzy dotarli do tego miejsca. W tym podrozdziale zaprezentowane zostały wyniki pierwszego samonadzorowanego treningu wstępnego i uzyskana korzyść dla zadania rozpoznawania akordów. Etap ten składa się więc z jednego treningu nienadzorowanego i jednego treningu nadzorowanego. Jeżeli chodzi o trening nienadzorowany, to wszystkie hiperparametry zaprezentowane są w tabeli \ref{tab:params_mae1}. Jak widać, hiperparametry enkodera są dokładnie takie same jak hiperparametry powiększonego modelu z poprzedniego etapu. Hiperparametry dekodera różnią się natomiast jedynie liczbą bloków --- jest ich tylko $3$ (lub aż, trudno to ocenić). 
@@ -456,6 +457,7 @@ Tabela \ref{tab:results_medium-transformer-mae1-finetuning} prezentuje wyniki ek
 
 
 \section{Etap 5: Samonadzorowany trening wstępny --- drugie podejście}
+\sectionmark{Etap 5: Samonadzorowany trening wstępny}
 
 % mae2 - hiperparametry
 Ze względu na ograniczone zasoby i czas wykonany został jeszcze tylko jeden trening nienadzorowany. Różni się on od poprzedniego zasadą maskowania spektrogramów. Tym razem wycinanych było mniej, ale dłuższych fragmentów --- $6$ ciągłych bloków po $10$ ramek z pojedynczego $100$-ramkowego fragmentu. Wydłużenie brakujących fragmentów ma zmusić model do głębszego wniknięcia i zrozumienia przetwarzanych utworów, które jest niezbędne, aby poprawnie uzupełnić dłuższe, zamaskowane ciągi ramek. Z drugiej strony, zmniejszenie proporcji maskowania ma uczynić to zadanie przede wszystkim wykonalnym. Wartości tych hiperparametrów nie były jednak dokładnie zbadane, ponieważ do tego trzeba by wykonać kilkadziesiąt pełnych treningów samonadzorowanych. Wybrana proporcja maskowania i liczba ramek w ciągłym bloku są więc głównie oparte na intuicji i prostych hipotezach, mogą więc okazać się jak najbardziej nieoptymalne. Poza tym wszystkie pozostałe hiperparametry treningu są dokładnie takie same jak w poprzednim etapie, co widać w tabeli \ref{tab:params_mae2}.

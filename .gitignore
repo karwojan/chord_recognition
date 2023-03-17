@@ -9,7 +9,7 @@ mlruns/
 *.fdb_latexmk
 *.fls
 *.log
-*.pdf
+main.pdf
 *.synctex.gz
 *.toc
 *.lof
