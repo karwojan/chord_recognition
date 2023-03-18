@@ -10,6 +10,9 @@
 \usepackage{musicography}
 \usepackage{pdfpages}
 
+\usepackage{biblatex,csquotes}
+\addbibresource{bibliography.bib}
+
 \author{Jan Karwowski}
 \title{Nienadzorowane uczenie sieci neuronowych w zadaniu rozpoznawania akordów muzycznych}
 \includeonly{introduction,music_theory,dataset,methodology,experiments,summary}
@@ -41,8 +44,7 @@
 \include{experiments}
 \include{summary}
 
-\bibliographystyle{plain}
-\bibliography{bibliography}
+\printbibliography
 
 \listoffigures
 \listoftables
