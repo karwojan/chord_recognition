@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: karwomagisterka-clone
+spec:
+  accessModes:
+    - ReadOnlyMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 300Gi
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: karwomagisterka
+
